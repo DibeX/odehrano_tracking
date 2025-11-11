@@ -1,12 +1,12 @@
-import { i18n } from '@lingui/core';
-import { en, cs } from 'make-plural/plurals';
+import { i18n } from "@lingui/core";
+import { en, cs } from "make-plural/plurals";
 
 export const locales = {
-  en: 'English',
-  cs: 'Čeština',
+  en: "English",
+  cs: "Čeština",
 };
 
-export const defaultLocale = 'en';
+export const defaultLocale = "en";
 
 i18n.loadLocaleData({
   en: { plurals: en },
@@ -19,7 +19,18 @@ i18n.loadLocaleData({
  * many ways how to load messages — from REST API, from file, from cache, etc.
  */
 export async function loadCatalog(locale: string) {
-  const { messages } = await import(`@/locales/${locale}/messages`);
+  const catalogs: Record<string, () => Promise<{ messages: any }>> = {
+    en: () => import("../locales/en.po"),
+    cs: () => import("../locales/cs.po"),
+  };
+
+  const catalog = catalogs[locale];
+  if (!catalog) {
+    console.warn(`Catalog for locale "${locale}" not found`);
+    return;
+  }
+
+  const { messages } = await catalog();
   i18n.load(locale, messages);
   i18n.activate(locale);
 }

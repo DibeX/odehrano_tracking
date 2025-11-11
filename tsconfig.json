@@ -16,8 +16,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["vite/client", "vinxi/types/client"]
+    "types": ["vite/client"]
   },
-  "include": ["src/**/*", "app.config.ts"],
-  "exclude": ["node_modules", ".vinxi", "dist"]
+  "include": ["src/**/*", "vite.config.ts", "lingui.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }

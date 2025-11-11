@@ -1,5 +1,5 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/router-devtools';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { I18nProvider } from '@lingui/react';
 import { i18n } from '@lingui/core';
 import { AuthProvider } from '@/contexts/auth-context';

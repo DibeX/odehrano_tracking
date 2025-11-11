@@ -1,0 +1,1082 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2025-11-11 23:27+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+
+#. placeholder {0}: game.comments.length
+#: src/routes/games/index.tsx
+msgid "{0} comment(s)"
+msgstr "{0} comment(s)"
+
+#. placeholder {0}: result.tieBreakInfo.firstPlaceVotes
+#: src/routes/results.tsx
+msgid "{0} first-place votes"
+msgstr "{0} first-place votes"
+
+#: src/routes/games/$gameId.tsx
+msgid "Add Comment"
+msgstr "Add Comment"
+
+#: src/routes/games/index.tsx
+msgid "Add First Game"
+msgstr "Add First Game"
+
+#: src/components/layout/header.tsx
+#: src/routes/dashboard.tsx
+msgid "Add Game"
+msgstr "Add Game"
+
+#: src/routes/games/index.tsx
+#: src/routes/games/new.tsx
+#: src/routes/games/new.tsx
+msgid "Add Game Session"
+msgstr "Add Game Session"
+
+#: src/routes/dashboard.tsx
+msgid "Add Played Game"
+msgstr "Add Played Game"
+
+#. placeholder {0}: game.creator?.nickname
+#: src/routes/games/$gameId.tsx
+msgid "Added by {0}"
+msgstr "Added by {0}"
+
+#: src/routes/games/$gameId.tsx
+#: src/routes/games/new.tsx
+msgid "Adding..."
+msgstr "Adding..."
+
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "Admin"
+msgstr "Admin"
+
+#: src/routes/admin/users.tsx
+msgid "All registered users"
+msgstr "All registered users"
+
+#: src/routes/login.tsx
+msgid "An error occurred"
+msgstr "An error occurred"
+
+#: src/routes/games/new.tsx
+msgid "Any notes about this game session..."
+msgstr "Any notes about this game session..."
+
+#: src/routes/login.tsx
+#: src/routes/login.tsx
+msgid "Back to login"
+msgstr "Back to login"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "BGG ID required"
+msgstr "BGG ID required"
+
+#. placeholder {0}: gameInfo.rank
+#: src/components/features/bgg-game-search.tsx
+msgid "BGG Rank: #{0}"
+msgstr "BGG Rank: #{0}"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "BoardGameGeek ID"
+msgstr "BoardGameGeek ID"
+
+#: src/routes/games/index.tsx
+msgid "Browse all game sessions"
+msgstr "Browse all game sessions"
+
+#: src/routes/results.tsx
+msgid "Calculating rankings..."
+msgstr "Calculating rankings..."
+
+#: src/routes/admin/users.tsx
+#: src/routes/games/new.tsx
+#: src/routes/rankings/manage.tsx
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/components/features/bgg-game-search.tsx
+#: src/routes/games/$gameId.tsx
+msgid "Categories:"
+msgstr "Categories:"
+
+#: src/routes/profile.tsx
+#: src/routes/profile.tsx
+msgid "Change Password"
+msgstr "Change Password"
+
+#: src/routes/profile.tsx
+msgid "Changing..."
+msgstr "Changing..."
+
+#: src/routes/login.tsx
+msgid "Check your email"
+msgstr "Check your email"
+
+#: src/routes/invite/$token.tsx
+msgid "Choose a password"
+msgstr "Choose a password"
+
+#: src/routes/rankings/$year.tsx
+msgid "Click to add to your rankings"
+msgstr "Click to add to your rankings"
+
+#: src/routes/games/$gameId.tsx
+msgid "Comment added"
+msgstr "Comment added"
+
+#: src/routes/games/$gameId.tsx
+msgid "Comments"
+msgstr "Comments"
+
+#: src/routes/rankings/manage.tsx
+msgid "Configure ranking years, deadlines, and visibility"
+msgstr "Configure ranking years, deadlines, and visibility"
+
+#: src/routes/profile.tsx
+msgid "Confirm new password"
+msgstr "Confirm new password"
+
+#: src/routes/profile.tsx
+msgid "Confirm New Password"
+msgstr "Confirm New Password"
+
+#: src/routes/invite/$token.tsx
+msgid "Confirm Password"
+msgstr "Confirm Password"
+
+#: src/routes/invite/$token.tsx
+msgid "Confirm your password"
+msgstr "Confirm your password"
+
+#: src/routes/profile.tsx
+msgid "Contact an admin to change your role"
+msgstr "Contact an admin to change your role"
+
+#: src/routes/admin/users.tsx
+msgid "Copy Link"
+msgstr "Copy Link"
+
+#: src/routes/rankings/manage.tsx
+msgid "Create"
+msgstr "Create"
+
+#: src/routes/invite/$token.tsx
+msgid "Create Account"
+msgstr "Create Account"
+
+#: src/routes/rankings/index.tsx
+msgid "Create Current Year"
+msgstr "Create Current Year"
+
+#: src/routes/admin/users.tsx
+msgid "Create Invitation"
+msgstr "Create Invitation"
+
+#: src/routes/rankings/manage.tsx
+msgid "Create Ranking Year"
+msgstr "Create Ranking Year"
+
+#: src/routes/rankings/manage.tsx
+msgid "Create Year"
+msgstr "Create Year"
+
+#. placeholder {0}: new Date().getFullYear()
+#: src/routes/rankings/index.tsx
+msgid "Create Year {0}"
+msgstr "Create Year {0}"
+
+#. placeholder {0}: new Date(year.created_at).toLocaleDateString()
+#: src/routes/rankings/manage.tsx
+msgid "Created {0}"
+msgstr "Created {0}"
+
+#: src/routes/invite/$token.tsx
+msgid "Creating account..."
+msgstr "Creating account..."
+
+#: src/routes/admin/users.tsx
+#: src/routes/rankings/manage.tsx
+msgid "Creating..."
+msgstr "Creating..."
+
+#: src/routes/games/new.tsx
+msgid "Custom Name (Optional)"
+msgstr "Custom Name (Optional)"
+
+#: src/routes/results.tsx
+msgid "Damped (Recommended)"
+msgstr "Damped (Recommended)"
+
+#: src/routes/games/new.tsx
+msgid "Date Played"
+msgstr "Date Played"
+
+#: src/routes/rankings/manage.tsx
+msgid "Deadline"
+msgstr "Deadline"
+
+#: src/routes/rankings/manage.tsx
+msgid "Deadline (Optional)"
+msgstr "Deadline (Optional)"
+
+#: src/routes/rankings/manage.tsx
+msgid "Deadline updated"
+msgstr "Deadline updated"
+
+#. placeholder {0}: new Date(year.deadline).toLocaleDateString()
+#. placeholder {0}: new Date(yearInfo.deadline).toLocaleDateString()
+#: src/routes/rankings/$year.tsx
+#: src/routes/rankings/index.tsx
+#: src/routes/rankings/manage.tsx
+msgid "Deadline: {0}"
+msgstr "Deadline: {0}"
+
+#: src/routes/profile.tsx
+msgid "Description"
+msgstr "Description"
+
+#: src/routes/rankings/$year.tsx
+msgid "Drag games to reorder your rankings"
+msgstr "Drag games to reorder your rankings"
+
+#: src/routes/dashboard.tsx
+msgid "Edit Profile"
+msgstr "Edit Profile"
+
+#: src/routes/admin/users.tsx
+#: src/routes/invite/$token.tsx
+#: src/routes/login.tsx
+#: src/routes/profile.tsx
+msgid "Email"
+msgstr "Email"
+
+#: src/routes/profile.tsx
+msgid "Email cannot be changed"
+msgstr "Email cannot be changed"
+
+#: src/routes/admin/users.tsx
+msgid "Email required"
+msgstr "Email required"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Enter BGG game ID (e.g., 174430)"
+msgstr "Enter BGG game ID (e.g., 174430)"
+
+#: src/routes/profile.tsx
+msgid "Enter new password"
+msgstr "Enter new password"
+
+#: src/routes/login.tsx
+msgid "Enter your credentials to access your account"
+msgstr "Enter your credentials to access your account"
+
+#: src/routes/login.tsx
+msgid "Enter your email to receive a password reset link"
+msgstr "Enter your email to receive a password reset link"
+
+#: src/routes/invite/$token.tsx
+msgid "Enter your nickname"
+msgstr "Enter your nickname"
+
+#: src/routes/results.tsx
+msgid "Equal per Player"
+msgstr "Equal per Player"
+
+#: src/routes/games/$gameId.tsx
+msgid "Error adding comment"
+msgstr "Error adding comment"
+
+#: src/routes/games/new.tsx
+msgid "Error adding game"
+msgstr "Error adding game"
+
+#: src/routes/results.tsx
+msgid "Error calculating results"
+msgstr "Error calculating results"
+
+#: src/routes/profile.tsx
+msgid "Error changing password"
+msgstr "Error changing password"
+
+#: src/routes/admin/users.tsx
+msgid "Error creating invitation"
+msgstr "Error creating invitation"
+
+#: src/routes/rankings/index.tsx
+#: src/routes/rankings/manage.tsx
+msgid "Error creating year"
+msgstr "Error creating year"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Error fetching game"
+msgstr "Error fetching game"
+
+#: src/routes/admin/users.tsx
+msgid "Error loading data"
+msgstr "Error loading data"
+
+#: src/routes/games/$gameId.tsx
+msgid "Error loading game"
+msgstr "Error loading game"
+
+#: src/routes/games/index.tsx
+msgid "Error loading games"
+msgstr "Error loading games"
+
+#: src/routes/rankings/$year.tsx
+msgid "Error loading rankings"
+msgstr "Error loading rankings"
+
+#: src/routes/games/new.tsx
+msgid "Error loading users"
+msgstr "Error loading users"
+
+#: src/routes/rankings/index.tsx
+#: src/routes/rankings/manage.tsx
+#: src/routes/results.tsx
+msgid "Error loading years"
+msgstr "Error loading years"
+
+#: src/routes/rankings/$year.tsx
+msgid "Error saving rankings"
+msgstr "Error saving rankings"
+
+#: src/routes/rankings/manage.tsx
+msgid "Error updating deadline"
+msgstr "Error updating deadline"
+
+#: src/routes/profile.tsx
+msgid "Error updating profile"
+msgstr "Error updating profile"
+
+#: src/routes/admin/users.tsx
+msgid "Error updating role"
+msgstr "Error updating role"
+
+#: src/routes/rankings/manage.tsx
+#: src/routes/rankings/manage.tsx
+msgid "Error updating year"
+msgstr "Error updating year"
+
+#. placeholder {0}: new Date(invitation.expires_at).toLocaleDateString()
+#: src/routes/admin/users.tsx
+msgid "Expires: {0}"
+msgstr "Expires: {0}"
+
+#: src/routes/invite/$token.tsx
+msgid "Failed to create account"
+msgstr "Failed to create account"
+
+#: src/routes/invite/$token.tsx
+msgid "Failed to load invitation"
+msgstr "Failed to load invitation"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Find the game ID on BoardGameGeek.com in the URL (e.g., /boardgame/174430/gloomhaven)"
+msgstr "Find the game ID on BoardGameGeek.com in the URL (e.g., /boardgame/174430/gloomhaven)"
+
+#: src/routes/login.tsx
+msgid "Forgot password?"
+msgstr "Forgot password?"
+
+#: src/routes/games/new.tsx
+msgid "Game added"
+msgstr "Game added"
+
+#: src/routes/games/new.tsx
+msgid "Game Details"
+msgstr "Game Details"
+
+#: src/routes/games/$gameId.tsx
+msgid "Game not found"
+msgstr "Game not found"
+
+#: src/routes/games/new.tsx
+msgid "Game required"
+msgstr "Game required"
+
+#: src/components/layout/header.tsx
+msgid "Games"
+msgstr "Games"
+
+#. placeholder {0}: yearInfo.year
+#: src/routes/rankings/$year.tsx
+msgid "Games You Played in {0}"
+msgstr "Games You Played in {0}"
+
+#: src/routes/invite/$token.tsx
+msgid "Go to Login"
+msgstr "Go to Login"
+
+#: src/routes/rankings/manage.tsx
+msgid "Hide Results"
+msgstr "Hide Results"
+
+#: src/routes/invite/$token.tsx
+msgid "Invalid Invitation"
+msgstr "Invalid Invitation"
+
+#: src/routes/admin/users.tsx
+msgid "Invitation created"
+msgstr "Invitation created"
+
+#: src/routes/admin/users.tsx
+msgid "Invitation link copied to clipboard"
+msgstr "Invitation link copied to clipboard"
+
+#: src/routes/admin/users.tsx
+msgid "Invitation link created for {inviteEmail}"
+msgstr "Invitation link created for {inviteEmail}"
+
+#: src/routes/admin/users.tsx
+msgid "Invitation links that haven't been used yet"
+msgstr "Invitation links that haven't been used yet"
+
+#: src/routes/admin/users.tsx
+msgid "Invite New User"
+msgstr "Invite New User"
+
+#: src/routes/admin/users.tsx
+msgid "Invite User"
+msgstr "Invite User"
+
+#: src/routes/results.tsx
+msgid "Linear by Experience"
+msgstr "Linear by Experience"
+
+#: src/routes/admin/users.tsx
+msgid "Link copied"
+msgstr "Link copied"
+
+#: src/routes/games/index.tsx
+msgid "Loading games..."
+msgstr "Loading games..."
+
+#: src/routes/invite/$token.tsx
+msgid "Loading invitation..."
+msgstr "Loading invitation..."
+
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+#: src/routes/games/$gameId.tsx
+#: src/routes/rankings/$year.tsx
+#: src/routes/rankings/index.tsx
+#: src/routes/rankings/manage.tsx
+#: src/routes/results.tsx
+msgid "Loading..."
+msgstr "Loading..."
+
+#: src/routes/rankings/manage.tsx
+msgid "Lock"
+msgstr "Lock"
+
+#: src/routes/rankings/index.tsx
+#: src/routes/rankings/manage.tsx
+msgid "Locked"
+msgstr "Locked"
+
+#: src/routes/login.tsx
+msgid "Login"
+msgstr "Login"
+
+#: src/routes/rankings/manage.tsx
+msgid "Manage Ranking Years"
+msgstr "Manage Ranking Years"
+
+#: src/routes/dashboard.tsx
+#: src/routes/rankings/index.tsx
+msgid "Manage Rankings"
+msgstr "Manage Rankings"
+
+#: src/routes/dashboard.tsx
+msgid "Manage Users"
+msgstr "Manage Users"
+
+#: src/routes/dashboard.tsx
+msgid "Manage users and invitations"
+msgstr "Manage users and invitations"
+
+#: src/routes/admin/users.tsx
+msgid "Manage users and send invitations"
+msgstr "Manage users and send invitations"
+
+#: src/routes/rankings/index.tsx
+msgid "Manage Years"
+msgstr "Manage Years"
+
+#: src/routes/profile.tsx
+msgid "Manage your account settings"
+msgstr "Manage your account settings"
+
+#: src/routes/dashboard.tsx
+msgid "Manage your tabletop gaming sessions and rankings"
+msgstr "Manage your tabletop gaming sessions and rankings"
+
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "Moderator"
+msgstr "Moderator"
+
+#: src/routes/dashboard.tsx
+msgid "My Games"
+msgstr "My Games"
+
+#: src/routes/dashboard.tsx
+#: src/routes/profile.tsx
+msgid "My Profile"
+msgstr "My Profile"
+
+#: src/routes/dashboard.tsx
+#: src/routes/rankings/index.tsx
+msgid "My Rankings"
+msgstr "My Rankings"
+
+#: src/routes/profile.tsx
+msgid "New Password"
+msgstr "New Password"
+
+#: src/routes/invite/$token.tsx
+#: src/routes/profile.tsx
+msgid "Nickname"
+msgstr "Nickname"
+
+#: src/routes/invite/$token.tsx
+msgid "Nickname is required"
+msgstr "Nickname is required"
+
+#: src/routes/games/$gameId.tsx
+msgid "No comments yet. Be the first to comment!"
+msgstr "No comments yet. Be the first to comment!"
+
+#: src/routes/rankings/$year.tsx
+msgid "No games ranked yet. Add games from below to start ranking."
+msgstr "No games ranked yet. Add games from below to start ranking."
+
+#: src/routes/games/index.tsx
+msgid "No games recorded yet"
+msgstr "No games recorded yet"
+
+#: src/routes/admin/users.tsx
+msgid "No pending invitations"
+msgstr "No pending invitations"
+
+#: src/routes/results.tsx
+msgid "No public results available yet"
+msgstr "No public results available yet"
+
+#: src/routes/rankings/index.tsx
+msgid "No ranking years available yet"
+msgstr "No ranking years available yet"
+
+#: src/routes/results.tsx
+msgid "No rankings data available for this year"
+msgstr "No rankings data available for this year"
+
+#: src/routes/admin/users.tsx
+msgid "No users found"
+msgstr "No users found"
+
+#: src/routes/games/index.tsx
+msgid "Note:"
+msgstr "Note:"
+
+#: src/routes/games/new.tsx
+msgid "Notes (Optional)"
+msgstr "Notes (Optional)"
+
+#: src/routes/games/$gameId.tsx
+msgid "Notes:"
+msgstr "Notes:"
+
+#: src/routes/rankings/manage.tsx
+msgid "Open"
+msgstr "Open"
+
+#: src/routes/rankings/index.tsx
+msgid "Open for submissions"
+msgstr "Open for submissions"
+
+#: src/routes/games/new.tsx
+msgid "Optional additional information"
+msgstr "Optional additional information"
+
+#. placeholder {0}: selectedGame.name
+#: src/routes/games/new.tsx
+msgid "Original name: {0}"
+msgstr "Original name: {0}"
+
+#. placeholder {0}: game.board_game.name
+#: src/routes/games/$gameId.tsx
+msgid "Original: {0}"
+msgstr "Original: {0}"
+
+#: src/routes/games/new.tsx
+msgid "Override the game name for this session"
+msgstr "Override the game name for this session"
+
+#: src/routes/invite/$token.tsx
+#: src/routes/login.tsx
+msgid "Password"
+msgstr "Password"
+
+#: src/routes/profile.tsx
+msgid "Password changed"
+msgstr "Password changed"
+
+#: src/routes/invite/$token.tsx
+#: src/routes/profile.tsx
+msgid "Password must be at least 8 characters long"
+msgstr "Password must be at least 8 characters long"
+
+#: src/routes/profile.tsx
+msgid "Password too short"
+msgstr "Password too short"
+
+#: src/routes/invite/$token.tsx
+#: src/routes/profile.tsx
+msgid "Passwords do not match"
+msgstr "Passwords do not match"
+
+#: src/routes/admin/users.tsx
+msgid "Pending Invitations"
+msgstr "Pending Invitations"
+
+#: src/routes/games/index.tsx
+msgid "Played Games"
+msgstr "Played Games"
+
+#. placeholder {0}: formatDate(game.played_at)
+#: src/routes/games/$gameId.tsx
+#: src/routes/games/index.tsx
+msgid "Played on {0}"
+msgstr "Played on {0}"
+
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "Player"
+msgstr "Player"
+
+#: src/routes/results.tsx
+msgid "Player Rankings:"
+msgstr "Player Rankings:"
+
+#: src/routes/games/new.tsx
+msgid "Players"
+msgstr "Players"
+
+#: src/routes/games/new.tsx
+msgid "Players required"
+msgstr "Players required"
+
+#: src/routes/games/$gameId.tsx
+#: src/routes/games/index.tsx
+msgid "Players:"
+msgstr "Players:"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Please enter a BoardGameGeek game ID"
+msgstr "Please enter a BoardGameGeek game ID"
+
+#: src/routes/admin/users.tsx
+msgid "Please enter an email address"
+msgstr "Please enter an email address"
+
+#: src/routes/profile.tsx
+msgid "Please make sure your passwords match"
+msgstr "Please make sure your passwords match"
+
+#: src/routes/games/new.tsx
+msgid "Please select a game from BoardGameGeek"
+msgstr "Please select a game from BoardGameGeek"
+
+#: src/routes/games/new.tsx
+msgid "Please select at least one player"
+msgstr "Please select at least one player"
+
+#: src/routes/login.tsx
+msgid "Please wait..."
+msgstr "Please wait..."
+
+#: src/routes/rankings/manage.tsx
+msgid "Private"
+msgstr "Private"
+
+#: src/routes/profile.tsx
+msgid "Profile Information"
+msgstr "Profile Information"
+
+#: src/routes/profile.tsx
+msgid "Profile updated"
+msgstr "Profile updated"
+
+#: src/routes/rankings/manage.tsx
+msgid "Public"
+msgstr "Public"
+
+#: src/routes/rankings/manage.tsx
+msgid "Publish Results"
+msgstr "Publish Results"
+
+#. placeholder {0}: rankedGames.length
+#: src/routes/rankings/$year.tsx
+msgid "Rank 1 = Most Favorite, Rank {0} = Least Favorite"
+msgstr "Rank 1 = Most Favorite, Rank {0} = Least Favorite"
+
+#: src/routes/dashboard.tsx
+#: src/routes/rankings/index.tsx
+msgid "Rank your favorite games by year"
+msgstr "Rank your favorite games by year"
+
+#: src/routes/rankings/manage.tsx
+msgid "Ranking deadline has been updated"
+msgstr "Ranking deadline has been updated"
+
+#: src/routes/results.tsx
+msgid "Ranking Results"
+msgstr "Ranking Results"
+
+#: src/routes/results.tsx
+msgid "Ranking Scheme"
+msgstr "Ranking Scheme"
+
+#: src/routes/rankings/index.tsx
+msgid "Ranking year {currentYear} has been created"
+msgstr "Ranking year {currentYear} has been created"
+
+#: src/routes/rankings/manage.tsx
+msgid "Ranking year has been created successfully"
+msgstr "Ranking year has been created successfully"
+
+#: src/components/layout/header.tsx
+msgid "Rankings"
+msgstr "Rankings"
+
+#: src/routes/rankings/$year.tsx
+msgid "Rankings are locked"
+msgstr "Rankings are locked"
+
+#: src/routes/rankings/manage.tsx
+msgid "Rankings are now locked from editing"
+msgstr "Rankings are now locked from editing"
+
+#. placeholder {0}: yearInfo.year
+#: src/routes/rankings/$year.tsx
+msgid "Rankings for {0}"
+msgstr "Rankings for {0}"
+
+#: src/routes/rankings/$year.tsx
+msgid "Rankings saved"
+msgstr "Rankings saved"
+
+#. placeholder {0}: gameInfo.rating
+#: src/components/features/bgg-game-search.tsx
+msgid "Rating: {0}/10"
+msgstr "Rating: {0}/10"
+
+#: src/routes/dashboard.tsx
+msgid "Record a new game session"
+msgstr "Record a new game session"
+
+#: src/routes/games/new.tsx
+msgid "Record a new tabletop game session"
+msgstr "Record a new tabletop game session"
+
+#: src/routes/rankings/$year.tsx
+msgid "Remove"
+msgstr "Remove"
+
+#: src/routes/login.tsx
+msgid "Reset Password"
+msgstr "Reset Password"
+
+#: src/components/layout/header.tsx
+#: src/routes/dashboard.tsx
+msgid "Results"
+msgstr "Results"
+
+#: src/routes/rankings/manage.tsx
+msgid "Results are no longer visible to players"
+msgstr "Results are no longer visible to players"
+
+#: src/routes/rankings/manage.tsx
+msgid "Results are now visible to all players"
+msgstr "Results are now visible to all players"
+
+#: src/routes/rankings/manage.tsx
+msgid "Results hidden"
+msgstr "Results hidden"
+
+#: src/routes/rankings/index.tsx
+msgid "Results Public"
+msgstr "Results Public"
+
+#: src/routes/rankings/manage.tsx
+msgid "Results published"
+msgstr "Results published"
+
+#: src/routes/results.tsx
+msgid "Results will appear here once an admin publishes them"
+msgstr "Results will appear here once an admin publishes them"
+
+#: src/routes/admin/users.tsx
+#: src/routes/profile.tsx
+msgid "Role"
+msgstr "Role"
+
+#: src/routes/admin/users.tsx
+msgid "Role updated"
+msgstr "Role updated"
+
+#. placeholder {0}: invitation.role
+#: src/routes/admin/users.tsx
+msgid "Role: {0}"
+msgstr "Role: {0}"
+
+#: src/routes/profile.tsx
+msgid "Save Changes"
+msgstr "Save Changes"
+
+#: src/routes/rankings/$year.tsx
+msgid "Save Rankings"
+msgstr "Save Rankings"
+
+#: src/routes/profile.tsx
+#: src/routes/rankings/$year.tsx
+msgid "Saving..."
+msgstr "Saving..."
+
+#: src/routes/games/new.tsx
+#: src/routes/results.tsx
+msgid "Score"
+msgstr "Score"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Search"
+msgstr "Search"
+
+#: src/routes/games/new.tsx
+msgid "Search for the game on BoardGameGeek"
+msgstr "Search for the game on BoardGameGeek"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Searching..."
+msgstr "Searching..."
+
+#: src/routes/games/new.tsx
+msgid "Select Game"
+msgstr "Select Game"
+
+#: src/routes/games/new.tsx
+msgid "Select who played and add their scores"
+msgstr "Select who played and add their scores"
+
+#: src/routes/admin/users.tsx
+msgid "Send an invitation link to a new user. The link will expire in 14 days."
+msgstr "Send an invitation link to a new user. The link will expire in 14 days."
+
+#: src/routes/login.tsx
+msgid "Send reset link"
+msgstr "Send reset link"
+
+#: src/routes/admin/users.tsx
+msgid "Send this link to the user. It expires in 14 days."
+msgstr "Send this link to the user. It expires in 14 days."
+
+#: src/routes/rankings/manage.tsx
+msgid "Set up a new year for game rankings"
+msgstr "Set up a new year for game rankings"
+
+#: src/routes/invite/$token.tsx
+msgid "Set Up Your Account"
+msgstr "Set Up Your Account"
+
+#: src/routes/games/$gameId.tsx
+msgid "Share your thoughts about this game session"
+msgstr "Share your thoughts about this game session"
+
+#: src/routes/login.tsx
+msgid "Sign in"
+msgstr "Sign in"
+
+#: src/components/layout/header.tsx
+msgid "Sign Out"
+msgstr "Sign Out"
+
+#: src/components/layout/header.tsx
+msgid "Tabletop Tracker"
+msgstr "Tabletop Tracker"
+
+#: src/routes/profile.tsx
+msgid "Tell us about yourself..."
+msgstr "Tell us about yourself..."
+
+#: src/routes/games/new.tsx
+msgid "The game session has been recorded successfully"
+msgstr "The game session has been recorded successfully"
+
+#: src/routes/invite/$token.tsx
+msgid "This invitation link is invalid or has expired"
+msgstr "This invitation link is invalid or has expired"
+
+#: src/routes/invite/$token.tsx
+msgid "This name will be visible to other users"
+msgstr "This name will be visible to other users"
+
+#: src/routes/rankings/manage.tsx
+msgid "Unlock"
+msgstr "Unlock"
+
+#: src/routes/profile.tsx
+msgid "Update your password"
+msgstr "Update your password"
+
+#: src/routes/profile.tsx
+msgid "Update your personal information"
+msgstr "Update your personal information"
+
+#: src/routes/dashboard.tsx
+msgid "Update your profile information"
+msgstr "Update your profile information"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Use This Game"
+msgstr "Use This Game"
+
+#: src/routes/admin/users.tsx
+#: src/routes/dashboard.tsx
+msgid "User Management"
+msgstr "User Management"
+
+#: src/routes/admin/users.tsx
+msgid "User role has been updated successfully"
+msgstr "User role has been updated successfully"
+
+#: src/routes/admin/users.tsx
+msgid "user@example.com"
+msgstr "user@example.com"
+
+#: src/components/layout/header.tsx
+#: src/routes/admin/users.tsx
+msgid "Users"
+msgstr "Users"
+
+#: src/routes/rankings/manage.tsx
+msgid "Users can now edit their rankings"
+msgstr "Users can now edit their rankings"
+
+#: src/routes/dashboard.tsx
+msgid "View and manage your played games"
+msgstr "View and manage your played games"
+
+#: src/routes/results.tsx
+msgid "View calculated game rankings based on player votes"
+msgstr "View calculated game rankings based on player votes"
+
+#: src/routes/dashboard.tsx
+msgid "View community game rankings"
+msgstr "View community game rankings"
+
+#: src/routes/games/index.tsx
+msgid "View Details"
+msgstr "View Details"
+
+#: src/routes/dashboard.tsx
+msgid "View Games"
+msgstr "View Games"
+
+#: src/routes/rankings/index.tsx
+msgid "View Rankings"
+msgstr "View Rankings"
+
+#: src/routes/dashboard.tsx
+#: src/routes/rankings/index.tsx
+msgid "View Results"
+msgstr "View Results"
+
+#: src/routes/rankings/$year.tsx
+msgid "View your final rankings"
+msgstr "View your final rankings"
+
+#: src/routes/login.tsx
+msgid "We've sent you a password reset link. Please check your email and follow the instructions."
+msgstr "We've sent you a password reset link. Please check your email and follow the instructions."
+
+#. placeholder {0}: user?.nickname
+#: src/routes/dashboard.tsx
+msgid "Welcome back, {0}!"
+msgstr "Welcome back, {0}!"
+
+#: src/routes/games/new.tsx
+msgid "Winner"
+msgstr "Winner"
+
+#: src/routes/games/$gameId.tsx
+msgid "Write a comment..."
+msgstr "Write a comment..."
+
+#: src/routes/rankings/manage.tsx
+#: src/routes/results.tsx
+msgid "Year"
+msgstr "Year"
+
+#: src/routes/rankings/index.tsx
+#: src/routes/rankings/manage.tsx
+msgid "Year created"
+msgstr "Year created"
+
+#: src/routes/rankings/manage.tsx
+msgid "Year locked"
+msgstr "Year locked"
+
+#: src/routes/rankings/$year.tsx
+msgid "Year not found"
+msgstr "Year not found"
+
+#: src/routes/games/$gameId.tsx
+msgid "Year Published:"
+msgstr "Year Published:"
+
+#: src/routes/rankings/manage.tsx
+msgid "Year unlocked"
+msgstr "Year unlocked"
+
+#. placeholder {0}: gameInfo.yearPublished
+#. placeholder {0}: result.game.year_published
+#: src/components/features/bgg-game-search.tsx
+#: src/routes/results.tsx
+msgid "Year: {0}"
+msgstr "Year: {0}"
+
+#. placeholder {0}: invitation?.role
+#: src/routes/invite/$token.tsx
+msgid "You've been invited to join as a {0}"
+msgstr "You've been invited to join as a {0}"
+
+#: src/routes/login.tsx
+msgid "you@example.com"
+msgstr "you@example.com"
+
+#: src/routes/games/$gameId.tsx
+msgid "Your comment has been added successfully"
+msgstr "Your comment has been added successfully"
+
+#: src/routes/profile.tsx
+msgid "Your password has been changed successfully"
+msgstr "Your password has been changed successfully"
+
+#: src/routes/profile.tsx
+msgid "Your profile has been updated successfully"
+msgstr "Your profile has been updated successfully"
+
+#: src/routes/rankings/$year.tsx
+msgid "Your Rankings"
+msgstr "Your Rankings"
+
+#: src/routes/rankings/$year.tsx
+msgid "Your rankings have been saved successfully"
+msgstr "Your rankings have been saved successfully"

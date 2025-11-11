@@ -294,9 +294,12 @@ CREATE POLICY "Admins and moderators can manage all rankings" ON user_game_ranki
 
 -- Function to create user profile on signup
 CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-  INSERT INTO users (id, email, nickname, role)
+  INSERT INTO public.users (id, email, nickname, role)
   VALUES (
     NEW.id,
     NEW.email,
@@ -304,8 +307,12 @@ BEGIN
     COALESCE((NEW.raw_user_meta_data->>'role')::user_role, 'player')
   );
   RETURN NEW;
+EXCEPTION
+  WHEN unique_violation THEN
+    -- If user already exists, just return NEW
+    RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
 
 -- Trigger to create user profile on signup
 CREATE TRIGGER on_auth_user_created
