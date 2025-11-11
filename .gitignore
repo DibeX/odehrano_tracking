@@ -39,3 +39,6 @@ lerna-debug.log*
 
 # Lingui
 src/locales/**/*.js
+
+# Tanstack
+.tanstack
