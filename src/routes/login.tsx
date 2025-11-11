@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
+import { Trans, t } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +13,7 @@ export const Route = createFileRoute('/login')({
 });
 
 function LoginPage() {
+  const { _ } = useLingui();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -37,7 +40,7 @@ function LoginPage() {
         navigate({ to: '/dashboard' });
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      setError(err.message || _(t`An error occurred`));
     } finally {
       setLoading(false);
     }
@@ -48,9 +51,11 @@ function LoginPage() {
       <div className="flex min-h-screen items-center justify-center bg-background p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Check your email</CardTitle>
+            <CardTitle>
+              <Trans>Check your email</Trans>
+            </CardTitle>
             <CardDescription>
-              We've sent you a password reset link. Please check your email and follow the instructions.
+              <Trans>We've sent you a password reset link. Please check your email and follow the instructions.</Trans>
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -63,7 +68,7 @@ function LoginPage() {
               variant="outline"
               className="w-full"
             >
-              Back to login
+              <Trans>Back to login</Trans>
             </Button>
           </CardContent>
         </Card>
@@ -75,21 +80,25 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>{resetMode ? 'Reset Password' : 'Login'}</CardTitle>
+          <CardTitle>
+            {resetMode ? <Trans>Reset Password</Trans> : <Trans>Login</Trans>}
+          </CardTitle>
           <CardDescription>
             {resetMode
-              ? 'Enter your email to receive a password reset link'
-              : 'Enter your credentials to access your account'}
+              ? <Trans>Enter your email to receive a password reset link</Trans>
+              : <Trans>Enter your credentials to access your account</Trans>}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">
+                <Trans>Email</Trans>
+              </Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={_(t`you@example.com`)}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -99,7 +108,9 @@ function LoginPage() {
 
             {!resetMode && (
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">
+                  <Trans>Password</Trans>
+                </Label>
                 <Input
                   id="password"
                   type="password"
@@ -119,7 +130,7 @@ function LoginPage() {
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Please wait...' : resetMode ? 'Send reset link' : 'Sign in'}
+              {loading ? <Trans>Please wait...</Trans> : resetMode ? <Trans>Send reset link</Trans> : <Trans>Sign in</Trans>}
             </Button>
 
             <Button
@@ -132,7 +143,7 @@ function LoginPage() {
               }}
               disabled={loading}
             >
-              {resetMode ? 'Back to login' : 'Forgot password?'}
+              {resetMode ? <Trans>Back to login</Trans> : <Trans>Forgot password?</Trans>}
             </Button>
           </form>
         </CardContent>
