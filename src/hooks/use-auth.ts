@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
-import type { User } from '@/types';
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
+import type { User } from "@/types";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -38,15 +38,15 @@ export function useAuth() {
   async function fetchUserProfile(userId: string) {
     try {
       const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
+        .from("users")
+        .select("*")
+        .eq("id", userId)
         .single();
 
       if (error) throw error;
       setUser(data);
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error("Error fetching user profile:", error);
       setUser(null);
     } finally {
       setLoading(false);
@@ -80,10 +80,11 @@ export function useAuth() {
     return { data, error };
   }
 
-  function hasRole(role: 'admin' | 'moderator' | 'player'): boolean {
+  function hasRole(role: "admin" | "moderator" | "player"): boolean {
     if (!user) return false;
-    if (role === 'admin') return user.role === 'admin';
-    if (role === 'moderator') return user.role === 'admin' || user.role === 'moderator';
+    if (role === "admin") return user.role === "admin";
+    if (role === "moderator")
+      return user.role === "admin" || user.role === "moderator";
     return true; // Everyone is at least a player
   }
 
@@ -96,7 +97,7 @@ export function useAuth() {
     resetPassword,
     updatePassword,
     hasRole,
-    isAdmin: hasRole('admin'),
-    isModerator: hasRole('moderator'),
+    isAdmin: hasRole("admin"),
+    isModerator: hasRole("moderator"),
   };
 }

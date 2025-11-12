@@ -1,4 +1,4 @@
-import { createRootRoute, Outlet } from '@tanstack/react-router';
+import { createRootRoute, Outlet, Scripts, HeadContent } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { I18nProvider } from '@lingui/react';
 import { i18n } from '@lingui/core';
@@ -13,12 +13,20 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <I18nProvider i18n={i18n}>
-      <AuthProvider>
-        <Outlet />
-        <Toaster />
-        {import.meta.env.DEV && <TanStackRouterDevtools />}
-      </AuthProvider>
-    </I18nProvider>
+    <html>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <I18nProvider i18n={i18n}>
+          <AuthProvider>
+            <Outlet />
+            <Toaster />
+            {import.meta.env.DEV && <TanStackRouterDevtools />}
+          </AuthProvider>
+        </I18nProvider>
+        <Scripts />
+      </body>
+    </html>
   );
 }

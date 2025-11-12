@@ -12,7 +12,11 @@ export default defineConfig({
     },
   },
   plugins: [
-    tanstackStart(),
+    tanstackStart({
+      spa: {
+        enabled: true,
+      },
+    }),
     // react's vite plugin must come after start's vite plugin
     viteReact({
       babel: {

@@ -42,3 +42,4 @@ src/locales/**/*.js
 
 # Tanstack
 .tanstack
+nul

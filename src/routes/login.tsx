@@ -1,22 +1,28 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
-import { Trans, t } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/hooks/use-auth';
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { Trans, t } from "@lingui/macro";
+import { useLingui } from "@lingui/react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useAuth } from "@/hooks/use-auth";
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute("/login")({
   component: LoginPage,
 });
 
 function LoginPage() {
   const { _ } = useLingui();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [resetMode, setResetMode] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
@@ -26,7 +32,7 @@ function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
@@ -35,11 +41,23 @@ function LoginPage() {
         if (error) throw error;
         setResetSuccess(true);
       } else {
-        const { error } = await signIn(email, password);
-        if (error) throw error;
-        navigate({ to: '/dashboard' });
+        const { data, error } = await signIn(email, password);
+
+        if (error) {
+          throw error;
+        }
+
+        // Wait for auth state to update before navigating
+        if (data?.session) {
+          // Small delay to ensure auth state is propagated
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          navigate({ to: "/dashboard" });
+        } else {
+          console.warn("🟡 No session in response");
+        }
       }
     } catch (err: any) {
+      console.error("🔴 Login error:", err);
       setError(err.message || _(t`An error occurred`));
     } finally {
       setLoading(false);
@@ -55,7 +73,10 @@ function LoginPage() {
               <Trans>Check your email</Trans>
             </CardTitle>
             <CardDescription>
-              <Trans>We've sent you a password reset link. Please check your email and follow the instructions.</Trans>
+              <Trans>
+                We've sent you a password reset link. Please check your email
+                and follow the instructions.
+              </Trans>
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -63,7 +84,7 @@ function LoginPage() {
               onClick={() => {
                 setResetMode(false);
                 setResetSuccess(false);
-                setEmail('');
+                setEmail("");
               }}
               variant="outline"
               className="w-full"
@@ -84,9 +105,11 @@ function LoginPage() {
             {resetMode ? <Trans>Reset Password</Trans> : <Trans>Login</Trans>}
           </CardTitle>
           <CardDescription>
-            {resetMode
-              ? <Trans>Enter your email to receive a password reset link</Trans>
-              : <Trans>Enter your credentials to access your account</Trans>}
+            {resetMode ? (
+              <Trans>Enter your email to receive a password reset link</Trans>
+            ) : (
+              <Trans>Enter your credentials to access your account</Trans>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -130,7 +153,13 @@ function LoginPage() {
             )}
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Trans>Please wait...</Trans> : resetMode ? <Trans>Send reset link</Trans> : <Trans>Sign in</Trans>}
+              {loading ? (
+                <Trans>Please wait...</Trans>
+              ) : resetMode ? (
+                <Trans>Send reset link</Trans>
+              ) : (
+                <Trans>Sign in</Trans>
+              )}
             </Button>
 
             <Button
@@ -139,11 +168,15 @@ function LoginPage() {
               className="w-full"
               onClick={() => {
                 setResetMode(!resetMode);
-                setError('');
+                setError("");
               }}
               disabled={loading}
             >
-              {resetMode ? <Trans>Back to login</Trans> : <Trans>Forgot password?</Trans>}
+              {resetMode ? (
+                <Trans>Back to login</Trans>
+              ) : (
+                <Trans>Forgot password?</Trans>
+              )}
             </Button>
           </form>
         </CardContent>

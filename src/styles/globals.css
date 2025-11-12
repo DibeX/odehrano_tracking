@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@layer base {
+@layer {
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
@@ -46,3 +46,12 @@
     --ring: 224.3 76.3% 48%;
   }
 }
+
+/* @layer base {
+  * {
+    @apply border-red;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+} */
