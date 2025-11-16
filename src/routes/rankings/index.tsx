@@ -1,17 +1,24 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
-import { Trans, t } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
-import { requireAuth } from '@/lib/auth-helpers';
-import { useAuthContext } from '@/contexts/auth-context';
-import { AppLayout } from '@/components/layout/app-layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import type { RankingYear } from '@/types';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { requireAuth } from "@/lib/auth-helpers";
+import { useAuthContext } from "@/contexts/auth-context";
+import { AppLayout } from "@/components/layout/app-layout";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import type { RankingYear } from "@/types";
 
-export const Route = createFileRoute('/rankings/')({
+export const Route = createFileRoute("/rankings/")({
   component: RankingsPage,
   beforeLoad: async () => {
     await requireAuth();
@@ -33,9 +40,9 @@ function RankingsPage() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('ranking_years')
-        .select('*')
-        .order('year', { ascending: false });
+        .from("ranking_years")
+        .select("*")
+        .order("year", { ascending: false });
 
       if (error) throw error;
       setYears(data || []);
@@ -43,7 +50,7 @@ function RankingsPage() {
       toast({
         title: _(t`Error loading years`),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -54,13 +61,11 @@ function RankingsPage() {
     const currentYear = new Date().getFullYear();
 
     try {
-      const { error } = await supabase
-        .from('ranking_years')
-        .insert({
-          year: currentYear,
-          is_locked: false,
-          is_public: false,
-        });
+      const { error } = await supabase.from("ranking_years").insert({
+        year: currentYear,
+        is_locked: false,
+        is_public: false,
+      });
 
       if (error) throw error;
 
@@ -74,7 +79,7 @@ function RankingsPage() {
       toast({
         title: _(t`Error creating year`),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   }
@@ -117,7 +122,7 @@ function RankingsPage() {
         ) : years.length === 0 ? (
           <Card>
             <CardContent className="pt-6">
-              <div className="text-center space-y-4">
+              <div className="space-y-4 text-center">
                 <p className="text-muted-foreground">
                   <Trans>No ranking years available yet</Trans>
                 </p>
@@ -147,7 +152,7 @@ function RankingsPage() {
                     )}
                     {year.is_public && (
                       <>
-                        {' • '}
+                        {" • "}
                         <span className="text-blue-500">
                           <Trans>Results Public</Trans>
                         </span>
@@ -158,12 +163,17 @@ function RankingsPage() {
                 <CardContent className="space-y-4">
                   {year.deadline && (
                     <p className="text-sm text-muted-foreground">
-                      <Trans>Deadline: {new Date(year.deadline).toLocaleDateString()}</Trans>
+                      <Trans>
+                        Deadline: {new Date(year.deadline).toLocaleDateString()}
+                      </Trans>
                     </p>
                   )}
 
-                  <div className="space-y-2">
-                    <Link to="/rankings/$year" params={{ year: year.year.toString() }}>
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      to="/rankings/$year"
+                      params={{ year: year.year.toString() }}
+                    >
                       <Button className="w-full" disabled={year.is_locked}>
                         {year.is_locked ? (
                           <Trans>View Rankings</Trans>

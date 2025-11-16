@@ -20,8 +20,12 @@ import { Route as RankingsManageRouteImport } from './routes/rankings/manage'
 import { Route as RankingsYearRouteImport } from './routes/rankings/$year'
 import { Route as InviteTokenRouteImport } from './routes/invite/$token'
 import { Route as GamesNewRouteImport } from './routes/games/new'
+import { Route as GamesLibraryRouteImport } from './routes/games/library'
 import { Route as GamesGameIdRouteImport } from './routes/games/$gameId'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as GamesSessionsNewRouteImport } from './routes/games/sessions/new'
+import { Route as GamesEditGameIdRouteImport } from './routes/games/edit.$gameId'
+import { Route as GamesSessionsEditSessionIdRouteImport } from './routes/games/sessions/edit.$sessionId'
 
 const ResultsRoute = ResultsRouteImport.update({
   id: '/results',
@@ -78,6 +82,11 @@ const GamesNewRoute = GamesNewRouteImport.update({
   path: '/games/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamesLibraryRoute = GamesLibraryRouteImport.update({
+  id: '/games/library',
+  path: '/games/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GamesGameIdRoute = GamesGameIdRouteImport.update({
   id: '/games/$gameId',
   path: '/games/$gameId',
@@ -88,6 +97,22 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamesSessionsNewRoute = GamesSessionsNewRouteImport.update({
+  id: '/games/sessions/new',
+  path: '/games/sessions/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesEditGameIdRoute = GamesEditGameIdRouteImport.update({
+  id: '/games/edit/$gameId',
+  path: '/games/edit/$gameId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesSessionsEditSessionIdRoute =
+  GamesSessionsEditSessionIdRouteImport.update({
+    id: '/games/sessions/edit/$sessionId',
+    path: '/games/sessions/edit/$sessionId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -97,12 +122,16 @@ export interface FileRoutesByFullPath {
   '/results': typeof ResultsRoute
   '/admin/users': typeof AdminUsersRoute
   '/games/$gameId': typeof GamesGameIdRoute
+  '/games/library': typeof GamesLibraryRoute
   '/games/new': typeof GamesNewRoute
   '/invite/$token': typeof InviteTokenRoute
   '/rankings/$year': typeof RankingsYearRoute
   '/rankings/manage': typeof RankingsManageRoute
   '/games': typeof GamesIndexRoute
   '/rankings': typeof RankingsIndexRoute
+  '/games/edit/$gameId': typeof GamesEditGameIdRoute
+  '/games/sessions/new': typeof GamesSessionsNewRoute
+  '/games/sessions/edit/$sessionId': typeof GamesSessionsEditSessionIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -112,12 +141,16 @@ export interface FileRoutesByTo {
   '/results': typeof ResultsRoute
   '/admin/users': typeof AdminUsersRoute
   '/games/$gameId': typeof GamesGameIdRoute
+  '/games/library': typeof GamesLibraryRoute
   '/games/new': typeof GamesNewRoute
   '/invite/$token': typeof InviteTokenRoute
   '/rankings/$year': typeof RankingsYearRoute
   '/rankings/manage': typeof RankingsManageRoute
   '/games': typeof GamesIndexRoute
   '/rankings': typeof RankingsIndexRoute
+  '/games/edit/$gameId': typeof GamesEditGameIdRoute
+  '/games/sessions/new': typeof GamesSessionsNewRoute
+  '/games/sessions/edit/$sessionId': typeof GamesSessionsEditSessionIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -128,12 +161,16 @@ export interface FileRoutesById {
   '/results': typeof ResultsRoute
   '/admin/users': typeof AdminUsersRoute
   '/games/$gameId': typeof GamesGameIdRoute
+  '/games/library': typeof GamesLibraryRoute
   '/games/new': typeof GamesNewRoute
   '/invite/$token': typeof InviteTokenRoute
   '/rankings/$year': typeof RankingsYearRoute
   '/rankings/manage': typeof RankingsManageRoute
   '/games/': typeof GamesIndexRoute
   '/rankings/': typeof RankingsIndexRoute
+  '/games/edit/$gameId': typeof GamesEditGameIdRoute
+  '/games/sessions/new': typeof GamesSessionsNewRoute
+  '/games/sessions/edit/$sessionId': typeof GamesSessionsEditSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -145,12 +182,16 @@ export interface FileRouteTypes {
     | '/results'
     | '/admin/users'
     | '/games/$gameId'
+    | '/games/library'
     | '/games/new'
     | '/invite/$token'
     | '/rankings/$year'
     | '/rankings/manage'
     | '/games'
     | '/rankings'
+    | '/games/edit/$gameId'
+    | '/games/sessions/new'
+    | '/games/sessions/edit/$sessionId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -160,12 +201,16 @@ export interface FileRouteTypes {
     | '/results'
     | '/admin/users'
     | '/games/$gameId'
+    | '/games/library'
     | '/games/new'
     | '/invite/$token'
     | '/rankings/$year'
     | '/rankings/manage'
     | '/games'
     | '/rankings'
+    | '/games/edit/$gameId'
+    | '/games/sessions/new'
+    | '/games/sessions/edit/$sessionId'
   id:
     | '__root__'
     | '/'
@@ -175,12 +220,16 @@ export interface FileRouteTypes {
     | '/results'
     | '/admin/users'
     | '/games/$gameId'
+    | '/games/library'
     | '/games/new'
     | '/invite/$token'
     | '/rankings/$year'
     | '/rankings/manage'
     | '/games/'
     | '/rankings/'
+    | '/games/edit/$gameId'
+    | '/games/sessions/new'
+    | '/games/sessions/edit/$sessionId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -191,12 +240,16 @@ export interface RootRouteChildren {
   ResultsRoute: typeof ResultsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   GamesGameIdRoute: typeof GamesGameIdRoute
+  GamesLibraryRoute: typeof GamesLibraryRoute
   GamesNewRoute: typeof GamesNewRoute
   InviteTokenRoute: typeof InviteTokenRoute
   RankingsYearRoute: typeof RankingsYearRoute
   RankingsManageRoute: typeof RankingsManageRoute
   GamesIndexRoute: typeof GamesIndexRoute
   RankingsIndexRoute: typeof RankingsIndexRoute
+  GamesEditGameIdRoute: typeof GamesEditGameIdRoute
+  GamesSessionsNewRoute: typeof GamesSessionsNewRoute
+  GamesSessionsEditSessionIdRoute: typeof GamesSessionsEditSessionIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -278,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GamesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/games/library': {
+      id: '/games/library'
+      path: '/games/library'
+      fullPath: '/games/library'
+      preLoaderRoute: typeof GamesLibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/games/$gameId': {
       id: '/games/$gameId'
       path: '/games/$gameId'
@@ -292,6 +352,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/games/sessions/new': {
+      id: '/games/sessions/new'
+      path: '/games/sessions/new'
+      fullPath: '/games/sessions/new'
+      preLoaderRoute: typeof GamesSessionsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/edit/$gameId': {
+      id: '/games/edit/$gameId'
+      path: '/games/edit/$gameId'
+      fullPath: '/games/edit/$gameId'
+      preLoaderRoute: typeof GamesEditGameIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/sessions/edit/$sessionId': {
+      id: '/games/sessions/edit/$sessionId'
+      path: '/games/sessions/edit/$sessionId'
+      fullPath: '/games/sessions/edit/$sessionId'
+      preLoaderRoute: typeof GamesSessionsEditSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -303,12 +384,16 @@ const rootRouteChildren: RootRouteChildren = {
   ResultsRoute: ResultsRoute,
   AdminUsersRoute: AdminUsersRoute,
   GamesGameIdRoute: GamesGameIdRoute,
+  GamesLibraryRoute: GamesLibraryRoute,
   GamesNewRoute: GamesNewRoute,
   InviteTokenRoute: InviteTokenRoute,
   RankingsYearRoute: RankingsYearRoute,
   RankingsManageRoute: RankingsManageRoute,
   GamesIndexRoute: GamesIndexRoute,
   RankingsIndexRoute: RankingsIndexRoute,
+  GamesEditGameIdRoute: GamesEditGameIdRoute,
+  GamesSessionsNewRoute: GamesSessionsNewRoute,
+  GamesSessionsEditSessionIdRoute: GamesSessionsEditSessionIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

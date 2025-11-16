@@ -5,18 +5,21 @@ A full-stack application for tracking and ranking tabletop games played within a
 ## Features
 
 ### User Management
+
 - **Role-based access control**: Admin, Moderator, and Player roles
 - **Invitation system**: Admins can invite new users via email with expiring (14-day) single-use tokens
 - **User profiles**: Nickname, email, avatar with crop functionality, and description
 - **Authentication**: Login, password reset, and secure password setup for new users
 
 ### Game Management
+
 - **BoardGameGeek integration**: Fetch game metadata via BGG XML API
 - **Played games tracking**: Record game sessions with date, players, scores, winners, and notes
 - **Custom naming**: Override game names while preserving original name in tooltips
 - **Comments**: Users can comment on played game sessions
 
 ### Ranking System
+
 - **Yearly rankings**: Players rank games played during each year
 - **Manual additions**: Players can add games to their rankings even if not assigned to a session
 - **Locked years**: Admins/Moderators can lock years to prevent further ranking changes
@@ -24,12 +27,15 @@ A full-stack application for tracking and ranking tabletop games played within a
 - **Privacy controls**: Rankings can be kept private or made public by Admins/Moderators
 
 ### Results & Analytics
+
 Three ranking calculation schemes:
+
 - **Scheme A (Equal)**: One person = one vote (w_p = 1)
 - **Scheme B (Damped)**: Weight by √(games played) - recommended compromise
 - **Scheme C (Linear)**: Weight by games played (w_p = np)
 
 Advanced tie-breaking:
+
 1. Higher first-place votes
 2. Higher top-2 placements
 3. Head-to-head comparison among overlapping voters
@@ -38,6 +44,7 @@ Advanced tie-breaking:
 ## Tech Stack
 
 ### Frontend
+
 - **React 18** with TypeScript
 - **TanStack Start** (full-stack React framework)
 - **TanStack Router** for routing
@@ -46,6 +53,7 @@ Advanced tie-breaking:
 - **Lingui** for internationalization
 
 ### Backend
+
 - **Supabase** for:
   - PostgreSQL database
   - Authentication (Supabase Auth)
@@ -54,9 +62,11 @@ Advanced tie-breaking:
   - Storage (for avatars)
 
 ### External APIs
+
 - **BoardGameGeek XML API v2** for game metadata
 
 ### Deployment
+
 - **Vercel** for hosting (free tier)
 
 ## Project Structure
@@ -90,6 +100,7 @@ tabletop-tracking/
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - npm or pnpm
 - Supabase account (free tier)
@@ -97,12 +108,14 @@ tabletop-tracking/
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd tabletop-tracking
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
@@ -114,11 +127,13 @@ tabletop-tracking/
    - Enable Email authentication in Authentication > Providers
 
 4. **Configure environment variables**
+
    ```bash
    cp .env.example .env
    ```
 
    Edit `.env` and add your Supabase credentials:
+
    ```env
    VITE_SUPABASE_URL=your_supabase_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
@@ -131,12 +146,14 @@ tabletop-tracking/
    - Set up policies to allow authenticated users to upload
 
 6. **Extract and compile translations**
+
    ```bash
    npm run extract
    npm run compile
    ```
 
 7. **Run the development server**
+
    ```bash
    npm run dev
    ```
@@ -170,6 +187,7 @@ tabletop-tracking/
 ## Database Schema
 
 ### Tables
+
 - **users**: User profiles with roles
 - **user_invitations**: Invitation tokens for new users
 - **board_games**: Game metadata from BGG
@@ -180,7 +198,9 @@ tabletop-tracking/
 - **user_game_rankings**: User rankings per game per year
 
 ### Row Level Security
+
 All tables have RLS policies configured:
+
 - Players can view public data and manage their own content
 - Moderators can manage games and rankings
 - Admins have full access
@@ -188,19 +208,23 @@ All tables have RLS policies configured:
 ## Development
 
 ### Code Style
+
 - Use named functions instead of arrow functions where possible
 - All imports use `@/` alias pointing to `src/`
 - TypeScript strict mode enabled
 - Follow React best practices
 
 ### Adding Translations
+
 1. Wrap text with Lingui macros:
+
    ```tsx
-   import { Trans } from '@lingui/macro';
-   <Trans>Hello World</Trans>
+   import { Trans } from "@lingui/react/macro";
+   <Trans>Hello World</Trans>;
    ```
 
 2. Extract messages:
+
    ```bash
    npm run extract
    ```
@@ -213,6 +237,7 @@ All tables have RLS policies configured:
    ```
 
 ### Adding New Components
+
 - UI components go in `src/components/ui/`
 - Feature components go in `src/components/features/`
 - Follow shadcn/ui patterns for consistency
@@ -220,7 +245,9 @@ All tables have RLS policies configured:
 ## API Integration
 
 ### BoardGameGeek API
+
 The app uses BGG XML API v2:
+
 - Fetch game by ID: `https://boardgamegeek.com/xmlapi2/thing?id={id}&stats=1`
 - Search games: `https://boardgamegeek.com/xmlapi2/search?query={query}&type=boardgame`
 
@@ -231,19 +258,23 @@ API service located in `src/services/bgg-api.ts`
 The ranking engine (`src/services/ranking-calculator.ts`) implements three weighted voting schemes:
 
 **Common calculations per player:**
+
 - `raw_points_p(r) = np − r + 1` (where np = total games ranked by player)
 - `S_p = np*(np+1)/2`
 - `base_fraction_p(r) = raw_points_p(r) / S_p`
 
 **Scheme A (Equal):**
+
 - `w_p = 1`
 - `contribution = base_fraction * 1`
 
 **Scheme B (Damped - Recommended):**
+
 - `w_p = √np`
 - `contribution = base_fraction * √np`
 
 **Scheme C (Linear):**
+
 - `w_p = np`
 - `contribution = base_fraction * np`
 

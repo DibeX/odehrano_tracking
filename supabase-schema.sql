@@ -12,6 +12,8 @@ CREATE TABLE users (
   avatar_url TEXT,
   description TEXT,
   role user_role NOT NULL DEFAULT 'player',
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  last_login_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -31,12 +33,14 @@ CREATE TABLE user_invitations (
 -- Board games table
 CREATE TABLE board_games (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  bgg_id INTEGER UNIQUE NOT NULL,
+  bgg_id INTEGER UNIQUE,
   name TEXT NOT NULL,
   original_name TEXT,
+  alternate_names TEXT[] DEFAULT '{}',
   image_url TEXT,
   year_published INTEGER,
   categories TEXT[] DEFAULT '{}',
+  publishers TEXT[] DEFAULT '{}',
   bgg_rank INTEGER,
   bgg_rating DECIMAL(3, 2),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

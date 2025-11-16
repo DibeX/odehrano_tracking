@@ -1,18 +1,27 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
-import { Trans, t } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
-import { requireAuth } from '@/lib/auth-helpers';
-import { useAuthContext } from '@/contexts/auth-context';
-import { AppLayout } from '@/components/layout/app-layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { formatDate } from '@/lib/utils';
-import type { PlayedGameWithDetails } from '@/types';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { requireAuth } from "@/lib/auth-helpers";
+import { useAuthContext } from "@/contexts/auth-context";
+import { AppLayout } from "@/components/layout/app-layout";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import { UserAvatar } from "@/components/ui/user-avatar";
+import { formatDate } from "@/lib/utils";
+import type { PlayedGameWithDetails } from "@/types";
+import { Plus, Library, ExternalLink } from "lucide-react";
 
-export const Route = createFileRoute('/games/')({
+export const Route = createFileRoute("/games/")({
   component: GamesPage,
   beforeLoad: async () => {
     await requireAuth();
@@ -34,8 +43,9 @@ function GamesPage() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('played_games')
-        .select(`
+        .from("played_games")
+        .select(
+          `
           *,
           board_game:board_games(*),
           players:played_game_players(
@@ -45,19 +55,34 @@ function GamesPage() {
           comments:played_game_comments(
             *,
             user:users(*)
-          ),
-          creator:created_by(*)
-        `)
-        .order('played_at', { ascending: false });
+          )
+        `
+        )
+        .order("played_at", { ascending: false });
 
       if (error) throw error;
+
+      // Fetch creators separately
+      if (data && data.length > 0) {
+        const creatorIds = [...new Set(data.map((g) => g.created_by))];
+        const { data: creators } = await supabase
+          .from("users")
+          .select("*")
+          .in("id", creatorIds);
+
+        const creatorsMap = new Map(creators?.map((c) => [c.id, c]) || []);
+
+        data.forEach((game: any) => {
+          game.creator = creatorsMap.get(game.created_by) || null;
+        });
+      }
 
       setGames(data as any);
     } catch (error: any) {
       toast({
         title: _(t`Error loading games`),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -77,13 +102,22 @@ function GamesPage() {
             </p>
           </div>
 
-          {(isAdmin || isModerator) && (
-            <Link to="/games/new">
-              <Button>
-                <Trans>Add Game Session</Trans>
+          <div className="flex gap-2">
+            <Link to="/games/library">
+              <Button variant="outline">
+                <Library className="w-4 h-4 mr-2" />
+                <Trans>Game Library</Trans>
               </Button>
             </Link>
-          )}
+            {(isAdmin || isModerator) && (
+              <Link to="/games/sessions/new">
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  <Trans>Record Session</Trans>
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
 
         {loading ? (
@@ -97,14 +131,14 @@ function GamesPage() {
         ) : games.length === 0 ? (
           <Card>
             <CardContent className="pt-6">
-              <div className="text-center space-y-4">
+              <div className="space-y-4 text-center">
                 <p className="text-muted-foreground">
-                  <Trans>No games recorded yet</Trans>
+                  <Trans>No play sessions recorded yet</Trans>
                 </p>
                 {(isAdmin || isModerator) && (
-                  <Link to="/games/new">
+                  <Link to="/games/sessions/new">
                     <Button>
-                      <Trans>Add First Game</Trans>
+                      <Trans>Record First Session</Trans>
                     </Button>
                   </Link>
                 )}
@@ -116,18 +150,33 @@ function GamesPage() {
             {games.map((game) => (
               <Card key={game.id} className="overflow-hidden">
                 {game.board_game.image_url && (
-                  <div className="aspect-video overflow-hidden bg-muted">
+                  <div className="overflow-hidden aspect-video bg-muted">
                     <img
                       src={game.board_game.image_url}
                       alt={game.custom_name || game.board_game.name}
-                      className="w-full h-full object-cover"
+                      className="object-cover w-full h-full"
                     />
                   </div>
                 )}
                 <CardHeader>
-                  <CardTitle className="line-clamp-2">
-                    {game.custom_name || game.board_game.name}
-                  </CardTitle>
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="line-clamp-2">
+                      {game.custom_name || game.board_game.name}
+                    </CardTitle>
+                    {game.board_game.bgg_id && (
+                      <a
+                        href={`https://boardgamegeek.com/boardgame/${game.board_game.bgg_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0"
+                      >
+                        <Button variant="outline" size="sm">
+                          <ExternalLink className="w-3 h-3 mr-1" />
+                          BGG
+                        </Button>
+                      </a>
+                    )}
+                  </div>
                   <CardDescription>
                     <Trans>Played on {formatDate(game.played_at)}</Trans>
                   </CardDescription>
@@ -135,21 +184,27 @@ function GamesPage() {
                 <CardContent className="space-y-4">
                   {game.players && game.players.length > 0 && (
                     <div>
-                      <p className="text-sm font-medium mb-2">
+                      <p className="mb-2 text-sm font-medium">
                         <Trans>Players:</Trans>
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {game.players.map((player) => (
                           <div
                             key={player.id}
-                            className={`text-xs px-2 py-1 rounded-full ${
+                            className={`flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
                               player.is_winner
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-secondary text-secondary-foreground'
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-secondary text-secondary-foreground"
                             }`}
                           >
+                            <UserAvatar
+                              nickname={player.user.nickname}
+                              avatarUrl={player.user.avatar_url}
+                              size="xs"
+                              showFallback={false}
+                            />
                             {player.user.nickname}
-                            {player.is_winner && ' 👑'}
+                            {player.is_winner && " 👑"}
                             {player.score !== null && ` (${player.score})`}
                           </div>
                         ))}
@@ -159,7 +214,7 @@ function GamesPage() {
 
                   {game.note && (
                     <div>
-                      <p className="text-sm font-medium mb-1">
+                      <p className="mb-1 text-sm font-medium">
                         <Trans>Note:</Trans>
                       </p>
                       <p className="text-sm text-muted-foreground line-clamp-3">

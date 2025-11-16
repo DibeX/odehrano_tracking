@@ -7,4 +7,5 @@ export const Route = createFileRoute('/')({
       to: '/dashboard',
     });
   },
+  component: () => null,
 });

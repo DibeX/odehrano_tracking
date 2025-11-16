@@ -1,19 +1,37 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
-import { Trans, t } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
-import { requireAuth } from '@/lib/auth-helpers';
-import { useAuthContext } from '@/contexts/auth-context';
-import { AppLayout } from '@/components/layout/app-layout';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import { formatDate } from '@/lib/utils';
-import type { PlayedGameWithDetails } from '@/types';
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { requireAuth } from "@/lib/auth-helpers";
+import { useAuthContext } from "@/contexts/auth-context";
+import { AppLayout } from "@/components/layout/app-layout";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import { UserAvatar } from "@/components/ui/user-avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { formatDate, formatDateTime } from "@/lib/utils";
+import type { PlayedGameWithDetails } from "@/types";
+import { ExternalLink, ArrowLeft, Trash2, Edit } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/games/$gameId')({
+export const Route = createFileRoute("/games/$gameId")({
   component: GameDetailsPage,
   beforeLoad: async () => {
     await requireAuth();
@@ -22,13 +40,24 @@ export const Route = createFileRoute('/games/$gameId')({
 
 function GameDetailsPage() {
   const { gameId } = Route.useParams();
-  const { user } = useAuthContext();
+  const { user, isAdmin, isModerator } = useAuthContext();
   const { _ } = useLingui();
   const { toast } = useToast();
+  const router = useRouter();
   const [game, setGame] = useState<PlayedGameWithDetails | null>(null);
   const [loading, setLoading] = useState(true);
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  function handleBack() {
+    if (router.history.length <= 1) {
+      router.navigate({ to: "/" });
+    } else {
+      router.history.back();
+    }
+  }
 
   useEffect(() => {
     loadGame();
@@ -38,8 +67,9 @@ function GameDetailsPage() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('played_games')
-        .select(`
+        .from("played_games")
+        .select(
+          `
           *,
           board_game:board_games(*),
           players:played_game_players(
@@ -49,19 +79,36 @@ function GameDetailsPage() {
           comments:played_game_comments(
             *,
             user:users(*)
-          ),
-          creator:users!created_by(*)
-        `)
-        .eq('id', gameId)
-        .single();
+          )
+        `
+        )
+        .eq("id", gameId)
+        .maybeSingle();
 
       if (error) throw error;
+      if (!data) {
+        setGame(null);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch creator separately
+      if (data) {
+        const { data: creatorData } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", data.created_by)
+          .single();
+
+        (data as any).creator = creatorData;
+      }
+
       setGame(data as any);
     } catch (error: any) {
       toast({
         title: _(t`Error loading game`),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -74,7 +121,7 @@ function GameDetailsPage() {
 
     setSubmitting(true);
     try {
-      const { error } = await supabase.from('played_game_comments').insert({
+      const { error } = await supabase.from("played_game_comments").insert({
         played_game_id: gameId,
         user_id: user.id,
         comment: newComment,
@@ -87,29 +134,63 @@ function GameDetailsPage() {
         description: _(t`Your comment has been added successfully`),
       });
 
-      setNewComment('');
+      setNewComment("");
       loadGame();
     } catch (error: any) {
       toast({
         title: _(t`Error adding comment`),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setSubmitting(false);
     }
   }
 
+  async function handleDeleteGame() {
+    setDeleting(true);
+    try {
+      const { error } = await supabase
+        .from("played_games")
+        .delete()
+        .eq("id", gameId);
+
+      if (error) throw error;
+
+      toast({
+        title: _(t`Game session deleted`),
+        description: _(t`The game session has been permanently deleted`),
+      });
+
+      setDeleteDialogOpen(false);
+      router.navigate({ to: "/games" });
+    } catch (error: any) {
+      toast({
+        title: _(t`Error deleting game session`),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   if (loading) {
     return (
       <AppLayout>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
-              <Trans>Loading...</Trans>
-            </p>
-          </CardContent>
-        </Card>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <Button variant="ghost" size="sm" onClick={handleBack}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            <Trans>Back</Trans>
+          </Button>
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-center text-muted-foreground">
+                <Trans>Loading...</Trans>
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </AppLayout>
     );
   }
@@ -117,34 +198,59 @@ function GameDetailsPage() {
   if (!game) {
     return (
       <AppLayout>
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">
-              <Trans>Game not found</Trans>
-            </p>
-          </CardContent>
-        </Card>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <Button variant="ghost" size="sm" onClick={handleBack}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            <Trans>Back</Trans>
+          </Button>
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-center text-muted-foreground">
+                <Trans>Game not found</Trans>
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </AppLayout>
     );
   }
 
   return (
     <AppLayout>
-      <div className="max-w-4xl space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Button variant="ghost" size="sm" onClick={handleBack}>
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          <Trans>Back</Trans>
+        </Button>
         <Card>
           {game.board_game.image_url && (
-            <div className="aspect-video overflow-hidden rounded-t-xl bg-muted">
+            <div className="overflow-hidden aspect-video rounded-t-xl bg-muted">
               <img
                 src={game.board_game.image_url}
                 alt={game.custom_name || game.board_game.name}
-                className="w-full h-full object-cover"
+                className="object-cover w-full h-full"
               />
             </div>
           )}
           <CardHeader>
-            <CardTitle className="text-3xl">
-              {game.custom_name || game.board_game.name}
-            </CardTitle>
+            <div className="flex items-start justify-between gap-2">
+              <CardTitle className="text-3xl">
+                {game.custom_name || game.board_game.name}
+              </CardTitle>
+              {game.board_game.bgg_id && (
+                <a
+                  href={`https://boardgamegeek.com/boardgame/${game.board_game.bgg_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0"
+                >
+                  <Button variant="outline" size="sm">
+                    <ExternalLink className="w-3 h-3 mr-1" />
+                    BGG
+                  </Button>
+                </a>
+              )}
+            </div>
             {game.custom_name && (
               <p className="text-sm text-muted-foreground">
                 <Trans>Original: {game.board_game.name}</Trans>
@@ -152,14 +258,32 @@ function GameDetailsPage() {
             )}
             <CardDescription>
               <Trans>Played on {formatDate(game.played_at)}</Trans>
-              {' • '}
+              {" • "}
               <Trans>Added by {game.creator?.nickname}</Trans>
             </CardDescription>
+            {(isAdmin || isModerator) && (
+              <div className="flex gap-2 pt-2">
+                <Link to="/games/sessions/edit/$sessionId" params={{ sessionId: gameId }}>
+                  <Button variant="outline" size="sm">
+                    <Edit className="w-4 h-4 mr-2" />
+                    <Trans>Edit Session</Trans>
+                  </Button>
+                </Link>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setDeleteDialogOpen(true)}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  <Trans>Delete Session</Trans>
+                </Button>
+              </div>
+            )}
           </CardHeader>
           <CardContent className="space-y-6">
             {game.board_game.year_published && (
               <div>
-                <p className="text-sm font-medium mb-1">
+                <p className="mb-1 text-sm font-medium">
                   <Trans>Year Published:</Trans>
                 </p>
                 <p>{game.board_game.year_published}</p>
@@ -168,14 +292,14 @@ function GameDetailsPage() {
 
             {game.board_game.categories.length > 0 && (
               <div>
-                <p className="text-sm font-medium mb-2">
+                <p className="mb-2 text-sm font-medium">
                   <Trans>Categories:</Trans>
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {game.board_game.categories.map((category) => (
                     <span
                       key={category}
-                      className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded-full"
+                      className="px-2 py-1 text-xs rounded-full bg-secondary text-secondary-foreground"
                     >
                       {category}
                     </span>
@@ -186,7 +310,7 @@ function GameDetailsPage() {
 
             {game.note && (
               <div>
-                <p className="text-sm font-medium mb-1">
+                <p className="mb-1 text-sm font-medium">
                   <Trans>Notes:</Trans>
                 </p>
                 <p className="text-muted-foreground">{game.note}</p>
@@ -195,7 +319,7 @@ function GameDetailsPage() {
 
             {game.players && game.players.length > 0 && (
               <div>
-                <p className="text-sm font-medium mb-3">
+                <p className="mb-3 text-sm font-medium">
                   <Trans>Players:</Trans>
                 </p>
                 <div className="space-y-2">
@@ -204,16 +328,26 @@ function GameDetailsPage() {
                       key={player.id}
                       className={`flex items-center justify-between p-3 rounded-lg ${
                         player.is_winner
-                          ? 'bg-primary/10 border border-primary'
-                          : 'bg-secondary'
+                          ? "bg-primary/10 border border-primary"
+                          : "bg-secondary"
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{player.user.nickname}</span>
+                        <UserAvatar
+                          nickname={player.user.nickname}
+                          avatarUrl={player.user.avatar_url}
+                          size="sm"
+                          showFallback={false}
+                        />
+                        <span className="font-medium">
+                          {player.user.nickname}
+                        </span>
                         {player.is_winner && <span>👑</span>}
                       </div>
                       {player.score !== null && (
-                        <span className="text-lg font-semibold">{player.score}</span>
+                        <span className="text-lg font-semibold">
+                          {player.score}
+                        </span>
                       )}
                     </div>
                   ))}
@@ -242,18 +376,33 @@ function GameDetailsPage() {
                 rows={3}
               />
               <Button type="submit" disabled={submitting || !newComment.trim()}>
-                {submitting ? <Trans>Adding...</Trans> : <Trans>Add Comment</Trans>}
+                {submitting ? (
+                  <Trans>Adding...</Trans>
+                ) : (
+                  <Trans>Add Comment</Trans>
+                )}
               </Button>
             </form>
 
             {game.comments && game.comments.length > 0 ? (
-              <div className="space-y-4 mt-6">
+              <div className="mt-6 space-y-4">
                 {game.comments.map((comment) => (
-                  <div key={comment.id} className="border-l-2 border-primary pl-4">
+                  <div
+                    key={comment.id}
+                    className="pl-4 border-l-2 border-primary"
+                  >
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium">{comment.user.nickname}</span>
+                      <UserAvatar
+                        nickname={comment.user.nickname}
+                        avatarUrl={comment.user.avatar_url}
+                        size="xs"
+                        showFallback={false}
+                      />
+                      <span className="font-medium">
+                        {comment.user.nickname}
+                      </span>
                       <span className="text-xs text-muted-foreground">
-                        {formatDate(comment.created_at)}
+                        {formatDateTime(comment.created_at)}
                       </span>
                     </div>
                     <p className="text-sm">{comment.comment}</p>
@@ -261,12 +410,47 @@ function GameDetailsPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-center text-muted-foreground py-4">
+              <p className="py-4 text-center text-muted-foreground">
                 <Trans>No comments yet. Be the first to comment!</Trans>
               </p>
             )}
           </CardContent>
         </Card>
+
+        {/* Delete confirmation dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                <Trans>Delete Game Session</Trans>
+              </DialogTitle>
+              <DialogDescription>
+                <Trans>
+                  Are you sure you want to permanently delete this game session? This will remove all player scores and comments. This action cannot be undone.
+                </Trans>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteDialogOpen(false)}
+              >
+                <Trans>Cancel</Trans>
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteGame}
+                disabled={deleting}
+              >
+                {deleting ? (
+                  <Trans>Deleting...</Trans>
+                ) : (
+                  <Trans>Delete Permanently</Trans>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );

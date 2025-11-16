@@ -3,7 +3,10 @@
     "allow": [
       "Bash(git init:*)",
       "Bash(git branch:*)",
-      "Bash(npm create:*)"
+      "Bash(npm create:*)",
+      "Bash(del \"h:\\code\\repositories\\odehrano_tracking\\src\\routes\\games\\add.tsx\")",
+      "Bash(mkdir:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

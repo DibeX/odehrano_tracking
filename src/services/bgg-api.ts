@@ -62,13 +62,18 @@ async function parseXML(xmlText: string): Promise<any> {
 function extractGameData(itemElement: Element): BGGGameInfo {
   const id = parseInt(itemElement.getAttribute('id') || '0');
 
-  // Get primary name
+  // Get primary name and alternate names
   const names = itemElement.getElementsByTagName('name');
   let name = '';
+  const alternateNames: string[] = [];
   for (let i = 0; i < names.length; i++) {
     if (names[i].getAttribute('type') === 'primary') {
       name = names[i].getAttribute('value') || '';
-      break;
+    } else if (names[i].getAttribute('type') === 'alternate') {
+      const altName = names[i].getAttribute('value');
+      if (altName) {
+        alternateNames.push(altName);
+      }
     }
   }
 
@@ -82,12 +87,17 @@ function extractGameData(itemElement: Element): BGGGameInfo {
   const imageElements = itemElement.getElementsByTagName('image');
   const imageUrl = imageElements.length > 0 ? imageElements[0].textContent : null;
 
-  // Get categories
+  // Get categories and publishers
   const categories: string[] = [];
+  const publishers: string[] = [];
   const links = itemElement.getElementsByTagName('link');
   for (let i = 0; i < links.length; i++) {
-    if (links[i].getAttribute('type') === 'boardgamecategory') {
-      categories.push(links[i].getAttribute('value') || '');
+    const linkType = links[i].getAttribute('type');
+    const linkValue = links[i].getAttribute('value');
+    if (linkType === 'boardgamecategory' && linkValue) {
+      categories.push(linkValue);
+    } else if (linkType === 'boardgamepublisher' && linkValue) {
+      publishers.push(linkValue);
     }
   }
 
@@ -116,9 +126,11 @@ function extractGameData(itemElement: Element): BGGGameInfo {
   return {
     id,
     name,
+    alternateNames,
     yearPublished,
     imageUrl,
     categories,
+    publishers,
     rank,
     rating,
   };
@@ -188,9 +200,11 @@ export async function searchBGGGames(query: string): Promise<BGGGameInfo[]> {
       games.push({
         id,
         name,
+        alternateNames: [],
         yearPublished,
         imageUrl: null,
         categories: [],
+        publishers: [],
         rank: null,
         rating: null,
       });

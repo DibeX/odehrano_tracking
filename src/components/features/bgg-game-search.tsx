@@ -1,13 +1,20 @@
-import { useState } from 'react';
-import { Trans, t } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { fetchBGGGame } from '@/services/bgg-api';
-import { useToast } from '@/hooks/use-toast';
-import type { BGGGameInfo } from '@/types';
+import { useState } from "react";
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { fetchBGGGame } from "@/services/bgg-api";
+import { useToast } from "@/hooks/use-toast";
+import type { BGGGameInfo } from "@/types";
 
 interface BGGGameSearchProps {
   onGameSelected: (game: BGGGameInfo) => void;
@@ -16,7 +23,7 @@ interface BGGGameSearchProps {
 export function BGGGameSearch({ onGameSelected }: BGGGameSearchProps) {
   const { _ } = useLingui();
   const { toast } = useToast();
-  const [bggId, setBggId] = useState('');
+  const [bggId, setBggId] = useState("");
   const [searching, setSearching] = useState(false);
   const [gameInfo, setGameInfo] = useState<BGGGameInfo | null>(null);
 
@@ -25,7 +32,7 @@ export function BGGGameSearch({ onGameSelected }: BGGGameSearchProps) {
       toast({
         title: _(t`BGG ID required`),
         description: _(t`Please enter a BoardGameGeek game ID`),
-        variant: 'destructive',
+        variant: "destructive",
       });
       return;
     }
@@ -38,7 +45,7 @@ export function BGGGameSearch({ onGameSelected }: BGGGameSearchProps) {
       toast({
         title: _(t`Error fetching game`),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
       setGameInfo(null);
     } finally {
@@ -67,7 +74,7 @@ export function BGGGameSearch({ onGameSelected }: BGGGameSearchProps) {
             onChange={(e) => setBggId(e.target.value)}
             disabled={searching}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 e.preventDefault();
                 handleSearch();
               }
@@ -78,7 +85,10 @@ export function BGGGameSearch({ onGameSelected }: BGGGameSearchProps) {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          <Trans>Find the game ID on BoardGameGeek.com in the URL (e.g., /boardgame/174430/gloomhaven)</Trans>
+          <Trans>
+            Find the game ID on BoardGameGeek.com in the URL (e.g.,
+            /boardgame/174430/gloomhaven)
+          </Trans>
         </p>
       </div>
 
@@ -87,16 +97,18 @@ export function BGGGameSearch({ onGameSelected }: BGGGameSearchProps) {
           <CardHeader>
             <CardTitle>{gameInfo.name}</CardTitle>
             <CardDescription>
-              {gameInfo.yearPublished && <Trans>Year: {gameInfo.yearPublished}</Trans>}
+              {gameInfo.yearPublished && (
+                <Trans>Year: {gameInfo.yearPublished}</Trans>
+              )}
               {gameInfo.rank && (
                 <>
-                  {' • '}
+                  {" • "}
                   <Trans>BGG Rank: #{gameInfo.rank}</Trans>
                 </>
               )}
               {gameInfo.rating && (
                 <>
-                  {' • '}
+                  {" • "}
                   <Trans>Rating: {gameInfo.rating}/10</Trans>
                 </>
               )}

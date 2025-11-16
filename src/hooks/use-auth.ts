@@ -45,6 +45,13 @@ export function useAuth() {
 
       if (error) throw error;
       setUser(data);
+
+      // Update last login time (fire and forget)
+      supabase
+        .from("users")
+        .update({ last_login_at: new Date().toISOString() })
+        .eq("id", userId)
+        .then(() => {});
     } catch (error) {
       console.error("Error fetching user profile:", error);
       setUser(null);

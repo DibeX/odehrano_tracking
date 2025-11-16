@@ -8,10 +8,10 @@ export const locales = {
 
 export const defaultLocale = "en";
 
-i18n.loadLocaleData({
-  en: { plurals: en },
-  cs: { plurals: cs },
-});
+const pluralData: Record<string, (n: number | string, ord?: boolean) => string> = {
+  en,
+  cs,
+};
 
 /**
  * Load messages for given locale and activate it.
@@ -31,7 +31,7 @@ export async function loadCatalog(locale: string) {
   }
 
   const { messages } = await catalog();
-  i18n.load(locale, messages);
+  i18n.load(locale, { ...messages, plurals: pluralData[locale] });
   i18n.activate(locale);
 }
 

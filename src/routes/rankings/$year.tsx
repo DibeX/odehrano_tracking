@@ -1,17 +1,25 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useState, useEffect } from 'react';
-import { Trans, t } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
-import { requireAuth } from '@/lib/auth-helpers';
-import { useAuthContext } from '@/contexts/auth-context';
-import { AppLayout } from '@/components/layout/app-layout';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase';
-import { useToast } from '@/hooks/use-toast';
-import type { BoardGame, UserGameRanking, RankingYear } from '@/types';
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
+import { requireAuth } from "@/lib/auth-helpers";
+import { useAuthContext } from "@/contexts/auth-context";
+import { AppLayout } from "@/components/layout/app-layout";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
+import { Plus, ArrowLeft } from "lucide-react";
+import type { BoardGame, UserGameRanking, RankingYear } from "@/types";
 
-export const Route = createFileRoute('/rankings/$year')({
+export const Route = createFileRoute("/rankings/$year")({
   component: YearRankingsPage,
   beforeLoad: async () => {
     await requireAuth();
@@ -23,6 +31,7 @@ interface RankedGame {
   rank: number;
   rankingId?: string;
   isManuallyAdded: boolean;
+  sourceList?: "user" | "other"; // Track which list the game came from
 }
 
 function YearRankingsPage() {
@@ -30,12 +39,24 @@ function YearRankingsPage() {
   const { user } = useAuthContext();
   const { _ } = useLingui();
   const { toast } = useToast();
+  const router = useRouter();
   const [yearInfo, setYearInfo] = useState<RankingYear | null>(null);
   const [rankedGames, setRankedGames] = useState<RankedGame[]>([]);
   const [availableGames, setAvailableGames] = useState<BoardGame[]>([]);
+  const [otherAvailableGames, setOtherAvailableGames] = useState<BoardGame[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  function handleBack() {
+    if (router.history.length <= 1) {
+      router.navigate({ to: "/rankings" });
+    } else {
+      router.history.back();
+    }
+  }
 
   useEffect(() => {
     loadData();
@@ -48,9 +69,9 @@ function YearRankingsPage() {
     try {
       // Load year info
       const { data: yearData, error: yearError } = await supabase
-        .from('ranking_years')
-        .select('*')
-        .eq('year', parseInt(year))
+        .from("ranking_years")
+        .select("*")
+        .eq("year", parseInt(year))
         .single();
 
       if (yearError) throw yearError;
@@ -58,11 +79,11 @@ function YearRankingsPage() {
 
       // Load user's existing rankings
       const { data: rankingsData, error: rankingsError } = await supabase
-        .from('user_game_rankings')
-        .select('*, board_game:board_games(*)')
-        .eq('user_id', user.id)
-        .eq('year', parseInt(year))
-        .order('rank');
+        .from("user_game_rankings")
+        .select("*, board_game:board_games(*)")
+        .eq("user_id", user.id)
+        .eq("year", parseInt(year))
+        .order("rank");
 
       if (rankingsError) throw rankingsError;
 
@@ -75,36 +96,70 @@ function YearRankingsPage() {
 
       setRankedGames(ranked);
 
-      // Load games played in this year that aren't ranked yet
-      const { data: playedGamesData, error: playedError } = await supabase
-        .from('played_games')
-        .select(`
+      // Load games the user played in this year
+      const { data: userPlayedGamesData, error: userPlayedError } =
+        await supabase
+          .from("played_games")
+          .select(
+            `
           board_game_id,
           board_game:board_games(*),
           players:played_game_players!inner(user_id)
-        `)
-        .eq('players.user_id', user.id)
-        .gte('played_at', `${year}-01-01`)
-        .lte('played_at', `${year}-12-31`);
+        `
+          )
+          .eq("players.user_id", user.id)
+          .gte("played_at", `${year}-01-01`)
+          .lte("played_at", `${year}-12-31`);
 
-      if (playedError) throw playedError;
+      if (userPlayedError) throw userPlayedError;
 
-      // Filter out already ranked games
-      const rankedGameIds = new Set(ranked.map(rg => rg.boardGame.id));
-      const uniqueGames = new Map<string, BoardGame>();
+      // Load all games with sessions in this year (for "other games" section)
+      const { data: allPlayedGamesData, error: allPlayedError } = await supabase
+        .from("played_games")
+        .select(
+          `
+          board_game_id,
+          board_game:board_games(*)
+        `
+        )
+        .gte("played_at", `${year}-01-01`)
+        .lte("played_at", `${year}-12-31`);
 
-      (playedGamesData || []).forEach((pg: any) => {
+      if (allPlayedError) throw allPlayedError;
+
+      // Filter out already ranked games and separate into two groups
+      const rankedGameIds = new Set(ranked.map((rg) => rg.boardGame.id));
+      const userPlayedGameIds = new Set(
+        (userPlayedGamesData || []).map((pg: any) => pg.board_game.id)
+      );
+
+      const userGames = new Map<string, BoardGame>();
+      const otherGames = new Map<string, BoardGame>();
+
+      // Add user's played games
+      (userPlayedGamesData || []).forEach((pg: any) => {
         if (!rankedGameIds.has(pg.board_game.id)) {
-          uniqueGames.set(pg.board_game.id, pg.board_game);
+          userGames.set(pg.board_game.id, pg.board_game);
         }
       });
 
-      setAvailableGames(Array.from(uniqueGames.values()));
+      // Add other games (played by others but not by user)
+      (allPlayedGamesData || []).forEach((pg: any) => {
+        if (
+          !rankedGameIds.has(pg.board_game.id) &&
+          !userPlayedGameIds.has(pg.board_game.id)
+        ) {
+          otherGames.set(pg.board_game.id, pg.board_game);
+        }
+      });
+
+      setAvailableGames(Array.from(userGames.values()));
+      setOtherAvailableGames(Array.from(otherGames.values()));
     } catch (error: any) {
       toast({
         title: _(t`Error loading rankings`),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -118,10 +173,10 @@ function YearRankingsPage() {
     try {
       // Delete existing rankings
       const { error: deleteError } = await supabase
-        .from('user_game_rankings')
+        .from("user_game_rankings")
         .delete()
-        .eq('user_id', user.id)
-        .eq('year', yearInfo.year);
+        .eq("user_id", user.id)
+        .eq("year", yearInfo.year);
 
       if (deleteError) throw deleteError;
 
@@ -136,7 +191,7 @@ function YearRankingsPage() {
         }));
 
         const { error: insertError } = await supabase
-          .from('user_game_rankings')
+          .from("user_game_rankings")
           .insert(rankings);
 
         if (insertError) throw insertError;
@@ -152,7 +207,7 @@ function YearRankingsPage() {
       toast({
         title: _(t`Error saving rankings`),
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setSaving(false);
@@ -180,20 +235,29 @@ function YearRankingsPage() {
     setDraggedIndex(null);
   }
 
-  function addGameToRankings(game: BoardGame) {
-    setRankedGames([...rankedGames, {
-      boardGame: game,
-      rank: rankedGames.length + 1,
-      isManuallyAdded: false,
-    }]);
-    setAvailableGames(availableGames.filter(g => g.id !== game.id));
+  function addGameToRankings(game: BoardGame, sourceList: "user" | "other") {
+    setRankedGames([
+      ...rankedGames,
+      {
+        boardGame: game,
+        rank: rankedGames.length + 1,
+        isManuallyAdded: sourceList === "other",
+        sourceList,
+      },
+    ]);
+    setAvailableGames(availableGames.filter((g) => g.id !== game.id));
+    setOtherAvailableGames(otherAvailableGames.filter((g) => g.id !== game.id));
   }
 
   function removeGameFromRankings(index: number) {
     const game = rankedGames[index];
-    if (!game.isManuallyAdded) {
+    // Return the game to its original list
+    if (game.sourceList === "user") {
       setAvailableGames([...availableGames, game.boardGame]);
+    } else if (game.sourceList === "other") {
+      setOtherAvailableGames([...otherAvailableGames, game.boardGame]);
     }
+    // If sourceList is undefined (loaded from DB), we don't add it back to any list
     setRankedGames(rankedGames.filter((_, i) => i !== index));
   }
 
@@ -232,8 +296,17 @@ function YearRankingsPage() {
       <div className="max-w-4xl space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">
+            <h1 className="flex gap-4 text-3xl font-bold">
               <Trans>Rankings for {yearInfo.year}</Trans>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBack}
+                className="self-center"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                <Trans>Back</Trans>
+              </Button>
             </h1>
             <p className="text-muted-foreground">
               {isLocked ? (
@@ -257,7 +330,9 @@ function YearRankingsPage() {
           <Card className="border-orange-500">
             <CardContent className="pt-6">
               <p className="text-sm font-medium">
-                <Trans>Deadline: {new Date(yearInfo.deadline).toLocaleDateString()}</Trans>
+                <Trans>
+                  Deadline: {new Date(yearInfo.deadline).toLocaleDateString()}
+                </Trans>
               </p>
             </CardContent>
           </Card>
@@ -272,14 +347,19 @@ function YearRankingsPage() {
               {isLocked ? (
                 <Trans>View your final rankings</Trans>
               ) : (
-                <Trans>Rank 1 = Most Favorite, Rank {rankedGames.length} = Least Favorite</Trans>
+                <Trans>
+                  Rank 1 = Most Favorite, Rank {rankedGames.length} = Least
+                  Favorite
+                </Trans>
               )}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {rankedGames.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                <Trans>No games ranked yet. Add games from below to start ranking.</Trans>
+              <p className="py-8 text-center text-muted-foreground">
+                <Trans>
+                  No games ranked yet. Add games from below to start ranking.
+                </Trans>
               </p>
             ) : (
               <div className="space-y-2">
@@ -290,11 +370,12 @@ function YearRankingsPage() {
                     onDragStart={() => handleDragStart(index)}
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDragEnd={handleDragEnd}
-                    className={`flex items-center gap-4 p-4 border rounded-lg ${
-                      !isLocked ? 'cursor-move hover:bg-accent' : ''
-                    } ${draggedIndex === index ? 'opacity-50' : ''}`}
+                    onDrop={handleDragEnd}
+                    className={`flex items-center gap-4 px-4 py-2 border rounded-lg ${
+                      !isLocked ? "cursor-move hover:bg-accent" : ""
+                    } ${draggedIndex === index ? "opacity-50" : ""}`}
                   >
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground font-bold">
+                    <div className="flex items-center justify-center w-8 h-8 font-bold rounded-full bg-primary text-primary-foreground">
                       {index + 1}
                     </div>
 
@@ -302,7 +383,7 @@ function YearRankingsPage() {
                       <img
                         src={rg.boardGame.image_url}
                         alt={rg.boardGame.name}
-                        className="w-12 h-12 object-cover rounded"
+                        className="object-cover rounded size-16"
                       />
                     )}
 
@@ -346,14 +427,14 @@ function YearRankingsPage() {
                 {availableGames.map((game) => (
                   <div
                     key={game.id}
-                    className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent cursor-pointer"
-                    onClick={() => addGameToRankings(game)}
+                    className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-accent"
+                    onClick={() => addGameToRankings(game, "user")}
                   >
                     {game.image_url && (
                       <img
                         src={game.image_url}
                         alt={game.name}
-                        className="w-12 h-12 object-cover rounded"
+                        className="object-cover w-12 h-12 rounded"
                       />
                     )}
                     <div className="flex-1">
@@ -364,6 +445,48 @@ function YearRankingsPage() {
                         </p>
                       )}
                     </div>
+                    <Plus className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {!isLocked && otherAvailableGames.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <Trans>Other Games Played in {yearInfo.year}</Trans>
+              </CardTitle>
+              <CardDescription>
+                <Trans>Games you didn't play but can still rank</Trans>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-2">
+                {otherAvailableGames.map((game) => (
+                  <div
+                    key={game.id}
+                    className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-accent"
+                    onClick={() => addGameToRankings(game, "other")}
+                  >
+                    {game.image_url && (
+                      <img
+                        src={game.image_url}
+                        alt={game.name}
+                        className="object-cover w-12 h-12 rounded"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <p className="font-medium">{game.name}</p>
+                      {game.year_published && (
+                        <p className="text-sm text-muted-foreground">
+                          {game.year_published}
+                        </p>
+                      )}
+                    </div>
+                    <Plus className="w-5 h-5 text-muted-foreground" />
                   </div>
                 ))}
               </div>

@@ -1,12 +1,18 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { Trans } from '@lingui/macro';
-import { requireAuth } from '@/lib/auth-helpers';
-import { useAuthContext } from '@/contexts/auth-context';
-import { AppLayout } from '@/components/layout/app-layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Trans } from "@lingui/react/macro";
+import { requireAuth } from "@/lib/auth-helpers";
+import { useAuthContext } from "@/contexts/auth-context";
+import { AppLayout } from "@/components/layout/app-layout";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute('/dashboard')({
+export const Route = createFileRoute("/dashboard")({
   component: DashboardPage,
   beforeLoad: async () => {
     await requireAuth();
@@ -74,7 +80,7 @@ function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link to="/results">
+            <Link to="/results" search={{ year: undefined }}>
               <Button className="w-full">
                 <Trans>View Results</Trans>
               </Button>

@@ -29,6 +29,10 @@ export type UserGameRanking = Database['public']['Tables']['user_game_rankings']
 export type UserGameRankingInsert = Database['public']['Tables']['user_game_rankings']['Insert'];
 export type UserGameRankingUpdate = Database['public']['Tables']['user_game_rankings']['Update'];
 
+export type CategoryPreset = Database['public']['Tables']['category_presets']['Row'];
+export type CategoryPresetInsert = Database['public']['Tables']['category_presets']['Insert'];
+export type CategoryPresetUpdate = Database['public']['Tables']['category_presets']['Update'];
+
 export type UserRole = Database['public']['Enums']['user_role'];
 
 export type RankingScheme = 'equal' | 'damped' | 'linear';
@@ -36,9 +40,11 @@ export type RankingScheme = 'equal' | 'damped' | 'linear';
 export interface BGGGameInfo {
   id: number;
   name: string;
+  alternateNames: string[];
   yearPublished: number | null;
   imageUrl: string | null;
   categories: string[];
+  publishers: string[];
   rank: number | null;
   rating: number | null;
 }

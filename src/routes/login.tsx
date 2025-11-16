@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Trans, t } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
+import { LanguageSelector } from "@/components/ui/language-selector";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -66,7 +69,7 @@ function LoginPage() {
 
   if (resetSuccess) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="flex items-center justify-center min-h-screen p-4 bg-background">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>
@@ -98,19 +101,27 @@ function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="flex items-center justify-center min-h-screen p-4 bg-background">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>
-            {resetMode ? <Trans>Reset Password</Trans> : <Trans>Login</Trans>}
+          <CardTitle className="flex justify-between">
+            <div className="flex flex-col gap-1">
+              {resetMode ? <Trans>Reset Password</Trans> : <Trans>Login</Trans>}
+              <CardDescription>
+                {resetMode ? (
+                  <Trans>
+                    Enter your email to receive a password reset link
+                  </Trans>
+                ) : (
+                  <Trans>Enter your credentials to access your account</Trans>
+                )}
+              </CardDescription>
+            </div>
+            <div className="flex gap-1">
+              <LanguageSelector />
+              <ThemeToggle />
+            </div>
           </CardTitle>
-          <CardDescription>
-            {resetMode ? (
-              <Trans>Enter your email to receive a password reset link</Trans>
-            ) : (
-              <Trans>Enter your credentials to access your account</Trans>
-            )}
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -147,7 +158,7 @@ function LoginPage() {
             )}
 
             {error && (
-              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+              <div className="p-3 text-sm rounded-md bg-destructive/15 text-destructive">
                 {error}
               </div>
             )}

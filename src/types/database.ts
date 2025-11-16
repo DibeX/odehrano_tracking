@@ -19,6 +19,8 @@ export interface Database {
           avatar_url: string | null;
           description: string | null;
           role: UserRole;
+          is_active: boolean;
+          last_login_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -29,6 +31,8 @@ export interface Database {
           avatar_url?: string | null;
           description?: string | null;
           role?: UserRole;
+          is_active?: boolean;
+          last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -39,9 +43,12 @@ export interface Database {
           avatar_url?: string | null;
           description?: string | null;
           role?: UserRole;
+          is_active?: boolean;
+          last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       user_invitations: {
         Row: {
@@ -74,16 +81,19 @@ export interface Database {
           used_at?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       board_games: {
         Row: {
           id: string;
-          bgg_id: number;
+          bgg_id: number | null;
           name: string;
           original_name: string | null;
+          alternate_names: string[];
           image_url: string | null;
           year_published: number | null;
           categories: string[];
+          publishers: string[];
           bgg_rank: number | null;
           bgg_rating: number | null;
           created_at: string;
@@ -91,12 +101,14 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          bgg_id: number;
+          bgg_id?: number | null;
           name: string;
           original_name?: string | null;
+          alternate_names?: string[];
           image_url?: string | null;
           year_published?: number | null;
           categories?: string[];
+          publishers?: string[];
           bgg_rank?: number | null;
           bgg_rating?: number | null;
           created_at?: string;
@@ -104,17 +116,20 @@ export interface Database {
         };
         Update: {
           id?: string;
-          bgg_id?: number;
+          bgg_id?: number | null;
           name?: string;
           original_name?: string | null;
+          alternate_names?: string[];
           image_url?: string | null;
           year_published?: number | null;
           categories?: string[];
+          publishers?: string[];
           bgg_rank?: number | null;
           bgg_rating?: number | null;
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       played_games: {
         Row: {
@@ -147,6 +162,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       played_game_players: {
         Row: {
@@ -173,6 +189,7 @@ export interface Database {
           is_winner?: boolean;
           created_at?: string;
         };
+        Relationships: [];
       };
       played_game_comments: {
         Row: {
@@ -199,6 +216,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       ranking_years: {
         Row: {
@@ -228,6 +246,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       user_game_rankings: {
         Row: {
@@ -260,6 +279,37 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
+      };
+      category_presets: {
+        Row: {
+          id: string;
+          name: string;
+          categories: string[];
+          created_by: string;
+          is_public: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          categories: string[];
+          created_by: string;
+          is_public?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          categories?: string[];
+          created_by?: string;
+          is_public?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
       };
     };
     Views: {
@@ -270,6 +320,9 @@ export interface Database {
     };
     Enums: {
       user_role: UserRole;
+    };
+    CompositeTypes: {
+      [_ in never]: never;
     };
   };
 }
