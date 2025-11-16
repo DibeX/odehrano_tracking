@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": ".output/public",
-  "framework": null,
-  "regions": ["iad1"]
+  "outputDirectory": "dist",
+  "framework": "tanstack-start",
+  "regions": ["fra1"]
 }
