@@ -4,6 +4,7 @@ import viteReact from "@vitejs/plugin-react";
 import { lingui } from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath } from "url";
+import { nitro } from "nitro/vite";
 
 export default defineConfig({
   resolve: {
@@ -12,11 +13,8 @@ export default defineConfig({
     },
   },
   plugins: [
-    tanstackStart({
-      spa: {
-        enabled: true,
-      },
-    }),
+    tanstackStart(),
+    nitro(),
     // react's vite plugin must come after start's vite plugin
     viteReact({
       babel: {
