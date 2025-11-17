@@ -1500,7 +1500,7 @@ function ResultsPage() {
                                 <img
                                   src={item.game.image_url}
                                   alt={item.game.name}
-                                  className="object-cover w-full h-full"
+                                  className="object-contain w-full h-full"
                                 />
                               </div>
                             )}
@@ -1579,11 +1579,11 @@ function ResultsPage() {
                           {index + 1}
                         </div>
                         {result.game.image_url && (
-                          <div className="w-20 h-20 overflow-hidden rounded bg-muted shrink-0">
+                          <div className="w-24 h-full overflow-hidden rounded bg-muted shrink-0">
                             <img
                               src={result.game.image_url}
                               alt={result.game.name}
-                              className="object-cover w-full h-full"
+                              className="object-contain w-full h-full"
                             />
                           </div>
                         )}

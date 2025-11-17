@@ -106,8 +106,40 @@ function UsersPage() {
       if (usersResult.error) throw usersResult.error;
       if (invitationsResult.error) throw invitationsResult.error;
 
-      setUsers(usersResult.data || []);
-      setInvitations(invitationsResult.data || []);
+      const users = usersResult.data || [];
+      const pendingInvitations = invitationsResult.data || [];
+
+      // Check for invitations that have been used but not marked as such
+      // This happens when a user registers with the invite link but the used_at wasn't updated
+      const userEmails = new Set(users.map((u) => u.email?.toLowerCase()).filter(Boolean));
+      const usedInvitationIds: string[] = [];
+
+      for (const invitation of pendingInvitations) {
+        const inviteEmail = invitation.email.toLowerCase();
+        const isUsed = userEmails.has(inviteEmail) ||
+          (invitation.placeholder_user_id &&
+            users.some((u) => u.id === invitation.placeholder_user_id && !u.is_placeholder));
+
+        if (isUsed) {
+          usedInvitationIds.push(invitation.id);
+        }
+      }
+
+      // Mark used invitations as completed
+      if (usedInvitationIds.length > 0) {
+        await supabase
+          .from("user_invitations")
+          .update({ used_at: new Date().toISOString() })
+          .in("id", usedInvitationIds);
+      }
+
+      // Filter out the used invitations from the display
+      const activeInvitations = pendingInvitations.filter(
+        (inv) => !usedInvitationIds.includes(inv.id)
+      );
+
+      setUsers(users);
+      setInvitations(activeInvitations);
     } catch (error: any) {
       toast({
         title: _(t`Error loading data`),

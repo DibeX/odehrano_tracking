@@ -17,6 +17,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import type { BoardGame, User } from "@/types";
@@ -263,232 +264,234 @@ function NewSessionPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Game Selection */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                <Trans>Select Game</Trans>
-              </CardTitle>
-              <CardDescription>
-                <Trans>Choose which game was played</Trans>
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {selectedGame && !showGameSearch ? (
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-4">
-                    {selectedGame.image_url && (
-                      <img
-                        src={selectedGame.image_url}
-                        alt={selectedGame.name}
-                        className="object-cover w-16 h-16 rounded"
-                      />
-                    )}
-                    <div>
-                      <p className="font-medium">{selectedGame.name}</p>
-                      {selectedGame.year_published && (
-                        <p className="text-sm text-muted-foreground">
-                          {selectedGame.year_published}
-                        </p>
+            {/* Game Selection */}
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <Trans>Select Game</Trans>
+                </CardTitle>
+                <CardDescription>
+                  <Trans>Choose which game was played</Trans>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {selectedGame && !showGameSearch ? (
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-4">
+                      {selectedGame.image_url && (
+                        <img
+                          src={selectedGame.image_url}
+                          alt={selectedGame.name}
+                          className="object-cover w-16 h-16 rounded"
+                        />
                       )}
+                      <div>
+                        <p className="font-medium">{selectedGame.name}</p>
+                        {selectedGame.year_published && (
+                          <p className="text-sm text-muted-foreground">
+                            {selectedGame.year_published}
+                          </p>
+                        )}
+                      </div>
                     </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowGameSearch(true)}
+                    >
+                      <Trans>Change</Trans>
+                    </Button>
                   </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <Search className="absolute w-4 h-4 left-3 top-3 text-muted-foreground" />
+                      <Input
+                        placeholder={_(t`Search for a game...`)}
+                        value={gameSearchQuery}
+                        onChange={(e) => setGameSearchQuery(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+
+                    {games.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        <Trans>
+                          No games in library. Add games first before recording
+                          sessions.
+                        </Trans>
+                      </p>
+                    ) : (
+                      <ScrollArea className="border rounded-md" viewportClassName="max-h-[calc(100vh-24rem)]">
+                        <div className="space-y-2 p-2">
+                          {filteredGames.map((game) => (
+                            <button
+                              key={game.id}
+                              type="button"
+                              onClick={() => selectGame(game)}
+                              className="flex items-center w-full gap-3 p-3 text-left transition-colors border rounded-lg hover:bg-muted"
+                            >
+                              {game.image_url && (
+                                <img
+                                  src={game.image_url}
+                                  alt={game.name}
+                                  className="object-cover w-12 h-12 rounded"
+                                />
+                              )}
+                              <div>
+                                <p className="font-medium">{game.name}</p>
+                                {game.year_published && (
+                                  <p className="text-xs text-muted-foreground">
+                                    {game.year_published}
+                                  </p>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {selectedGame && (
+              <>
+                {/* Session Details */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>
+                      <Trans>Session Details</Trans>
+                    </CardTitle>
+                    <CardDescription>
+                      <Trans>When was the game played?</Trans>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="playedAt">
+                        <Trans>Date Played</Trans>
+                      </Label>
+                      <Input
+                        id="playedAt"
+                        type="date"
+                        value={playedAt}
+                        onChange={(e) => setPlayedAt(e.target.value)}
+                        required
+                        disabled={submitting}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="note">
+                        <Trans>Notes (Optional)</Trans>
+                      </Label>
+                      <Textarea
+                        id="note"
+                        placeholder={_(
+                          t`Any notes about this game session...`
+                        )}
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                        disabled={submitting}
+                        rows={4}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Players */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>
+                      <Trans>Players</Trans>
+                    </CardTitle>
+                    <CardDescription>
+                      <Trans>Select who played and add their scores</Trans>
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {users.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        <Trans>No users found</Trans>
+                      </p>
+                    ) : (
+                      users.map((u) => (
+                        <div
+                          key={u.id}
+                          className="flex items-center gap-4 p-4 border rounded-lg"
+                        >
+                          <input
+                            type="checkbox"
+                            id={`player-${u.id}`}
+                            checked={selectedPlayers.has(u.id)}
+                            onChange={() => togglePlayer(u.id)}
+                            disabled={submitting}
+                            className="w-4 h-4"
+                          />
+                          <Label
+                            htmlFor={`player-${u.id}`}
+                            className="flex-1 cursor-pointer"
+                          >
+                            {u.nickname}
+                          </Label>
+
+                          {selectedPlayers.has(u.id) && (
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="number"
+                                placeholder={_(t`Score`)}
+                                value={playerScores.get(u.id)?.score || ""}
+                                onChange={(e) =>
+                                  updatePlayerScore(u.id, e.target.value)
+                                }
+                                disabled={submitting}
+                                className="w-24"
+                                step="0.01"
+                              />
+                              <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={
+                                    playerScores.get(u.id)?.isWinner || false
+                                  }
+                                  onChange={() => toggleWinner(u.id)}
+                                  disabled={submitting}
+                                  className="w-4 h-4"
+                                />
+                                <span className="text-sm">
+                                  <Trans>Winner</Trans>
+                                </span>
+                              </label>
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Submit */}
+                <div className="flex gap-4">
+                  <Button type="submit" disabled={submitting}>
+                    {submitting ? (
+                      <Trans>Recording...</Trans>
+                    ) : (
+                      <Trans>Record Session</Trans>
+                    )}
+                  </Button>
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setShowGameSearch(true)}
+                    onClick={() => navigate({ to: "/games" })}
+                    disabled={submitting}
                   >
-                    <Trans>Change</Trans>
+                    <Trans>Cancel</Trans>
                   </Button>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="relative">
-                    <Search className="absolute w-4 h-4 left-3 top-3 text-muted-foreground" />
-                    <Input
-                      placeholder={_(t`Search for a game...`)}
-                      value={gameSearchQuery}
-                      onChange={(e) => setGameSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-
-                  {games.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      <Trans>
-                        No games in library. Add games first before recording
-                        sessions.
-                      </Trans>
-                    </p>
-                  ) : (
-                    <div className="space-y-2 overflow-y-auto max-h-64">
-                      {filteredGames.map((game) => (
-                        <button
-                          key={game.id}
-                          type="button"
-                          onClick={() => selectGame(game)}
-                          className="flex items-center w-full gap-3 p-3 text-left transition-colors border rounded-lg hover:bg-muted"
-                        >
-                          {game.image_url && (
-                            <img
-                              src={game.image_url}
-                              alt={game.name}
-                              className="object-cover w-12 h-12 rounded"
-                            />
-                          )}
-                          <div>
-                            <p className="font-medium">{game.name}</p>
-                            {game.year_published && (
-                              <p className="text-xs text-muted-foreground">
-                                {game.year_published}
-                              </p>
-                            )}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {selectedGame && (
-            <>
-              {/* Session Details */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    <Trans>Session Details</Trans>
-                  </CardTitle>
-                  <CardDescription>
-                    <Trans>When was the game played?</Trans>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="playedAt">
-                      <Trans>Date Played</Trans>
-                    </Label>
-                    <Input
-                      id="playedAt"
-                      type="date"
-                      value={playedAt}
-                      onChange={(e) => setPlayedAt(e.target.value)}
-                      required
-                      disabled={submitting}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="note">
-                      <Trans>Notes (Optional)</Trans>
-                    </Label>
-                    <Textarea
-                      id="note"
-                      placeholder={_(
-                        t`Any notes about this game session...`
-                      )}
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      disabled={submitting}
-                      rows={4}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Players */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>
-                    <Trans>Players</Trans>
-                  </CardTitle>
-                  <CardDescription>
-                    <Trans>Select who played and add their scores</Trans>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {users.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      <Trans>No users found</Trans>
-                    </p>
-                  ) : (
-                    users.map((u) => (
-                      <div
-                        key={u.id}
-                        className="flex items-center gap-4 p-4 border rounded-lg"
-                      >
-                        <input
-                          type="checkbox"
-                          id={`player-${u.id}`}
-                          checked={selectedPlayers.has(u.id)}
-                          onChange={() => togglePlayer(u.id)}
-                          disabled={submitting}
-                          className="w-4 h-4"
-                        />
-                        <Label
-                          htmlFor={`player-${u.id}`}
-                          className="flex-1 cursor-pointer"
-                        >
-                          {u.nickname}
-                        </Label>
-
-                        {selectedPlayers.has(u.id) && (
-                          <div className="flex items-center gap-2">
-                            <Input
-                              type="number"
-                              placeholder={_(t`Score`)}
-                              value={playerScores.get(u.id)?.score || ""}
-                              onChange={(e) =>
-                                updatePlayerScore(u.id, e.target.value)
-                              }
-                              disabled={submitting}
-                              className="w-24"
-                              step="0.01"
-                            />
-                            <label className="flex items-center gap-2 cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={
-                                  playerScores.get(u.id)?.isWinner || false
-                                }
-                                onChange={() => toggleWinner(u.id)}
-                                disabled={submitting}
-                                className="w-4 h-4"
-                              />
-                              <span className="text-sm">
-                                <Trans>Winner</Trans>
-                              </span>
-                            </label>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Submit */}
-              <div className="flex gap-4">
-                <Button type="submit" disabled={submitting}>
-                  {submitting ? (
-                    <Trans>Recording...</Trans>
-                  ) : (
-                    <Trans>Record Session</Trans>
-                  )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate({ to: "/games" })}
-                  disabled={submitting}
-                >
-                  <Trans>Cancel</Trans>
-                </Button>
-              </div>
-            </>
-          )}
+              </>
+            )}
         </form>
       </div>
     </AppLayout>

@@ -224,11 +224,11 @@ function GameDetailsPage() {
         </Button>
         <Card>
           {game.board_game.image_url && (
-            <div className="overflow-hidden aspect-video rounded-t-xl bg-muted">
+            <div className="flex items-center justify-center overflow-hidden rounded-t-xl bg-muted">
               <img
                 src={game.board_game.image_url}
                 alt={game.custom_name || game.board_game.name}
-                className="object-cover w-full h-full"
+                className="object-contain max-w-full max-h-80"
               />
             </div>
           )}
@@ -263,7 +263,10 @@ function GameDetailsPage() {
             </CardDescription>
             {(isAdmin || isModerator) && (
               <div className="flex gap-2 pt-2">
-                <Link to="/games/sessions/edit/$sessionId" params={{ sessionId: gameId }}>
+                <Link
+                  to="/games/sessions/edit/$sessionId"
+                  params={{ sessionId: gameId }}
+                >
                   <Button variant="outline" size="sm">
                     <Edit className="w-4 h-4 mr-2" />
                     <Trans>Edit Session</Trans>
@@ -281,12 +284,24 @@ function GameDetailsPage() {
             )}
           </CardHeader>
           <CardContent className="space-y-6">
-            {game.board_game.year_published && (
-              <div>
-                <p className="mb-1 text-sm font-medium">
-                  <Trans>Year Published:</Trans>
-                </p>
-                <p>{game.board_game.year_published}</p>
+            {(game.board_game.game_type || game.board_game.year_published) && (
+              <div className="flex flex-wrap gap-6">
+                {game.board_game.game_type && (
+                  <div>
+                    <p className="mb-1 text-sm font-medium">
+                      <Trans>Game Type:</Trans>
+                    </p>
+                    <p className="capitalize">{game.board_game.game_type.replace(/_/g, ' ')}</p>
+                  </div>
+                )}
+                {game.board_game.year_published && (
+                  <div>
+                    <p className="mb-1 text-sm font-medium">
+                      <Trans>Year Published:</Trans>
+                    </p>
+                    <p>{game.board_game.year_published}</p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -426,7 +441,9 @@ function GameDetailsPage() {
               </DialogTitle>
               <DialogDescription>
                 <Trans>
-                  Are you sure you want to permanently delete this game session? This will remove all player scores and comments. This action cannot be undone.
+                  Are you sure you want to permanently delete this game session?
+                  This will remove all player scores and comments. This action
+                  cannot be undone.
                 </Trans>
               </DialogDescription>
             </DialogHeader>

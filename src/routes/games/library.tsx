@@ -207,15 +207,15 @@ function GamesLibraryPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredGames.map((game) => (
-              <Card key={game.id} className="overflow-hidden">
+              <Card key={game.id} className="overflow-hidden flex flex-col">
                 {game.image_url && (
-                  <div className="overflow-hidden aspect-video bg-muted">
+                  <div className="flex items-center justify-center overflow-hidden h-48 bg-muted">
                     <img
                       src={game.image_url}
                       alt={game.name}
-                      className="object-cover w-full h-full"
+                      className="object-contain max-w-full max-h-full"
                     />
                   </div>
                 )}
@@ -242,7 +242,7 @@ function GamesLibraryPage() {
                     )}
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 flex-1 flex flex-col">
                   {game.alternate_names && game.alternate_names.length > 0 && (
                     <div>
                       <p className="mb-1 text-sm font-medium">
@@ -303,7 +303,7 @@ function GamesLibraryPage() {
                   )}
 
                   {(isAdmin || isModerator) && (
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2 mt-auto pt-2">
                       <div className="flex gap-2">
                         <Link
                           to="/games/edit/$gameId"

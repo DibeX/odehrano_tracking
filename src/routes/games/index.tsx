@@ -146,23 +146,28 @@ function GamesPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {games.map((game) => (
-              <Card key={game.id} className="overflow-hidden">
+              <Card key={game.id} className="flex flex-col overflow-hidden">
                 {game.board_game.image_url && (
-                  <div className="overflow-hidden aspect-video bg-muted">
+                  <div className="flex items-center justify-center h-48 overflow-hidden bg-muted">
                     <img
                       src={game.board_game.image_url}
                       alt={game.custom_name || game.board_game.name}
-                      className="object-cover w-full h-full"
+                      className="object-contain max-w-full max-h-full"
                     />
                   </div>
                 )}
-                <CardHeader>
+                <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="line-clamp-2">
-                      {game.custom_name || game.board_game.name}
-                    </CardTitle>
+                    <div className="flex flex-col gap-1">
+                      <CardTitle className="line-clamp-2">
+                        {game.custom_name || game.board_game.name}
+                      </CardTitle>
+                      <CardDescription>
+                        <Trans>Played on {formatDate(game.played_at)}</Trans>
+                      </CardDescription>
+                    </div>
                     {game.board_game.bgg_id && (
                       <a
                         href={`https://boardgamegeek.com/boardgame/${game.board_game.bgg_id}`}
@@ -177,11 +182,8 @@ function GamesPage() {
                       </a>
                     )}
                   </div>
-                  <CardDescription>
-                    <Trans>Played on {formatDate(game.played_at)}</Trans>
-                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="flex flex-col flex-1 space-y-2">
                   {game.players && game.players.length > 0 && (
                     <div>
                       <p className="mb-2 text-sm font-medium">
@@ -229,11 +231,13 @@ function GamesPage() {
                     </p>
                   )}
 
-                  <Link to="/games/$gameId" params={{ gameId: game.id }}>
-                    <Button variant="outline" className="w-full">
-                      <Trans>View Details</Trans>
-                    </Button>
-                  </Link>
+                  <div className="pt-2 mt-auto">
+                    <Link to="/games/$gameId" params={{ gameId: game.id }}>
+                      <Button variant="outline" className="w-full">
+                        <Trans>View Details</Trans>
+                      </Button>
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             ))}
