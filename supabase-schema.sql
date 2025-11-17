@@ -191,6 +191,16 @@ CREATE POLICY "Admins can manage invitations" ON user_invitations
 CREATE POLICY "Anyone can view valid invitations by token" ON user_invitations
   FOR SELECT USING (used_at IS NULL AND expires_at > NOW());
 
+CREATE POLICY "Users can mark own invitation as used" ON user_invitations
+  FOR UPDATE USING (
+    -- Allow update only for invitations matching the user's email
+    email = (SELECT email FROM auth.users WHERE id = auth.uid())
+  )
+  WITH CHECK (
+    -- Only allow updating used_at field (other fields must remain the same)
+    email = (SELECT email FROM auth.users WHERE id = auth.uid())
+  );
+
 -- Board games policies
 CREATE POLICY "Everyone can view board games" ON board_games
   FOR SELECT USING (true);
