@@ -32,7 +32,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Save, Trash2, Pencil, Filter, Info, Trophy, Users, TrendingUp, Award } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { X, Plus, Save, Trash2, Pencil, Filter, Info, Trophy, Users, TrendingUp, Award, Eye } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { UserAvatar } from "@/components/ui/user-avatar";
@@ -123,6 +124,15 @@ function ResultsPage() {
   const [presetToDelete, setPresetToDelete] = useState<string | null>(null);
   const [categoryFilterDialogOpen, setCategoryFilterDialogOpen] =
     useState(false);
+
+  // Player rankings dialog state
+  const [playerRankingsDialogOpen, setPlayerRankingsDialogOpen] = useState(false);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string>("");
+  const [playerGameRankings, setPlayerGameRankings] = useState<
+    { game: BoardGame; rank: number }[]
+  >([]);
+  const [loadingPlayerRankings, setLoadingPlayerRankings] = useState(false);
 
   useEffect(() => {
     loadYears();
@@ -605,6 +615,71 @@ function ResultsPage() {
     );
   }
 
+  async function loadUsersForRankingsDialog() {
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .order("nickname");
+
+      if (error) throw error;
+      setAllUsers(data || []);
+    } catch (error: any) {
+      toast({
+        title: _(t`Error loading users`),
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  }
+
+  async function loadPlayerGameRankings(userId: string) {
+    if (!selectedYear || !userId) return;
+
+    setLoadingPlayerRankings(true);
+    try {
+      const { data, error } = await supabase
+        .from("user_game_rankings")
+        .select("rank, board_game:board_games(*)")
+        .eq("user_id", userId)
+        .eq("year", selectedYear)
+        .order("rank");
+
+      if (error) throw error;
+
+      const rankings = (data || []).map((item: any) => ({
+        game: item.board_game as BoardGame,
+        rank: item.rank as number,
+      }));
+
+      setPlayerGameRankings(rankings);
+    } catch (error: any) {
+      toast({
+        title: _(t`Error loading player rankings`),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingPlayerRankings(false);
+    }
+  }
+
+  function handleOpenPlayerRankingsDialog() {
+    setPlayerRankingsDialogOpen(true);
+    setSelectedPlayerId("");
+    setPlayerGameRankings([]);
+    loadUsersForRankingsDialog();
+  }
+
+  function handlePlayerSelect(userId: string) {
+    setSelectedPlayerId(userId);
+    if (userId) {
+      loadPlayerGameRankings(userId);
+    } else {
+      setPlayerGameRankings([]);
+    }
+  }
+
   if (loading) {
     return (
       <AppLayout>
@@ -668,6 +743,14 @@ function ResultsPage() {
             >
               <Users className="w-4 h-4" />
               <Trans>Players Ranking</Trans>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleOpenPlayerRankingsDialog}
+              className="gap-2"
+            >
+              <Eye className="w-4 h-4" />
+              <Trans>View Player Rankings</Trans>
             </Button>
           </div>
         </div>
@@ -1153,6 +1236,135 @@ function ResultsPage() {
               <Button variant="destructive" onClick={deletePreset}>
                 <Trash2 className="w-4 h-4 mr-2" />
                 <Trans>Delete</Trans>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Player Rankings Dialog */}
+        <Dialog
+          open={playerRankingsDialogOpen}
+          onOpenChange={setPlayerRankingsDialogOpen}
+        >
+          <DialogContent className="max-w-2xl p-0 gap-0 flex flex-col max-h-[95dvh]">
+            <DialogHeader className="p-6 pb-4 shrink-0">
+              <DialogTitle>
+                <Trans>Player Game Rankings</Trans>
+              </DialogTitle>
+              <DialogDescription>
+                <Trans>
+                  Select a player to view how they ranked their games for{" "}
+                  {selectedYear}
+                </Trans>
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="px-6 pb-4 shrink-0">
+              <div className="space-y-2">
+                <Label>
+                  <Trans>Select Player</Trans>
+                </Label>
+                <Select
+                  value={selectedPlayerId}
+                  onValueChange={handlePlayerSelect}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={_(t`Choose a player...`)} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {allUsers.map((user) => (
+                      <SelectItem key={user.id} value={user.id}>
+                        <div className="flex items-center gap-2">
+                          <UserAvatar
+                            nickname={user.nickname}
+                            avatarUrl={user.avatar_url}
+                            size="sm"
+                            showFallback={false}
+                          />
+                          {user.nickname}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {selectedPlayerId && (
+              <div className="flex-1 overflow-hidden px-6">
+                {loadingPlayerRankings ? (
+                  <p className="text-center text-muted-foreground py-4">
+                    <Trans>Loading rankings...</Trans>
+                  </p>
+                ) : playerGameRankings.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">
+                    <Trans>
+                      This player has not submitted any rankings for{" "}
+                      {selectedYear}
+                    </Trans>
+                  </p>
+                ) : (
+                  <div className="flex flex-col h-full">
+                    <p className="text-sm font-medium mb-2 shrink-0">
+                      <Trans>
+                        {playerGameRankings.length} games ranked
+                      </Trans>
+                    </p>
+                    <ScrollArea
+                      className="flex-1 border rounded-md"
+                      viewportClassName="max-h-[calc(95dvh-280px)]"
+                    >
+                      <div className="divide-y">
+                        {playerGameRankings.map((item) => (
+                          <div
+                            key={item.game.id}
+                            className="flex items-center gap-3 p-3 hover:bg-muted/50"
+                          >
+                            <div className="flex items-center justify-center w-8 h-8 text-sm font-bold rounded-full bg-primary text-primary-foreground shrink-0">
+                              {item.rank}
+                            </div>
+                            {item.game.image_url && (
+                              <div className="w-12 h-12 overflow-hidden rounded bg-muted shrink-0">
+                                <img
+                                  src={item.game.image_url}
+                                  alt={item.game.name}
+                                  className="object-cover w-full h-full"
+                                />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium truncate">
+                                {item.game.name}
+                              </p>
+                              {item.game.year_published && (
+                                <p className="text-xs text-muted-foreground">
+                                  {item.game.year_published}
+                                </p>
+                              )}
+                            </div>
+                            {item.game.game_type && (
+                              <Badge
+                                variant="outline"
+                                className="text-xs font-medium border-primary text-primary shrink-0"
+                              >
+                                {getBoardGameTypeLabel(
+                                  item.game.game_type as BoardGameType,
+                                  _
+                                )}
+                              </Badge>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <DialogFooter className="p-6 pt-4 shrink-0">
+              <Button onClick={() => setPlayerRankingsDialogOpen(false)}>
+                <Trans>Close</Trans>
               </Button>
             </DialogFooter>
           </DialogContent>
