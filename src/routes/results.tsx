@@ -33,7 +33,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Plus, Save, Trash2, Pencil, Filter, Info, Trophy, Users, TrendingUp, Award, Eye } from "lucide-react";
+import {
+  X,
+  Plus,
+  Save,
+  Trash2,
+  Pencil,
+  Filter,
+  Info,
+  Trophy,
+  Users,
+  TrendingUp,
+  Award,
+  Eye,
+} from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { UserAvatar } from "@/components/ui/user-avatar";
@@ -101,6 +114,14 @@ function ResultsPage() {
   const [viewMode, setViewMode] = useState<"games" | "players">("games");
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
   const [loadingPlayerStats, setLoadingPlayerStats] = useState(false);
+  const [playerSortBy, setPlayerSortBy] = useState<
+    | "gamesPlayed"
+    | "gamesWon"
+    | "winRatio"
+    | "uniqueGamesPlayed"
+    | "participationRate"
+    | "winStreak"
+  >("gamesWon");
 
   // Category filtering state
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
@@ -109,8 +130,12 @@ function ResultsPage() {
   const [selectedPreset, setSelectedPreset] = useState<string>("");
 
   // Game type filtering state
-  const [availableGameTypes, setAvailableGameTypes] = useState<BoardGameType[]>([]);
-  const [selectedGameType, setSelectedGameType] = useState<BoardGameType | "all">("all");
+  const [availableGameTypes, setAvailableGameTypes] = useState<BoardGameType[]>(
+    []
+  );
+  const [selectedGameType, setSelectedGameType] = useState<
+    BoardGameType | "all"
+  >("all");
 
   // Preset management dialog state
   const [presetDialogOpen, setPresetDialogOpen] = useState(false);
@@ -126,13 +151,17 @@ function ResultsPage() {
     useState(false);
 
   // Player rankings dialog state
-  const [playerRankingsDialogOpen, setPlayerRankingsDialogOpen] = useState(false);
+  const [playerRankingsDialogOpen, setPlayerRankingsDialogOpen] =
+    useState(false);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>("");
   const [playerGameRankings, setPlayerGameRankings] = useState<
     { game: BoardGame; rank: number }[]
   >([]);
   const [loadingPlayerRankings, setLoadingPlayerRankings] = useState(false);
+  const [dialogGameTypeFilter, setDialogGameTypeFilter] = useState<
+    BoardGameType | "all"
+  >("all");
 
   useEffect(() => {
     loadYears();
@@ -334,9 +363,8 @@ function ResultsPage() {
 
       for (const user of users as User[]) {
         // Get all game records for this user
-        const userGameRecords = playerRecords?.filter(
-          (pr) => pr.user_id === user.id
-        ) || [];
+        const userGameRecords =
+          playerRecords?.filter((pr) => pr.user_id === user.id) || [];
 
         if (userGameRecords.length === 0) continue;
 
@@ -434,9 +462,6 @@ function ResultsPage() {
           participationRate,
         });
       }
-
-      // Sort by games played (descending)
-      stats.sort((a, b) => b.gamesPlayed - a.gamesPlayed);
 
       setPlayerStats(stats);
     } catch (error: any) {
@@ -668,6 +693,7 @@ function ResultsPage() {
     setPlayerRankingsDialogOpen(true);
     setSelectedPlayerId("");
     setPlayerGameRankings([]);
+    setDialogGameTypeFilter("all");
     loadUsersForRankingsDialog();
   }
 
@@ -679,6 +705,66 @@ function ResultsPage() {
       setPlayerGameRankings([]);
     }
   }
+
+  // Filter player rankings by game type
+  const filteredPlayerGameRankings = useMemo(() => {
+    if (dialogGameTypeFilter === "all") {
+      return playerGameRankings;
+    }
+    return playerGameRankings.filter(
+      (item) => item.game.game_type === dialogGameTypeFilter
+    );
+  }, [playerGameRankings, dialogGameTypeFilter]);
+
+  // Get available game types from player's rankings
+  const availableDialogGameTypes = useMemo(() => {
+    const types = new Set<BoardGameType>();
+    for (const item of playerGameRankings) {
+      if (item.game.game_type) {
+        types.add(item.game.game_type as BoardGameType);
+      }
+    }
+    return Array.from(types);
+  }, [playerGameRankings]);
+
+  // Reset game type filter if selected type is not available for new player
+  useEffect(() => {
+    if (
+      dialogGameTypeFilter !== "all" &&
+      playerGameRankings.length > 0 &&
+      !availableDialogGameTypes.includes(dialogGameTypeFilter as BoardGameType)
+    ) {
+      setDialogGameTypeFilter("all");
+    }
+  }, [
+    availableDialogGameTypes,
+    dialogGameTypeFilter,
+    playerGameRankings.length,
+  ]);
+
+  // Sort player stats based on selected sorting option
+  const sortedPlayerStats = useMemo(() => {
+    const sorted = [...playerStats];
+    sorted.sort((a, b) => {
+      switch (playerSortBy) {
+        case "gamesPlayed":
+          return b.gamesPlayed - a.gamesPlayed;
+        case "gamesWon":
+          return b.gamesWon - a.gamesWon;
+        case "winRatio":
+          return b.winRatio - a.winRatio;
+        case "uniqueGamesPlayed":
+          return b.uniqueGamesPlayed - a.uniqueGamesPlayed;
+        case "participationRate":
+          return b.participationRate - a.participationRate;
+        case "winStreak":
+          return b.winStreak - a.winStreak;
+        default:
+          return b.gamesPlayed - a.gamesPlayed;
+      }
+    });
+    return sorted;
+  }, [playerStats, playerSortBy]);
 
   if (loading) {
     return (
@@ -782,130 +868,180 @@ function ResultsPage() {
             </Select>
           </div>
 
-          {viewMode === "games" && (
-          <>
-          <div className="flex-1 min-w-[200px]">
-            <label className="flex items-center gap-1 mb-2 text-sm font-medium">
-              <Trans>Ranking Scheme</Trans>
-              <ResponsiveTooltip
-                content={
-                  <div className="space-y-2 max-w-xs">
-                    <div>
-                      <strong><Trans>Equal per Player:</Trans></strong>{" "}
-                      <Trans>
-                        Each player has equal voting weight (w_p = 1). Best for giving everyone an equal voice regardless of participation.
-                      </Trans>
-                    </div>
-                    <div>
-                      <strong><Trans>Damped (Recommended):</Trans></strong>{" "}
-                      <Trans>
-                        Player weight is square root of games played (w_p = √np). Recommended compromise that values experience while not overpowering casual voters.
-                      </Trans>
-                    </div>
-                    <div>
-                      <strong><Trans>Linear by Experience:</Trans></strong>{" "}
-                      <Trans>
-                        Player weight proportional to games played (w_p = np). Gives more weight to players who participated more throughout the year.
-                      </Trans>
-                    </div>
-                  </div>
-                }
-                contentClassName="text-left"
-              >
-                <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-              </ResponsiveTooltip>
-            </label>
-            <Select
-              value={selectedScheme}
-              onValueChange={(value) =>
-                setSelectedScheme(value as RankingScheme)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="equal">
-                  <Trans>Equal per Player</Trans>
-                </SelectItem>
-                <SelectItem value="damped">
-                  <Trans>Damped (Recommended)</Trans>
-                </SelectItem>
-                <SelectItem value="linear">
-                  <Trans>Linear by Experience</Trans>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex-1 min-w-[200px]">
-            <label className="block mb-2 text-sm font-medium">
-              <Trans>Game Type</Trans>
-            </label>
-            <Select
-              value={selectedGameType}
-              onValueChange={(value) =>
-                setSelectedGameType(value as BoardGameType | "all")
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={_(t`All Types`)} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">
-                  <Trans>All Types</Trans>
-                </SelectItem>
-                {availableGameTypes.length > 0
-                  ? availableGameTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {getBoardGameTypeLabel(type, _)}
-                      </SelectItem>
-                    ))
-                  : BOARD_GAME_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {getBoardGameTypeLabel(type, _)}
-                      </SelectItem>
-                    ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex-1 min-w-[200px]">
-            <label className="block mb-2 text-sm font-medium">
-              <Trans>Category</Trans>
-            </label>
-            <div className="flex gap-2">
+          {viewMode === "players" && (
+            <div className="flex-1 min-w-[200px]">
+              <label className="block mb-2 text-sm font-medium">
+                <Trans>Sort By</Trans>
+              </label>
               <Select
-                value={selectedPreset || "none"}
-                onValueChange={handlePresetChange}
+                value={playerSortBy}
+                onValueChange={(value) =>
+                  setPlayerSortBy(value as typeof playerSortBy)
+                }
               >
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder={_(t`All Categories`)} />
+                <SelectTrigger>
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">
-                    <Trans>All Categories</Trans>
+                  <SelectItem value="gamesWon">
+                    <Trans>Games Won</Trans>
                   </SelectItem>
-                  {categoryPresets.map((preset) => (
-                    <SelectItem key={preset.id} value={preset.id}>
-                      {preset.name} ({preset.categories.length})
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="gamesPlayed">
+                    <Trans>Sessions Played</Trans>
+                  </SelectItem>
+                  <SelectItem value="winRatio">
+                    <Trans>Win Rate</Trans>
+                  </SelectItem>
+                  <SelectItem value="uniqueGamesPlayed">
+                    <Trans>Unique Games</Trans>
+                  </SelectItem>
+                  <SelectItem value="participationRate">
+                    <Trans>Participation Rate</Trans>
+                  </SelectItem>
+                  <SelectItem value="winStreak">
+                    <Trans>Win Streak</Trans>
+                  </SelectItem>
                 </SelectContent>
               </Select>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setCategoryFilterDialogOpen(true)}
-                className={
-                  selectedCategories.length > 0 ? "border-primary" : ""
-                }
-              >
-                <Filter className="w-4 h-4" />
-              </Button>
             </div>
-          </div>
-          </>
+          )}
+
+          {viewMode === "games" && (
+            <>
+              <div className="flex-1 min-w-[200px]">
+                <label className="flex items-center gap-1 mb-2 text-sm font-medium">
+                  <Trans>Ranking Scheme</Trans>
+                  <ResponsiveTooltip
+                    content={
+                      <div className="max-w-xs space-y-2">
+                        <div>
+                          <strong>
+                            <Trans>Equal per Player:</Trans>
+                          </strong>{" "}
+                          <Trans>
+                            Each player has equal voting weight (w_p = 1). Best
+                            for giving everyone an equal voice regardless of
+                            participation.
+                          </Trans>
+                        </div>
+                        <div>
+                          <strong>
+                            <Trans>Damped (Recommended):</Trans>
+                          </strong>{" "}
+                          <Trans>
+                            Player weight is square root of games played (w_p =
+                            √np). Recommended compromise that values experience
+                            while not overpowering casual voters.
+                          </Trans>
+                        </div>
+                        <div>
+                          <strong>
+                            <Trans>Linear by Experience:</Trans>
+                          </strong>{" "}
+                          <Trans>
+                            Player weight proportional to games played (w_p =
+                            np). Gives more weight to players who participated
+                            more throughout the year.
+                          </Trans>
+                        </div>
+                      </div>
+                    }
+                    contentClassName="text-left"
+                  >
+                    <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                  </ResponsiveTooltip>
+                </label>
+                <Select
+                  value={selectedScheme}
+                  onValueChange={(value) =>
+                    setSelectedScheme(value as RankingScheme)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="equal">
+                      <Trans>Equal per Player</Trans>
+                    </SelectItem>
+                    <SelectItem value="damped">
+                      <Trans>Damped (Recommended)</Trans>
+                    </SelectItem>
+                    <SelectItem value="linear">
+                      <Trans>Linear by Experience</Trans>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex-1 min-w-[200px]">
+                <label className="block mb-2 text-sm font-medium">
+                  <Trans>Game Type</Trans>
+                </label>
+                <Select
+                  value={selectedGameType}
+                  onValueChange={(value) =>
+                    setSelectedGameType(value as BoardGameType | "all")
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={_(t`All Types`)} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      <Trans>All Types</Trans>
+                    </SelectItem>
+                    {availableGameTypes.length > 0
+                      ? availableGameTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {getBoardGameTypeLabel(type, _)}
+                          </SelectItem>
+                        ))
+                      : BOARD_GAME_TYPES.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {getBoardGameTypeLabel(type, _)}
+                          </SelectItem>
+                        ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex-1 min-w-[200px]">
+                <label className="block mb-2 text-sm font-medium">
+                  <Trans>Category</Trans>
+                </label>
+                <div className="flex gap-2">
+                  <Select
+                    value={selectedPreset || "none"}
+                    onValueChange={handlePresetChange}
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder={_(t`All Categories`)} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">
+                        <Trans>All Categories</Trans>
+                      </SelectItem>
+                      {categoryPresets.map((preset) => (
+                        <SelectItem key={preset.id} value={preset.id}>
+                          {preset.name} ({preset.categories.length})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setCategoryFilterDialogOpen(true)}
+                    className={
+                      selectedCategories.length > 0 ? "border-primary" : ""
+                    }
+                  >
+                    <Filter className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
         </div>
 
@@ -1260,62 +1396,98 @@ function ResultsPage() {
             </DialogHeader>
 
             <div className="px-6 pb-4 shrink-0">
-              <div className="space-y-2">
-                <Label>
-                  <Trans>Select Player</Trans>
-                </Label>
-                <Select
-                  value={selectedPlayerId}
-                  onValueChange={handlePlayerSelect}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={_(t`Choose a player...`)} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {allUsers.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        <div className="flex items-center gap-2">
-                          <UserAvatar
-                            nickname={user.nickname}
-                            avatarUrl={user.avatar_url}
-                            size="sm"
-                            showFallback={false}
-                          />
-                          {user.nickname}
-                        </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>
+                    <Trans>Select Player</Trans>
+                  </Label>
+                  <Select
+                    value={selectedPlayerId}
+                    onValueChange={handlePlayerSelect}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={_(t`Choose a player...`)} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {allUsers.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          <div className="flex items-center gap-2">
+                            <UserAvatar
+                              nickname={user.nickname}
+                              avatarUrl={user.avatar_url}
+                              size="sm"
+                              showFallback={false}
+                            />
+                            {user.nickname}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>
+                    <Trans>Game Type</Trans>
+                  </Label>
+                  <Select
+                    value={dialogGameTypeFilter}
+                    onValueChange={(value) =>
+                      setDialogGameTypeFilter(value as BoardGameType | "all")
+                    }
+                    disabled={
+                      !selectedPlayerId || playerGameRankings.length === 0
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={_(t`All Types`)} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">
+                        <Trans>All Types</Trans>
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                      {availableDialogGameTypes.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {getBoardGameTypeLabel(type, _)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
             {selectedPlayerId && (
-              <div className="flex-1 overflow-hidden px-6">
+              <div className="flex-1 px-6 overflow-hidden">
                 {loadingPlayerRankings ? (
-                  <p className="text-center text-muted-foreground py-4">
+                  <p className="py-4 text-center text-muted-foreground">
                     <Trans>Loading rankings...</Trans>
                   </p>
                 ) : playerGameRankings.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-4">
+                  <p className="py-4 text-center text-muted-foreground">
                     <Trans>
                       This player has not submitted any rankings for{" "}
                       {selectedYear}
                     </Trans>
                   </p>
+                ) : filteredPlayerGameRankings.length === 0 ? (
+                  <p className="py-4 text-center text-muted-foreground">
+                    <Trans>No games match the selected game type filter</Trans>
+                  </p>
                 ) : (
                   <div className="flex flex-col h-full">
-                    <p className="text-sm font-medium mb-2 shrink-0">
+                    <p className="mb-2 text-sm font-medium shrink-0">
                       <Trans>
-                        {playerGameRankings.length} games ranked
+                        {filteredPlayerGameRankings.length} of{" "}
+                        {playerGameRankings.length} games shown
                       </Trans>
                     </p>
                     <ScrollArea
                       className="flex-1 border rounded-md"
-                      viewportClassName="max-h-[calc(95dvh-280px)]"
+                      viewportClassName="max-h-[calc(95dvh-350px)]"
                     >
                       <div className="divide-y">
-                        {playerGameRankings.map((item) => (
+                        {filteredPlayerGameRankings.map((item) => (
                           <div
                             key={item.game.id}
                             className="flex items-center gap-3 p-3 hover:bg-muted/50"
@@ -1422,7 +1594,9 @@ function ResultsPage() {
                           <CardDescription>
                             {result.game.year_published && (
                               <span>
-                                <Trans>Year: {result.game.year_published}</Trans>
+                                <Trans>
+                                  Year: {result.game.year_published}
+                                </Trans>
                               </span>
                             )}
                             {result.tieBreakInfo && (
@@ -1548,7 +1722,9 @@ function ResultsPage() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold">{playerStats.length}</div>
+                      <div className="text-2xl font-bold">
+                        {playerStats.length}
+                      </div>
                     </CardContent>
                   </Card>
                   <Card>
@@ -1559,10 +1735,14 @@ function ResultsPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold">
-                        {playerStats[0]?.gamesPlayed || 0}
+                        {Math.max(...playerStats.map((p) => p.gamesPlayed))}
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {playerStats[0]?.user.nickname}
+                        {
+                          playerStats.reduce((max, p) =>
+                            p.gamesPlayed > max.gamesPlayed ? p : max
+                          ).user.nickname
+                        }
                       </p>
                     </CardContent>
                   </Card>
@@ -1611,7 +1791,7 @@ function ResultsPage() {
 
                 {/* Player Cards */}
                 <div className="space-y-4">
-                  {playerStats.map((stats, index) => (
+                  {sortedPlayerStats.map((stats, index) => (
                     <Card
                       key={stats.user.id}
                       className={index < 3 ? "border-primary" : ""}
@@ -1632,7 +1812,8 @@ function ResultsPage() {
                             </CardTitle>
                             <CardDescription>
                               <Trans>
-                                {stats.gamesPlayed} games played in {selectedYear}
+                                {stats.gamesPlayed} games played in{" "}
+                                {selectedYear}
                               </Trans>
                             </CardDescription>
                           </div>
@@ -1659,9 +1840,7 @@ function ResultsPage() {
                               {stats.gamesWon}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              <Trans>
-                                out of {stats.gamesPlayed} games
-                              </Trans>
+                              <Trans>out of {stats.gamesPlayed} games</Trans>
                             </div>
                           </div>
 
@@ -1712,23 +1891,23 @@ function ResultsPage() {
                         </div>
 
                         {stats.favoriteGame && (
-                          <div className="mt-4 p-3 rounded bg-muted/50">
-                            <p className="text-sm font-medium mb-1">
+                          <div className="p-3 mt-4 rounded bg-muted/50">
+                            <p className="mb-1 text-sm font-medium">
                               <Trans>Most Played Game</Trans>
                             </p>
                             <p className="text-sm">
                               {stats.favoriteGame.name}{" "}
                               <span className="text-muted-foreground">
-                                ({stats.favoriteGame.count}{" "}
-                                <Trans>times</Trans>)
+                                ({stats.favoriteGame.count} <Trans>times</Trans>
+                                )
                               </span>
                             </p>
                           </div>
                         )}
 
                         {stats.averageScore > 0 && (
-                          <div className="mt-4 p-3 rounded bg-muted/50">
-                            <p className="text-sm font-medium mb-1">
+                          <div className="p-3 mt-4 rounded bg-muted/50">
+                            <p className="mb-1 text-sm font-medium">
                               <Trans>Average Score</Trans>
                             </p>
                             <p className="text-sm">
