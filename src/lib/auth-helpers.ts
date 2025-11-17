@@ -3,6 +3,11 @@ import { supabase } from "@/lib/supabase";
 import type { UserRole } from "@/types";
 
 export async function requireAuth() {
+  // Skip auth check during SSR - let client handle it
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -11,8 +16,7 @@ export async function requireAuth() {
     throw redirect({
       to: "/login",
       search: {
-        redirect:
-          typeof window !== "undefined" ? window.location.pathname : undefined,
+        redirect: window.location.pathname,
       },
     });
   }
@@ -22,6 +26,11 @@ export async function requireAuth() {
 
 export async function requireRole(role: UserRole) {
   const session = await requireAuth();
+
+  // Skip role check during SSR
+  if (!session) {
+    return null;
+  }
 
   const { data: user, error } = await supabase
     .from("users")

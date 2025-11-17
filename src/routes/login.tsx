@@ -16,9 +16,16 @@ import {
 import { useAuthContext } from "@/contexts/auth-context";
 import { LanguageSelector } from "@/components/ui/language-selector";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Loader2 } from "lucide-react";
+import { z } from "zod";
+
+const loginSearchSchema = z.object({
+  redirect: z.string().optional(),
+});
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
+  validateSearch: loginSearchSchema,
 });
 
 function LoginPage() {
@@ -30,15 +37,25 @@ function LoginPage() {
   const [resetMode, setResetMode] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
 
-  const { signIn, resetPassword, user } = useAuthContext();
+  const { signIn, resetPassword, user, loading: authLoading } = useAuthContext();
   const navigate = useNavigate();
+  const { redirect: redirectTo } = Route.useSearch();
 
-  // Redirect to dashboard if already logged in
+  // Redirect to intended page (or dashboard) if already logged in
   useEffect(() => {
     if (user) {
-      navigate({ to: "/dashboard" });
+      navigate({ to: redirectTo || "/dashboard" });
     }
-  }, [user, navigate]);
+  }, [user, navigate, redirectTo]);
+
+  // Show loading spinner while checking auth state
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-4 bg-background">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
