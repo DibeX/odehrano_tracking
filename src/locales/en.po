@@ -1001,6 +1001,7 @@ msgstr "Game session deleted"
 msgid "Game Type"
 msgstr "Game Type"
 
+#: src/routes/games/$gameId.tsx
 #: src/routes/games/library.tsx
 msgid "Game Type:"
 msgstr "Game Type:"

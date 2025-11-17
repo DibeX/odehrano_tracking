@@ -1001,6 +1001,7 @@ msgstr "Herní partie smazána"
 msgid "Game Type"
 msgstr "Typ hry"
 
+#: src/routes/games/$gameId.tsx
 #: src/routes/games/library.tsx
 msgid "Game Type:"
 msgstr "Typ hry:"
