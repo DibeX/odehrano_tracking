@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     const { data: userData, error: roleError } = await supabaseClient
       .from("users")
       .select("role")
-      .eq("id", user.id)
+      .eq("auth_user_id", user.id)
       .single();
 
     if (roleError || !userData || userData.role !== "admin") {
@@ -62,11 +62,6 @@ Deno.serve(async (req) => {
 
     if (!userId) {
       throw new Error("User ID is required");
-    }
-
-    // Prevent self-deletion
-    if (userId === user.id) {
-      throw new Error("Cannot delete your own account");
     }
 
     // Create admin client with service role key
@@ -84,7 +79,7 @@ Deno.serve(async (req) => {
     // Verify the user to be deleted exists
     const { data: targetUser, error: targetError } = await supabaseAdmin
       .from("users")
-      .select("id, nickname, email")
+      .select("id, nickname, email, auth_user_id, is_placeholder")
       .eq("id", userId)
       .single();
 
@@ -92,13 +87,43 @@ Deno.serve(async (req) => {
       throw new Error("User not found");
     }
 
-    // Delete the user from auth.users (this will cascade to public.users)
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(
-      userId
-    );
+    // Prevent self-deletion (check both user.id and auth_user_id)
+    if (targetUser.auth_user_id === user.id) {
+      throw new Error("Cannot delete your own account");
+    }
 
-    if (deleteError) {
-      throw new Error(`Failed to delete user: ${deleteError.message}`);
+    // For placeholder users (no auth account), just delete from users table
+    if (targetUser.is_placeholder || !targetUser.auth_user_id) {
+      const { error: deleteError } = await supabaseAdmin
+        .from("users")
+        .delete()
+        .eq("id", userId);
+
+      if (deleteError) {
+        throw new Error(`Failed to delete user: ${deleteError.message}`);
+      }
+    } else {
+      // For regular users with auth accounts, delete from auth.users
+      // This will cascade to public.users due to ON DELETE SET NULL
+      // So we need to also delete from users table
+      const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(
+        targetUser.auth_user_id
+      );
+
+      if (authDeleteError) {
+        throw new Error(`Failed to delete auth user: ${authDeleteError.message}`);
+      }
+
+      // The CASCADE should handle the users table deletion, but let's be explicit
+      const { error: userDeleteError } = await supabaseAdmin
+        .from("users")
+        .delete()
+        .eq("id", userId);
+
+      if (userDeleteError) {
+        // This might fail if cascade already deleted it, which is fine
+        console.log("User table delete error (may be expected):", userDeleteError);
+      }
     }
 
     return new Response(

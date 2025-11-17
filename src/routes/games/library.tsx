@@ -26,6 +26,10 @@ import {
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import type { BoardGame } from "@/types";
+import {
+  getBoardGameTypeLabel,
+  type BoardGameType,
+} from "@/constants/board-game-types";
 import { Plus, Search, Edit, ArrowLeft, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/games/library")({
@@ -258,6 +262,20 @@ function GamesLibraryPage() {
                       <p className="text-sm text-muted-foreground line-clamp-2">
                         {game.publishers.join(", ")}
                       </p>
+                    </div>
+                  )}
+
+                  {game.game_type && (
+                    <div>
+                      <p className="mb-1 text-sm font-medium">
+                        <Trans>Game Type:</Trans>
+                      </p>
+                      <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary">
+                        {getBoardGameTypeLabel(
+                          game.game_type as BoardGameType,
+                          _
+                        )}
+                      </span>
                     </div>
                   )}
 

@@ -8,42 +8,50 @@ export type Json =
 
 export type UserRole = 'admin' | 'moderator' | 'player';
 
+export type BoardGameType = 'abstract_strategy' | 'customizable' | 'thematic' | 'family' | 'children' | 'party' | 'strategy' | 'wargames';
+
 export interface Database {
   public: {
     Tables: {
       users: {
         Row: {
           id: string;
-          email: string;
+          auth_user_id: string | null;
+          email: string | null;
           nickname: string;
           avatar_url: string | null;
           description: string | null;
           role: UserRole;
           is_active: boolean;
+          is_placeholder: boolean;
           last_login_at: string | null;
           created_at: string;
           updated_at: string;
         };
         Insert: {
-          id: string;
-          email: string;
+          id?: string;
+          auth_user_id?: string | null;
+          email?: string | null;
           nickname: string;
           avatar_url?: string | null;
           description?: string | null;
           role?: UserRole;
           is_active?: boolean;
+          is_placeholder?: boolean;
           last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
-          email?: string;
+          auth_user_id?: string | null;
+          email?: string | null;
           nickname?: string;
           avatar_url?: string | null;
           description?: string | null;
           role?: UserRole;
           is_active?: boolean;
+          is_placeholder?: boolean;
           last_login_at?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -60,6 +68,7 @@ export interface Database {
           expires_at: string;
           used_at: string | null;
           created_at: string;
+          placeholder_user_id: string | null;
         };
         Insert: {
           id?: string;
@@ -70,6 +79,7 @@ export interface Database {
           expires_at: string;
           used_at?: string | null;
           created_at?: string;
+          placeholder_user_id?: string | null;
         };
         Update: {
           id?: string;
@@ -80,6 +90,7 @@ export interface Database {
           expires_at?: string;
           used_at?: string | null;
           created_at?: string;
+          placeholder_user_id?: string | null;
         };
         Relationships: [];
       };
@@ -94,6 +105,7 @@ export interface Database {
           year_published: number | null;
           categories: string[];
           publishers: string[];
+          game_type: BoardGameType | null;
           bgg_rank: number | null;
           bgg_rating: number | null;
           created_at: string;
@@ -109,6 +121,7 @@ export interface Database {
           year_published?: number | null;
           categories?: string[];
           publishers?: string[];
+          game_type?: BoardGameType | null;
           bgg_rank?: number | null;
           bgg_rating?: number | null;
           created_at?: string;
@@ -124,6 +137,7 @@ export interface Database {
           year_published?: number | null;
           categories?: string[];
           publishers?: string[];
+          game_type?: BoardGameType | null;
           bgg_rank?: number | null;
           bgg_rating?: number | null;
           created_at?: string;

@@ -6,7 +6,15 @@
       "Bash(npm create:*)",
       "Bash(del \"h:\\code\\repositories\\odehrano_tracking\\src\\routes\\games\\add.tsx\")",
       "Bash(mkdir:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(wc:*)",
+      "Bash(sed:*)",
+      "Bash(file=\"/h/code/repositories/odehrano_tracking/src/routes/games/edit.$gameId.tsx\")",
+      "Bash(for f in \"/h/code/repositories/odehrano_tracking/src/routes/games/\"edit*.tsx)",
+      "Bash(do echo \"File: $f\")",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

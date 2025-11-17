@@ -32,7 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { X, Plus, Save, Trash2, Pencil, Filter, Info } from "lucide-react";
+import { X, Plus, Save, Trash2, Pencil, Filter, Info, Trophy, Users, TrendingUp, Award } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
 import { UserAvatar } from "@/components/ui/user-avatar";
@@ -46,8 +46,29 @@ import type {
   UserGameRanking,
   RankingResult,
   CategoryPreset,
+  PlayedGame,
+  PlayedGamePlayer,
 } from "@/types";
 import { GAME_CATEGORIES } from "@/constants/game-categories";
+import {
+  BOARD_GAME_TYPES,
+  type BoardGameType,
+  getBoardGameTypeLabel,
+} from "@/constants/board-game-types";
+
+// Player statistics interface
+interface PlayerStats {
+  user: User;
+  gamesPlayed: number;
+  gamesWon: number;
+  winRatio: number;
+  totalScore: number;
+  averageScore: number;
+  uniqueGamesPlayed: number;
+  favoriteGame: { name: string; count: number } | null;
+  winStreak: number;
+  participationRate: number;
+}
 
 export const Route = createFileRoute("/results")({
   component: ResultsPage,
@@ -75,11 +96,20 @@ function ResultsPage() {
   const [loading, setLoading] = useState(true);
   const [calculating, setCalculating] = useState(false);
 
+  // View toggle state
+  const [viewMode, setViewMode] = useState<"games" | "players">("games");
+  const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
+  const [loadingPlayerStats, setLoadingPlayerStats] = useState(false);
+
   // Category filtering state
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [categoryPresets, setCategoryPresets] = useState<CategoryPreset[]>([]);
   const [selectedPreset, setSelectedPreset] = useState<string>("");
+
+  // Game type filtering state
+  const [availableGameTypes, setAvailableGameTypes] = useState<BoardGameType[]>([]);
+  const [selectedGameType, setSelectedGameType] = useState<BoardGameType | "all">("all");
 
   // Preset management dialog state
   const [presetDialogOpen, setPresetDialogOpen] = useState(false);
@@ -105,15 +135,32 @@ function ResultsPage() {
     }
   }, [selectedYear, selectedScheme]);
 
-  // Filter results based on selected categories
-  const filteredResults = useMemo(() => {
-    if (selectedCategories.length === 0) {
-      return results;
+  useEffect(() => {
+    if (selectedYear && viewMode === "players") {
+      loadPlayerStats();
     }
-    return results.filter((result) =>
-      result.game.categories.some((cat) => selectedCategories.includes(cat))
-    );
-  }, [results, selectedCategories]);
+  }, [selectedYear, viewMode]);
+
+  // Filter results based on selected categories and game type
+  const filteredResults = useMemo(() => {
+    let filtered = results;
+
+    // Filter by game type
+    if (selectedGameType !== "all") {
+      filtered = filtered.filter(
+        (result) => result.game.game_type === selectedGameType
+      );
+    }
+
+    // Filter by categories
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((result) =>
+        result.game.categories.some((cat) => selectedCategories.includes(cat))
+      );
+    }
+
+    return filtered;
+  }, [results, selectedCategories, selectedGameType]);
 
   async function loadYears() {
     setLoading(true);
@@ -193,12 +240,17 @@ function ResultsPage() {
 
       // Extract unique categories from all games
       const allCategories = new Set<string>();
+      const allGameTypes = new Set<BoardGameType>();
       for (const game of games as BoardGame[]) {
         for (const category of game.categories) {
           allCategories.add(category);
         }
+        if (game.game_type) {
+          allGameTypes.add(game.game_type as BoardGameType);
+        }
       }
       setAvailableCategories(Array.from(allCategories).sort());
+      setAvailableGameTypes(Array.from(allGameTypes));
     } catch (error: any) {
       toast({
         title: _(t`Error calculating results`),
@@ -207,6 +259,184 @@ function ResultsPage() {
       });
     } finally {
       setCalculating(false);
+    }
+  }
+
+  async function loadPlayerStats() {
+    if (!selectedYear) return;
+
+    setLoadingPlayerStats(true);
+    try {
+      // Load all users
+      const { data: users, error: usersError } = await supabase
+        .from("users")
+        .select("*");
+
+      if (usersError) throw usersError;
+
+      // Load played games for the selected year
+      const startOfYear = `${selectedYear}-01-01`;
+      const endOfYear = `${selectedYear}-12-31`;
+
+      const { data: playedGames, error: gamesError } = await supabase
+        .from("played_games")
+        .select("*")
+        .gte("played_at", startOfYear)
+        .lte("played_at", endOfYear);
+
+      if (gamesError) throw gamesError;
+
+      // Load all game player records for these games
+      const gameIds = playedGames?.map((g) => g.id) || [];
+
+      if (gameIds.length === 0) {
+        setPlayerStats([]);
+        setLoadingPlayerStats(false);
+        return;
+      }
+
+      const { data: playerRecords, error: playersError } = await supabase
+        .from("played_game_players")
+        .select("*")
+        .in("played_game_id", gameIds);
+
+      if (playersError) throw playersError;
+
+      // Load board game details for favorite game calculation
+      const boardGameIds = Array.from(
+        new Set(playedGames?.map((g) => g.board_game_id) || [])
+      );
+
+      const { data: boardGames, error: boardGamesError } = await supabase
+        .from("board_games")
+        .select("id, name")
+        .in("id", boardGameIds);
+
+      if (boardGamesError) throw boardGamesError;
+
+      const boardGameMap = new Map(
+        boardGames?.map((bg) => [bg.id, bg.name]) || []
+      );
+
+      // Calculate statistics for each user
+      const stats: PlayerStats[] = [];
+      const totalGamesInYear = playedGames?.length || 0;
+
+      for (const user of users as User[]) {
+        // Get all game records for this user
+        const userGameRecords = playerRecords?.filter(
+          (pr) => pr.user_id === user.id
+        ) || [];
+
+        if (userGameRecords.length === 0) continue;
+
+        // Calculate basic stats
+        const gamesPlayed = userGameRecords.length;
+        const gamesWon = userGameRecords.filter((r) => r.is_winner).length;
+        const winRatio = gamesPlayed > 0 ? gamesWon / gamesPlayed : 0;
+
+        // Calculate score stats
+        const scoresWithValues = userGameRecords.filter(
+          (r) => r.score !== null
+        );
+        const totalScore = scoresWithValues.reduce(
+          (sum, r) => sum + (r.score || 0),
+          0
+        );
+        const averageScore =
+          scoresWithValues.length > 0
+            ? totalScore / scoresWithValues.length
+            : 0;
+
+        // Calculate unique games played
+        const uniqueGameIds = new Set<string>();
+        for (const record of userGameRecords) {
+          const playedGame = playedGames?.find(
+            (pg) => pg.id === record.played_game_id
+          );
+          if (playedGame) {
+            uniqueGameIds.add(playedGame.board_game_id);
+          }
+        }
+        const uniqueGamesPlayed = uniqueGameIds.size;
+
+        // Find favorite game (most played)
+        const gamePlayCounts = new Map<string, number>();
+        for (const record of userGameRecords) {
+          const playedGame = playedGames?.find(
+            (pg) => pg.id === record.played_game_id
+          );
+          if (playedGame) {
+            const bgId = playedGame.board_game_id;
+            gamePlayCounts.set(bgId, (gamePlayCounts.get(bgId) || 0) + 1);
+          }
+        }
+
+        let favoriteGame: { name: string; count: number } | null = null;
+        let maxCount = 0;
+        for (const [bgId, count] of gamePlayCounts) {
+          if (count > maxCount) {
+            maxCount = count;
+            const gameName = boardGameMap.get(bgId) || "Unknown";
+            favoriteGame = { name: gameName, count };
+          }
+        }
+
+        // Calculate win streak (simplified - just current streak based on chronological order)
+        const userGamesWithDates = userGameRecords
+          .map((record) => {
+            const playedGame = playedGames?.find(
+              (pg) => pg.id === record.played_game_id
+            );
+            return {
+              ...record,
+              played_at: playedGame?.played_at || "",
+            };
+          })
+          .sort(
+            (a, b) =>
+              new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
+          );
+
+        let winStreak = 0;
+        for (const game of userGamesWithDates) {
+          if (game.is_winner) {
+            winStreak++;
+          } else {
+            break;
+          }
+        }
+
+        // Participation rate
+        const participationRate =
+          totalGamesInYear > 0 ? gamesPlayed / totalGamesInYear : 0;
+
+        stats.push({
+          user,
+          gamesPlayed,
+          gamesWon,
+          winRatio,
+          totalScore,
+          averageScore,
+          uniqueGamesPlayed,
+          favoriteGame,
+          winStreak,
+          participationRate,
+        });
+      }
+
+      // Sort by games played (descending)
+      stats.sort((a, b) => b.gamesPlayed - a.gamesPlayed);
+
+      setPlayerStats(stats);
+    } catch (error: any) {
+      toast({
+        title: _(t`Error loading player statistics`),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingPlayerStats(false);
     }
   }
 
@@ -413,17 +643,37 @@ function ResultsPage() {
   return (
     <AppLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">
-            <Trans>Ranking Results</Trans>
-          </h1>
-          <p className="text-muted-foreground">
-            <Trans>View calculated game rankings based on player votes</Trans>
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">
+              <Trans>Ranking Results</Trans>
+            </h1>
+            <p className="text-muted-foreground">
+              <Trans>View calculated game rankings based on player votes</Trans>
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === "games" ? "default" : "outline"}
+              onClick={() => setViewMode("games")}
+              className="gap-2"
+            >
+              <Trophy className="w-4 h-4" />
+              <Trans>Games Ranking</Trans>
+            </Button>
+            <Button
+              variant={viewMode === "players" ? "default" : "outline"}
+              onClick={() => setViewMode("players")}
+              className="gap-2"
+            >
+              <Users className="w-4 h-4" />
+              <Trans>Players Ranking</Trans>
+            </Button>
+          </div>
         </div>
 
-        <div className="flex gap-4">
-          <div className="flex-1">
+        <div className="flex flex-wrap gap-4">
+          <div className="flex-1 min-w-[200px]">
             <label className="block mb-2 text-sm font-medium">
               <Trans>Year</Trans>
             </label>
@@ -449,7 +699,9 @@ function ResultsPage() {
             </Select>
           </div>
 
-          <div className="flex-1">
+          {viewMode === "games" && (
+          <>
+          <div className="flex-1 min-w-[200px]">
             <label className="flex items-center gap-1 mb-2 text-sm font-medium">
               <Trans>Ranking Scheme</Trans>
               <ResponsiveTooltip
@@ -503,7 +755,39 @@ function ResultsPage() {
             </Select>
           </div>
 
-          <div className="flex-1">
+          <div className="flex-1 min-w-[200px]">
+            <label className="block mb-2 text-sm font-medium">
+              <Trans>Game Type</Trans>
+            </label>
+            <Select
+              value={selectedGameType}
+              onValueChange={(value) =>
+                setSelectedGameType(value as BoardGameType | "all")
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={_(t`All Types`)} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  <Trans>All Types</Trans>
+                </SelectItem>
+                {availableGameTypes.length > 0
+                  ? availableGameTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {getBoardGameTypeLabel(type, _)}
+                      </SelectItem>
+                    ))
+                  : BOARD_GAME_TYPES.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {getBoardGameTypeLabel(type, _)}
+                      </SelectItem>
+                    ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex-1 min-w-[200px]">
             <label className="block mb-2 text-sm font-medium">
               <Trans>Category</Trans>
             </label>
@@ -538,10 +822,12 @@ function ResultsPage() {
               </Button>
             </div>
           </div>
+          </>
+          )}
         </div>
 
         {/* Selected Categories Summary */}
-        {selectedCategories.length > 0 && (
+        {viewMode === "games" && selectedCategories.length > 0 && (
           <div className="p-3 rounded-md bg-secondary">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium">
@@ -872,133 +1158,382 @@ function ResultsPage() {
           </DialogContent>
         </Dialog>
 
-        {calculating ? (
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">
-                <Trans>Calculating rankings...</Trans>
-              </p>
-            </CardContent>
-          </Card>
-        ) : filteredResults.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">
-                {selectedCategories.length > 0 ? (
-                  <Trans>No games match the selected categories</Trans>
-                ) : (
-                  <Trans>No rankings data available for this year</Trans>
-                )}
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            {filteredResults.map((result, index) => (
-              <Card
-                key={result.game.id}
-                className={index < 3 ? "border-primary" : ""}
-              >
-                <CardHeader>
-                  <div className="flex items-start gap-4">
-                    <div className="flex items-center justify-center w-12 h-12 text-lg font-bold rounded-full bg-primary text-primary-foreground">
-                      {index + 1}
-                    </div>
-                    {result.game.image_url && (
-                      <div className="w-20 h-20 overflow-hidden rounded bg-muted shrink-0">
-                        <img
-                          src={result.game.image_url}
-                          alt={result.game.name}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <CardTitle className="text-xl">
-                        {result.game.name}
-                      </CardTitle>
-                      <CardDescription>
-                        {result.game.year_published && (
-                          <span>
-                            <Trans>Year: {result.game.year_published}</Trans>
-                          </span>
-                        )}
-                        {result.tieBreakInfo && (
-                          <>
-                            {" • "}
-                            <span>
-                              <Trans>
-                                {result.tieBreakInfo.firstPlaceVotes}{" "}
-                                first-place votes
-                              </Trans>
-                            </span>
-                          </>
-                        )}
-                      </CardDescription>
-                      {result.game.categories.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {result.game.categories.map((cat) => (
-                            <Badge
-                              key={cat}
-                              variant={
-                                selectedCategories.includes(cat)
-                                  ? "default"
-                                  : "secondary"
-                              }
-                              className="text-xs"
-                            >
-                              {cat}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">
-                        {result.normalizedScore.toFixed(4)}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        <Trans>Score</Trans>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div>
-                    <p className="mb-3 text-sm font-medium">
-                      <Trans>Player Rankings:</Trans>
-                    </p>
-                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                      {result.playerContributions.map((contrib) => (
-                        <div
-                          key={contrib.user.id}
-                          className="flex items-center justify-between p-2 rounded bg-secondary"
-                        >
-                          <div className="flex items-center gap-2">
-                            <UserAvatar
-                              nickname={contrib.user.nickname}
-                              avatarUrl={contrib.user.avatar_url}
-                              size="sm"
-                              showFallback={false}
-                            />
-                            <span className="font-medium">
-                              {contrib.user.nickname}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              (#{contrib.rank})
-                            </span>
-                          </div>
-                          <span className="text-xs text-muted-foreground">
-                            {contrib.contribution.toFixed(4)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+        {/* Games Ranking View */}
+        {viewMode === "games" && (
+          <>
+            {calculating ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-center text-muted-foreground">
+                    <Trans>Calculating rankings...</Trans>
+                  </p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+            ) : filteredResults.length === 0 ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-center text-muted-foreground">
+                    {selectedCategories.length > 0 ||
+                    selectedGameType !== "all" ? (
+                      <Trans>No games match the selected filters</Trans>
+                    ) : (
+                      <Trans>No rankings data available for this year</Trans>
+                    )}
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {filteredResults.map((result, index) => (
+                  <Card
+                    key={result.game.id}
+                    className={index < 3 ? "border-primary" : ""}
+                  >
+                    <CardHeader>
+                      <div className="flex items-start gap-4">
+                        <div className="flex items-center justify-center w-12 h-12 text-lg font-bold rounded-full bg-primary text-primary-foreground">
+                          {index + 1}
+                        </div>
+                        {result.game.image_url && (
+                          <div className="w-20 h-20 overflow-hidden rounded bg-muted shrink-0">
+                            <img
+                              src={result.game.image_url}
+                              alt={result.game.name}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <CardTitle className="text-xl">
+                            {result.game.name}
+                          </CardTitle>
+                          <CardDescription>
+                            {result.game.year_published && (
+                              <span>
+                                <Trans>Year: {result.game.year_published}</Trans>
+                              </span>
+                            )}
+                            {result.tieBreakInfo && (
+                              <>
+                                {" • "}
+                                <span>
+                                  <Trans>
+                                    {result.tieBreakInfo.firstPlaceVotes}{" "}
+                                    first-place votes
+                                  </Trans>
+                                </span>
+                              </>
+                            )}
+                          </CardDescription>
+                          {result.game.game_type && (
+                            <div className="mt-2">
+                              <Badge
+                                variant="outline"
+                                className="text-xs font-medium border-primary text-primary"
+                              >
+                                {getBoardGameTypeLabel(
+                                  result.game.game_type as BoardGameType,
+                                  _
+                                )}
+                              </Badge>
+                            </div>
+                          )}
+                          {result.game.categories.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {result.game.categories.map((cat) => (
+                                <Badge
+                                  key={cat}
+                                  variant={
+                                    selectedCategories.includes(cat)
+                                      ? "default"
+                                      : "secondary"
+                                  }
+                                  className="text-xs"
+                                >
+                                  {cat}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">
+                            {result.normalizedScore.toFixed(4)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            <Trans>Score</Trans>
+                          </div>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div>
+                        <p className="mb-3 text-sm font-medium">
+                          <Trans>Player Rankings:</Trans>
+                        </p>
+                        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                          {result.playerContributions.map((contrib) => (
+                            <div
+                              key={contrib.user.id}
+                              className="flex items-center justify-between p-2 rounded bg-secondary"
+                            >
+                              <div className="flex items-center gap-2">
+                                <UserAvatar
+                                  nickname={contrib.user.nickname}
+                                  avatarUrl={contrib.user.avatar_url}
+                                  size="sm"
+                                  showFallback={false}
+                                />
+                                <span className="font-medium">
+                                  {contrib.user.nickname}
+                                </span>
+                                <span className="text-xs text-muted-foreground">
+                                  (#{contrib.rank})
+                                </span>
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                {contrib.contribution.toFixed(4)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Players Ranking View */}
+        {viewMode === "players" && (
+          <>
+            {loadingPlayerStats ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-center text-muted-foreground">
+                    <Trans>Loading player statistics...</Trans>
+                  </p>
+                </CardContent>
+              </Card>
+            ) : playerStats.length === 0 ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-center text-muted-foreground">
+                    <Trans>No player data available for this year</Trans>
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-6">
+                {/* Summary Stats */}
+                <div className="grid gap-4 md:grid-cols-4">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        <Trans>Total Players</Trans>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{playerStats.length}</div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        <Trans>Most Games Played</Trans>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {playerStats[0]?.gamesPlayed || 0}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {playerStats[0]?.user.nickname}
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        <Trans>Highest Win Rate</Trans>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {(
+                          Math.max(...playerStats.map((p) => p.winRatio)) * 100
+                        ).toFixed(1)}
+                        %
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {
+                          playerStats.reduce((max, p) =>
+                            p.winRatio > max.winRatio ? p : max
+                          ).user.nickname
+                        }
+                      </p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        <Trans>Most Wins</Trans>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {Math.max(...playerStats.map((p) => p.gamesWon))}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {
+                          playerStats.reduce((max, p) =>
+                            p.gamesWon > max.gamesWon ? p : max
+                          ).user.nickname
+                        }
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Player Cards */}
+                <div className="space-y-4">
+                  {playerStats.map((stats, index) => (
+                    <Card
+                      key={stats.user.id}
+                      className={index < 3 ? "border-primary" : ""}
+                    >
+                      <CardHeader>
+                        <div className="flex items-start gap-4">
+                          <div className="flex items-center justify-center w-12 h-12 text-lg font-bold rounded-full bg-primary text-primary-foreground">
+                            {index + 1}
+                          </div>
+                          <UserAvatar
+                            nickname={stats.user.nickname}
+                            avatarUrl={stats.user.avatar_url}
+                            size="lg"
+                          />
+                          <div className="flex-1">
+                            <CardTitle className="text-xl">
+                              {stats.user.nickname}
+                            </CardTitle>
+                            <CardDescription>
+                              <Trans>
+                                {stats.gamesPlayed} games played in {selectedYear}
+                              </Trans>
+                            </CardDescription>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-primary">
+                              {(stats.winRatio * 100).toFixed(1)}%
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              <Trans>Win Rate</Trans>
+                            </div>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                          <div className="p-3 rounded bg-secondary">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Trophy className="w-4 h-4 text-yellow-500" />
+                              <span className="text-sm font-medium">
+                                <Trans>Wins</Trans>
+                              </span>
+                            </div>
+                            <div className="text-lg font-bold">
+                              {stats.gamesWon}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              <Trans>
+                                out of {stats.gamesPlayed} games
+                              </Trans>
+                            </div>
+                          </div>
+
+                          <div className="p-3 rounded bg-secondary">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Award className="w-4 h-4 text-blue-500" />
+                              <span className="text-sm font-medium">
+                                <Trans>Unique Games</Trans>
+                              </span>
+                            </div>
+                            <div className="text-lg font-bold">
+                              {stats.uniqueGamesPlayed}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              <Trans>different titles</Trans>
+                            </div>
+                          </div>
+
+                          <div className="p-3 rounded bg-secondary">
+                            <div className="flex items-center gap-2 mb-1">
+                              <TrendingUp className="w-4 h-4 text-green-500" />
+                              <span className="text-sm font-medium">
+                                <Trans>Win Streak</Trans>
+                              </span>
+                            </div>
+                            <div className="text-lg font-bold">
+                              {stats.winStreak}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              <Trans>current streak</Trans>
+                            </div>
+                          </div>
+
+                          <div className="p-3 rounded bg-secondary">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Users className="w-4 h-4 text-purple-500" />
+                              <span className="text-sm font-medium">
+                                <Trans>Participation</Trans>
+                              </span>
+                            </div>
+                            <div className="text-lg font-bold">
+                              {(stats.participationRate * 100).toFixed(1)}%
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              <Trans>of all sessions</Trans>
+                            </div>
+                          </div>
+                        </div>
+
+                        {stats.favoriteGame && (
+                          <div className="mt-4 p-3 rounded bg-muted/50">
+                            <p className="text-sm font-medium mb-1">
+                              <Trans>Most Played Game</Trans>
+                            </p>
+                            <p className="text-sm">
+                              {stats.favoriteGame.name}{" "}
+                              <span className="text-muted-foreground">
+                                ({stats.favoriteGame.count}{" "}
+                                <Trans>times</Trans>)
+                              </span>
+                            </p>
+                          </div>
+                        )}
+
+                        {stats.averageScore > 0 && (
+                          <div className="mt-4 p-3 rounded bg-muted/50">
+                            <p className="text-sm font-medium mb-1">
+                              <Trans>Average Score</Trans>
+                            </p>
+                            <p className="text-sm">
+                              {stats.averageScore.toFixed(1)}{" "}
+                              <span className="text-muted-foreground">
+                                <Trans>points per game</Trans>
+                              </span>
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </AppLayout>

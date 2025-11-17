@@ -57,9 +57,27 @@ function InvitePage() {
       }
 
       setInvitation(data);
-      // Pre-fill nickname from email
-      const emailPrefix = data.email.split("@")[0];
-      setNickname(emailPrefix);
+
+      // If this is for a placeholder user, load their nickname
+      if (data.placeholder_user_id) {
+        const { data: placeholderUser, error: userError } = await supabase
+          .from("users")
+          .select("nickname")
+          .eq("id", data.placeholder_user_id)
+          .single();
+
+        if (!userError && placeholderUser) {
+          setNickname(placeholderUser.nickname);
+        } else {
+          // Fallback to email prefix
+          const emailPrefix = data.email.split("@")[0];
+          setNickname(emailPrefix);
+        }
+      } else {
+        // Pre-fill nickname from email
+        const emailPrefix = data.email.split("@")[0];
+        setNickname(emailPrefix);
+      }
     } catch (error: any) {
       setError(error.message || _(t`Failed to load invitation`));
     } finally {
@@ -90,30 +108,67 @@ function InvitePage() {
     try {
       if (!invitation) throw new Error("No invitation found");
 
-      // Create the user account
-      const { data: authData, error: signUpError } = await supabase.auth.signUp(
-        {
-          email: invitation.email,
-          password,
-          options: {
-            data: {
-              nickname,
-              role: invitation.role,
+      // Check if this is for activating a placeholder user
+      const isPlaceholderActivation = !!invitation.placeholder_user_id;
+
+      if (isPlaceholderActivation) {
+        // For placeholder user activation, we need to:
+        // 1. Create auth account without triggering the normal user creation
+        // 2. Link the auth account to the existing placeholder user
+        const { data: authData, error: signUpError } = await supabase.auth.signUp(
+          {
+            email: invitation.email,
+            password,
+            options: {
+              data: {
+                // Mark as placeholder activation to skip normal user creation
+                skip_user_creation: true,
+              },
             },
-          },
-        }
-      );
+          }
+        );
 
-      if (signUpError) throw signUpError;
-      if (!authData.user) throw new Error("Failed to create user");
+        if (signUpError) throw signUpError;
+        if (!authData.user) throw new Error("Failed to create auth account");
 
-      // Update the user's nickname in the users table
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({ nickname })
-        .eq("id", authData.user.id);
+        // Link the placeholder user to the new auth account
+        const { error: linkError } = await supabase
+          .from("users")
+          .update({
+            auth_user_id: authData.user.id,
+            email: invitation.email,
+            nickname: nickname.trim(),
+            is_placeholder: false,
+          })
+          .eq("id", invitation.placeholder_user_id!);
 
-      if (updateError) throw updateError;
+        if (linkError) throw linkError;
+      } else {
+        // Normal invitation flow - create new user
+        const { data: authData, error: signUpError } = await supabase.auth.signUp(
+          {
+            email: invitation.email,
+            password,
+            options: {
+              data: {
+                nickname,
+                role: invitation.role,
+              },
+            },
+          }
+        );
+
+        if (signUpError) throw signUpError;
+        if (!authData.user) throw new Error("Failed to create user");
+
+        // Update the user's nickname in the users table
+        const { error: updateError } = await supabase
+          .from("users")
+          .update({ nickname })
+          .eq("id", authData.user.id);
+
+        if (updateError) throw updateError;
+      }
 
       // Mark invitation as used
       const { error: invitationError } = await supabase

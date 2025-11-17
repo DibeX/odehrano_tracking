@@ -13,6 +13,7 @@ interface InviteRequest {
   role: "player" | "moderator" | "admin";
   resend?: boolean;
   token?: string;
+  placeholderUserId?: string; // For activating placeholder users
 }
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -93,8 +94,8 @@ Deno.serve(async (req) => {
     // Check if user is admin
     const { data: userData, error: roleError } = await supabaseClient
       .from("users")
-      .select("role")
-      .eq("id", user.id)
+      .select("id, role")
+      .eq("auth_user_id", user.id)
       .single();
 
     if (roleError || !userData || userData.role !== "admin") {
@@ -107,6 +108,7 @@ Deno.serve(async (req) => {
       role,
       resend,
       token: existingToken,
+      placeholderUserId,
     }: InviteRequest = await req.json();
 
     if (!resend && (!email || !role)) {
@@ -166,14 +168,32 @@ Deno.serve(async (req) => {
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 14);
 
+      // If this is for a placeholder user, verify the user exists and is a placeholder
+      if (placeholderUserId) {
+        const { data: placeholderUser, error: placeholderError } = await supabaseAdmin
+          .from("users")
+          .select("id, is_placeholder")
+          .eq("id", placeholderUserId)
+          .single();
+
+        if (placeholderError || !placeholderUser) {
+          throw new Error("Placeholder user not found");
+        }
+
+        if (!placeholderUser.is_placeholder) {
+          throw new Error("User is not a placeholder user");
+        }
+      }
+
       const { error: invitationError } = await supabaseAdmin
         .from("user_invitations")
         .insert({
           email: inviteEmail,
           token,
           role: inviteRole,
-          created_by: user.id,
+          created_by: userData.id, // Use user profile ID, not auth ID
           expires_at: expiresAt.toISOString(),
+          placeholder_user_id: placeholderUserId || null,
         });
 
       if (invitationError) {

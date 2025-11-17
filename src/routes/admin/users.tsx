@@ -62,6 +62,27 @@ function UsersPage() {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
 
+  // Placeholder user state
+  const [placeholderDialogOpen, setPlaceholderDialogOpen] = useState(false);
+  const [placeholderNickname, setPlaceholderNickname] = useState("");
+  const [placeholderDescription, setPlaceholderDescription] = useState("");
+  const [placeholderAvatarUrl, setPlaceholderAvatarUrl] = useState("");
+  const [creatingPlaceholder, setCreatingPlaceholder] = useState(false);
+
+  // Edit placeholder user state
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
+  const [editNickname, setEditNickname] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editAvatarUrl, setEditAvatarUrl] = useState("");
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  // Activate placeholder user state
+  const [activateDialogOpen, setActivateDialogOpen] = useState(false);
+  const [userToActivate, setUserToActivate] = useState<User | null>(null);
+  const [activateEmail, setActivateEmail] = useState("");
+  const [sendingActivation, setSendingActivation] = useState(false);
+
   useEffect(() => {
     loadData();
   }, []);
@@ -263,6 +284,143 @@ function UsersPage() {
     }
   }
 
+  async function handleCreatePlaceholderUser() {
+    if (!placeholderNickname.trim()) {
+      toast({
+        title: _(t`Nickname required`),
+        description: _(t`Please enter a nickname for the placeholder user`),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setCreatingPlaceholder(true);
+    try {
+      const { error } = await supabase.from("users").insert({
+        nickname: placeholderNickname.trim(),
+        description: placeholderDescription.trim() || null,
+        avatar_url: placeholderAvatarUrl.trim() || null,
+        is_placeholder: true,
+        role: "player",
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: _(t`Placeholder user created`),
+        description: _(t`The placeholder user has been created successfully`),
+      });
+
+      setPlaceholderDialogOpen(false);
+      setPlaceholderNickname("");
+      setPlaceholderDescription("");
+      setPlaceholderAvatarUrl("");
+      loadData();
+    } catch (error: any) {
+      toast({
+        title: _(t`Error creating placeholder user`),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setCreatingPlaceholder(false);
+    }
+  }
+
+  async function handleEditPlaceholderUser() {
+    if (!userToEdit || !editNickname.trim()) {
+      toast({
+        title: _(t`Nickname required`),
+        description: _(t`Please enter a nickname`),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSavingEdit(true);
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({
+          nickname: editNickname.trim(),
+          description: editDescription.trim() || null,
+          avatar_url: editAvatarUrl.trim() || null,
+        })
+        .eq("id", userToEdit.id);
+
+      if (error) throw error;
+
+      toast({
+        title: _(t`User updated`),
+        description: _(t`The user has been updated successfully`),
+      });
+
+      setEditDialogOpen(false);
+      setUserToEdit(null);
+      loadData();
+    } catch (error: any) {
+      toast({
+        title: _(t`Error updating user`),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSavingEdit(false);
+    }
+  }
+
+  async function handleActivatePlaceholderUser() {
+    if (!userToActivate || !activateEmail.trim()) {
+      toast({
+        title: _(t`Email required`),
+        description: _(t`Please enter an email address`),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSendingActivation(true);
+    try {
+      // Create an invitation for this placeholder user
+      const { data, error } = await supabase.functions.invoke("invite-user", {
+        body: {
+          email: activateEmail.trim(),
+          role: userToActivate.role,
+          placeholderUserId: userToActivate.id,
+        },
+      });
+
+      if (error) throw error;
+      if (!data.success) throw new Error(data.error);
+
+      toast({
+        title: _(t`Activation email sent`),
+        description: _(t`An invitation email has been sent to ${activateEmail.trim()}`),
+      });
+
+      setActivateDialogOpen(false);
+      setUserToActivate(null);
+      setActivateEmail("");
+      loadData();
+    } catch (error: any) {
+      toast({
+        title: _(t`Error sending activation`),
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSendingActivation(false);
+    }
+  }
+
+  function openEditDialog(user: User) {
+    setUserToEdit(user);
+    setEditNickname(user.nickname);
+    setEditDescription(user.description || "");
+    setEditAvatarUrl(user.avatar_url || "");
+    setEditDialogOpen(true);
+  }
+
   return (
     <AppLayout>
       <div className="space-y-6">
@@ -276,12 +434,88 @@ function UsersPage() {
             </p>
           </div>
 
-          <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Trans>Invite User</Trans>
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Dialog open={placeholderDialogOpen} onOpenChange={setPlaceholderDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Trans>Add Placeholder User</Trans>
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>
+                    <Trans>Create Placeholder User</Trans>
+                  </DialogTitle>
+                  <DialogDescription>
+                    <Trans>
+                      Create a user without an email account. They can be assigned to game sessions and activated later.
+                    </Trans>
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="placeholder-nickname">
+                      <Trans>Nickname</Trans>
+                    </Label>
+                    <Input
+                      id="placeholder-nickname"
+                      placeholder={_(t`Enter nickname`)}
+                      value={placeholderNickname}
+                      onChange={(e) => setPlaceholderNickname(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="placeholder-description">
+                      <Trans>Bio (optional)</Trans>
+                    </Label>
+                    <Input
+                      id="placeholder-description"
+                      placeholder={_(t`Short description`)}
+                      value={placeholderDescription}
+                      onChange={(e) => setPlaceholderDescription(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="placeholder-avatar">
+                      <Trans>Avatar URL (optional)</Trans>
+                    </Label>
+                    <Input
+                      id="placeholder-avatar"
+                      type="url"
+                      placeholder={_(t`https://example.com/avatar.jpg`)}
+                      value={placeholderAvatarUrl}
+                      onChange={(e) => setPlaceholderAvatarUrl(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setPlaceholderDialogOpen(false)}
+                  >
+                    <Trans>Cancel</Trans>
+                  </Button>
+                  <Button onClick={handleCreatePlaceholderUser} disabled={creatingPlaceholder}>
+                    {creatingPlaceholder ? (
+                      <Trans>Creating...</Trans>
+                    ) : (
+                      <Trans>Create User</Trans>
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Trans>Invite User</Trans>
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
@@ -347,6 +581,150 @@ function UsersPage() {
                     <Trans>Creating...</Trans>
                   ) : (
                     <Trans>Create Invitation</Trans>
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          </div>
+
+          {/* Edit placeholder user dialog */}
+          <Dialog open={editDialogOpen} onOpenChange={(open) => {
+            setEditDialogOpen(open);
+            if (!open) {
+              setUserToEdit(null);
+            }
+          }}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  <Trans>Edit User</Trans>
+                </DialogTitle>
+                <DialogDescription>
+                  <Trans>
+                    Update the user's profile information.
+                  </Trans>
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-nickname">
+                    <Trans>Nickname</Trans>
+                  </Label>
+                  <Input
+                    id="edit-nickname"
+                    placeholder={_(t`Enter nickname`)}
+                    value={editNickname}
+                    onChange={(e) => setEditNickname(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-description">
+                    <Trans>Bio</Trans>
+                  </Label>
+                  <Input
+                    id="edit-description"
+                    placeholder={_(t`Short description`)}
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="edit-avatar">
+                    <Trans>Avatar URL</Trans>
+                  </Label>
+                  <Input
+                    id="edit-avatar"
+                    type="url"
+                    placeholder={_(t`https://example.com/avatar.jpg`)}
+                    value={editAvatarUrl}
+                    onChange={(e) => setEditAvatarUrl(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEditDialogOpen(false);
+                    setUserToEdit(null);
+                  }}
+                >
+                  <Trans>Cancel</Trans>
+                </Button>
+                <Button onClick={handleEditPlaceholderUser} disabled={savingEdit}>
+                  {savingEdit ? (
+                    <Trans>Saving...</Trans>
+                  ) : (
+                    <Trans>Save Changes</Trans>
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Activate placeholder user dialog */}
+          <Dialog open={activateDialogOpen} onOpenChange={(open) => {
+            setActivateDialogOpen(open);
+            if (!open) {
+              setUserToActivate(null);
+              setActivateEmail("");
+            }
+          }}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  <Trans>Activate User</Trans>
+                </DialogTitle>
+                <DialogDescription>
+                  <Trans>
+                    Send an invitation email to activate this placeholder user. They will be able to log in after completing registration.
+                  </Trans>
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>
+                    <Trans>User</Trans>
+                  </Label>
+                  <p className="text-sm font-medium">{userToActivate?.nickname}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="activate-email">
+                    <Trans>Email</Trans>
+                  </Label>
+                  <Input
+                    id="activate-email"
+                    type="email"
+                    placeholder={_(t`user@example.com`)}
+                    value={activateEmail}
+                    onChange={(e) => setActivateEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setActivateDialogOpen(false);
+                    setUserToActivate(null);
+                    setActivateEmail("");
+                  }}
+                >
+                  <Trans>Cancel</Trans>
+                </Button>
+                <Button onClick={handleActivatePlaceholderUser} disabled={sendingActivation}>
+                  {sendingActivation ? (
+                    <Trans>Sending...</Trans>
+                  ) : (
+                    <Trans>Send Invitation</Trans>
                   )}
                 </Button>
               </DialogFooter>
@@ -576,6 +954,11 @@ function UsersPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="font-medium">{user.nickname}</p>
+                          {user.is_placeholder && (
+                            <span className="text-xs bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 px-2 py-0.5 rounded">
+                              <Trans>Placeholder</Trans>
+                            </span>
+                          )}
                           {!user.is_active && (
                             <span className="text-xs bg-destructive/20 text-destructive px-2 py-0.5 rounded">
                               <Trans>Inactive</Trans>
@@ -583,7 +966,7 @@ function UsersPage() {
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          {user.email}
+                          {user.email || _(t`No email`)}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           <Trans>Last login:</Trans>{" "}
@@ -594,6 +977,27 @@ function UsersPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      {user.is_placeholder && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openEditDialog(user)}
+                          >
+                            <Trans>Edit</Trans>
+                          </Button>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => {
+                              setUserToActivate(user);
+                              setActivateDialogOpen(true);
+                            }}
+                          >
+                            <Trans>Activate</Trans>
+                          </Button>
+                        </>
+                      )}
                       <Select
                         value={user.role}
                         onValueChange={(value) =>
@@ -615,20 +1019,22 @@ function UsersPage() {
                           </SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button
-                        variant={user.is_active ? "outline" : "default"}
-                        size="sm"
-                        onClick={() => {
-                          setUserToToggle(user);
-                          setConfirmDialogOpen(true);
-                        }}
-                      >
-                        {user.is_active ? (
-                          <Trans>Deactivate</Trans>
-                        ) : (
-                          <Trans>Activate</Trans>
-                        )}
-                      </Button>
+                      {!user.is_placeholder && (
+                        <Button
+                          variant={user.is_active ? "outline" : "default"}
+                          size="sm"
+                          onClick={() => {
+                            setUserToToggle(user);
+                            setConfirmDialogOpen(true);
+                          }}
+                        >
+                          {user.is_active ? (
+                            <Trans>Deactivate</Trans>
+                          ) : (
+                            <Trans>Activate</Trans>
+                          )}
+                        </Button>
+                      )}
                       <Button
                         variant="destructive"
                         size="sm"

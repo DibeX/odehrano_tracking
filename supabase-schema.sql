@@ -4,6 +4,18 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Create enum for user roles
 CREATE TYPE user_role AS ENUM ('admin', 'moderator', 'player');
 
+-- Create enum for board game types
+CREATE TYPE board_game_type AS ENUM (
+  'abstract_strategy',
+  'customizable',
+  'thematic',
+  'family',
+  'children',
+  'party',
+  'strategy',
+  'wargames'
+);
+
 -- Users table (extends Supabase auth.users)
 CREATE TABLE users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -41,6 +53,7 @@ CREATE TABLE board_games (
   year_published INTEGER,
   categories TEXT[] DEFAULT '{}',
   publishers TEXT[] DEFAULT '{}',
+  game_type board_game_type,
   bgg_rank INTEGER,
   bgg_rating DECIMAL(3, 2),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),

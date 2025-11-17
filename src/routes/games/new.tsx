@@ -22,6 +22,11 @@ import {
   GAME_CATEGORIES,
   type GameCategory,
 } from "@/constants/game-categories";
+import {
+  BOARD_GAME_TYPES,
+  type BoardGameType,
+  getBoardGameTypeLabel,
+} from "@/constants/board-game-types";
 import type { BGGGameInfo } from "@/types";
 import { Plus, X, Search, Download, Upload } from "lucide-react";
 
@@ -40,6 +45,7 @@ interface GameFormData {
   yearPublished: string;
   publishers: string[];
   categories: GameCategory[];
+  gameType: BoardGameType | null;
   bggId: string;
   imageUrl: string;
 }
@@ -60,6 +66,7 @@ function NewGamePage() {
     yearPublished: "",
     publishers: [],
     categories: [],
+    gameType: null,
     bggId: "",
     imageUrl: "",
   });
@@ -94,6 +101,7 @@ function NewGamePage() {
         yearPublished: gameInfo.yearPublished?.toString() || "",
         publishers: gameInfo.publishers,
         categories: mappedCategories,
+        gameType: null, // BGG doesn't provide this info, user needs to select
         bggId: gameInfo.id.toString(),
         imageUrl: gameInfo.imageUrl || "",
       });
@@ -263,6 +271,7 @@ function NewGamePage() {
             : null,
           publishers: formData.publishers,
           categories: formData.categories,
+          game_type: formData.gameType,
           image_url: finalImageUrl,
         })
         .select()
@@ -297,6 +306,7 @@ function NewGamePage() {
       yearPublished: "",
       publishers: [],
       categories: [],
+      gameType: null,
       bggId: "",
       imageUrl: "",
     });
@@ -560,6 +570,51 @@ function NewGamePage() {
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Game Type */}
+              <div className="space-y-2">
+                <Label>
+                  <Trans>Game Type</Trans>
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  <Trans>Select the primary game type classification</Trans>
+                </p>
+                <div className="p-3 space-y-1 border rounded-md">
+                  <label className="flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-muted">
+                    <input
+                      type="radio"
+                      name="gameType"
+                      checked={formData.gameType === null}
+                      onChange={() =>
+                        setFormData((prev) => ({ ...prev, gameType: null }))
+                      }
+                      className="rounded"
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      <Trans>Not specified</Trans>
+                    </span>
+                  </label>
+                  {BOARD_GAME_TYPES.map((type) => (
+                    <label
+                      key={type}
+                      className="flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-muted"
+                    >
+                      <input
+                        type="radio"
+                        name="gameType"
+                        checked={formData.gameType === type}
+                        onChange={() =>
+                          setFormData((prev) => ({ ...prev, gameType: type }))
+                        }
+                        className="rounded"
+                      />
+                      <span className="text-sm">
+                        {getBoardGameTypeLabel(type, _)}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               {/* Categories */}
