@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft, ChevronUp, ChevronDown } from "lucide-react";
 import type { BoardGame, UserGameRanking, RankingYear } from "@/types";
 
 export const Route = createFileRoute("/rankings/$year")({
@@ -49,6 +49,8 @@ function YearRankingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [initialRankedGames, setInitialRankedGames] = useState<RankedGame[]>([]);
 
   function handleBack() {
     if (router.history.length <= 1) {
@@ -58,9 +60,47 @@ function YearRankingsPage() {
     }
   }
 
+  const localStorageKey = `rankings_${year}_${user?.id}`;
+
+  function saveToLocalStorage(games: RankedGame[]) {
+    localStorage.setItem(localStorageKey, JSON.stringify(games));
+  }
+
+  function loadFromLocalStorage(): RankedGame[] | null {
+    const stored = localStorage.getItem(localStorageKey);
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  function clearLocalStorage() {
+    localStorage.removeItem(localStorageKey);
+  }
+
+  function checkForChanges(current: RankedGame[], initial: RankedGame[]) {
+    if (current.length !== initial.length) return true;
+    for (let i = 0; i < current.length; i++) {
+      if (current[i].boardGame.id !== initial[i].boardGame.id) return true;
+    }
+    return false;
+  }
+
   useEffect(() => {
     loadData();
   }, [year, user]);
+
+  // Save to localStorage and track changes whenever rankedGames changes
+  useEffect(() => {
+    if (!loading && user && initialRankedGames.length >= 0) {
+      saveToLocalStorage(rankedGames);
+      setHasUnsavedChanges(checkForChanges(rankedGames, initialRankedGames));
+    }
+  }, [rankedGames, initialRankedGames, loading, user]);
 
   async function loadData() {
     if (!user) return;
@@ -94,7 +134,7 @@ function YearRankingsPage() {
         isManuallyAdded: r.is_manually_added,
       }));
 
-      setRankedGames(ranked);
+      setInitialRankedGames(ranked);
 
       // Load games the user played in this year
       const { data: userPlayedGamesData, error: userPlayedError } =
@@ -127,8 +167,41 @@ function YearRankingsPage() {
 
       if (allPlayedError) throw allPlayedError;
 
-      // Filter out already ranked games and separate into two groups
-      const rankedGameIds = new Set(ranked.map((rg) => rg.boardGame.id));
+      // Build set of all valid game IDs (games that can be ranked)
+      const allValidGameIds = new Set<string>();
+      (userPlayedGamesData || []).forEach((pg: any) => {
+        allValidGameIds.add(pg.board_game.id);
+      });
+      (allPlayedGamesData || []).forEach((pg: any) => {
+        allValidGameIds.add(pg.board_game.id);
+      });
+
+      // Check for localStorage data and validate it
+      const localData = loadFromLocalStorage();
+      let currentRankedGames: RankedGame[];
+      if (localData && localData.length > 0) {
+        // Validate: only keep games that are valid (played in this year)
+        const validLocalData = localData.filter((rg) =>
+          allValidGameIds.has(rg.boardGame.id)
+        );
+        if (validLocalData.length > 0) {
+          currentRankedGames = validLocalData;
+          setRankedGames(validLocalData);
+          setHasUnsavedChanges(checkForChanges(validLocalData, ranked));
+        } else {
+          currentRankedGames = ranked;
+          setRankedGames(ranked);
+          setHasUnsavedChanges(false);
+          clearLocalStorage();
+        }
+      } else {
+        currentRankedGames = ranked;
+        setRankedGames(ranked);
+        setHasUnsavedChanges(false);
+      }
+
+      // Filter out already ranked games
+      const rankedGameIds = new Set(currentRankedGames.map((rg) => rg.boardGame.id));
       const userPlayedGameIds = new Set(
         (userPlayedGamesData || []).map((pg: any) => pg.board_game.id)
       );
@@ -180,15 +253,29 @@ function YearRankingsPage() {
 
       if (deleteError) throw deleteError;
 
-      // Insert new rankings
+      // Insert new rankings (deduplicate by board_game_id to prevent constraint violations)
       if (rankedGames.length > 0) {
-        const rankings = rankedGames.map((rg, index) => ({
-          user_id: user.id,
-          board_game_id: rg.boardGame.id,
-          year: yearInfo.year,
-          rank: index + 1,
-          is_manually_added: rg.isManuallyAdded,
-        }));
+        const seenGameIds = new Set<string>();
+        const rankings: Array<{
+          user_id: string;
+          board_game_id: string;
+          year: number;
+          rank: number;
+          is_manually_added: boolean;
+        }> = [];
+
+        rankedGames.forEach((rg, index) => {
+          if (!seenGameIds.has(rg.boardGame.id)) {
+            seenGameIds.add(rg.boardGame.id);
+            rankings.push({
+              user_id: user.id,
+              board_game_id: rg.boardGame.id,
+              year: yearInfo.year,
+              rank: index + 1,
+              is_manually_added: rg.isManuallyAdded,
+            });
+          }
+        });
 
         const { error: insertError } = await supabase
           .from("user_game_rankings")
@@ -196,6 +283,9 @@ function YearRankingsPage() {
 
         if (insertError) throw insertError;
       }
+
+      clearLocalStorage();
+      setHasUnsavedChanges(false);
 
       toast({
         title: _(t`Rankings saved`),
@@ -261,6 +351,20 @@ function YearRankingsPage() {
     setRankedGames(rankedGames.filter((_, i) => i !== index));
   }
 
+  function moveGameUp(index: number) {
+    if (index === 0) return;
+    const newRanked = [...rankedGames];
+    [newRanked[index - 1], newRanked[index]] = [newRanked[index], newRanked[index - 1]];
+    setRankedGames(newRanked);
+  }
+
+  function moveGameDown(index: number) {
+    if (index === rankedGames.length - 1) return;
+    const newRanked = [...rankedGames];
+    [newRanked[index], newRanked[index + 1]] = [newRanked[index + 1], newRanked[index]];
+    setRankedGames(newRanked);
+  }
+
   if (loading) {
     return (
       <AppLayout>
@@ -319,7 +423,7 @@ function YearRankingsPage() {
             </p>
           </div>
 
-          {!isLocked && (
+          {!isLocked && hasUnsavedChanges && (
             <Button onClick={handleSaveRankings} disabled={saving}>
               {saving ? <Trans>Saving...</Trans> : <Trans>Save Rankings</Trans>}
             </Button>
@@ -375,6 +479,29 @@ function YearRankingsPage() {
                       !isLocked ? "cursor-move hover:bg-accent" : ""
                     } ${draggedIndex === index ? "opacity-50" : ""}`}
                   >
+                    {!isLocked && (
+                      <div className="flex flex-col gap-1">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="w-8 h-8"
+                          onClick={() => moveGameUp(index)}
+                          disabled={index === 0}
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="w-8 h-8"
+                          onClick={() => moveGameDown(index)}
+                          disabled={index === rankedGames.length - 1}
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-center w-8 h-8 font-bold rounded-full bg-primary text-primary-foreground">
                       {index + 1}
                     </div>
