@@ -35,6 +35,11 @@ msgstr "{0} komentářů"
 msgid "{0} first-place votes"
 msgstr "{0} hlasů pro první místo"
 
+#. placeholder {0}: stats.gamesPlayed
+#: src/routes/results.tsx
+msgid "{0} games played in {selectedYear}"
+msgstr ""
+
 #. placeholder {0}: player.games_ranked
 #: src/routes/rankings/manage.tsx
 msgid "{0} games ranked"
@@ -56,14 +61,24 @@ msgstr "{0} byla aktualizována"
 msgid "A game with BGG ID {0} already exists: {1}"
 msgstr "Hra s BGG ID {0} již existuje: {1}"
 
+#: src/constants/board-game-types.ts
+msgid "Abstract Strategy Games"
+msgstr ""
+
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 msgid "Activate"
 msgstr "Aktivovat"
 
 #: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
 msgid "Activate User"
 msgstr "Aktivovat uživatele"
+
+#: src/routes/admin/users.tsx
+msgid "Activation email sent"
+msgstr ""
 
 #: src/routes/games/new.tsx
 msgid "Add a new board game to the database by entering details manually or importing from BoardGameGeek."
@@ -97,6 +112,10 @@ msgstr "Přidat hru"
 #: src/routes/games/new.tsx
 #~ msgid "Add Game Session"
 #~ msgstr "Přidat herní partii"
+
+#: src/routes/admin/users.tsx
+msgid "Add Placeholder User"
+msgstr ""
 
 #: src/routes/dashboard.tsx
 msgid "Add Played Game"
@@ -138,6 +157,11 @@ msgstr "Všechny kategorie"
 msgid "All registered users"
 msgstr "Všichni registrovaní uživatelé"
 
+#: src/routes/results.tsx
+#: src/routes/results.tsx
+msgid "All Types"
+msgstr ""
+
 #: src/routes/games/library.tsx
 msgid "Also known as:"
 msgstr "Také známá jako:"
@@ -150,6 +174,11 @@ msgstr "Alternativní názvy"
 #: src/routes/login.tsx
 msgid "An error occurred"
 msgstr "Došlo k chybě"
+
+#. placeholder {0}: activateEmail.trim()
+#: src/routes/admin/users.tsx
+msgid "An invitation email has been sent to {0}"
+msgstr ""
 
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/games/sessions/new.tsx
@@ -188,6 +217,18 @@ msgstr "Opravdu chcete trvale smazat tuto herní partii? Tím se odstraní všec
 msgid "Available Categories"
 msgstr "Dostupné kategorie"
 
+#: src/routes/admin/users.tsx
+msgid "Avatar URL"
+msgstr ""
+
+#: src/routes/admin/users.tsx
+msgid "Avatar URL (optional)"
+msgstr ""
+
+#: src/routes/results.tsx
+msgid "Average Score"
+msgstr ""
+
 #: src/routes/games/$gameId.tsx
 #: src/routes/games/$gameId.tsx
 #: src/routes/games/$gameId.tsx
@@ -225,6 +266,14 @@ msgstr "Je vyžadováno BGG ID"
 msgid "BGG Rank: #{0}"
 msgstr "BGG hodnocení: #{0}"
 
+#: src/routes/admin/users.tsx
+msgid "Bio"
+msgstr ""
+
+#: src/routes/admin/users.tsx
+msgid "Bio (optional)"
+msgstr ""
+
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
@@ -240,6 +289,9 @@ msgstr "Procházet všechny herní partie"
 msgid "Calculating rankings..."
 msgstr "Počítám hodnocení..."
 
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
@@ -303,6 +355,10 @@ msgstr "Měním..."
 #: src/routes/login.tsx
 msgid "Check your email"
 msgstr "Zkontrolujte si e-mail"
+
+#: src/constants/board-game-types.ts
+msgid "Children's Games"
+msgstr ""
 
 #: src/routes/invite/$token.tsx
 msgid "Choose a password"
@@ -372,6 +428,10 @@ msgstr "Kopírovat odkaz"
 msgid "Create"
 msgstr "Vytvořit"
 
+#: src/routes/admin/users.tsx
+msgid "Create a user without an email account. They can be assigned to game sessions and activated later."
+msgstr ""
+
 #: src/routes/invite/$token.tsx
 msgid "Create Account"
 msgstr "Vytvořit účet"
@@ -388,6 +448,10 @@ msgstr "Vytvořit aktuální rok"
 msgid "Create Invitation"
 msgstr "Vytvořit pozvánku"
 
+#: src/routes/admin/users.tsx
+msgid "Create Placeholder User"
+msgstr ""
+
 #: src/routes/results.tsx
 msgid "Create Preset"
 msgstr "Vytvořit předvolbu"
@@ -395,6 +459,10 @@ msgstr "Vytvořit předvolbu"
 #: src/routes/rankings/manage.tsx
 msgid "Create Ranking Year"
 msgstr "Vytvořit rok hodnocení"
+
+#: src/routes/admin/users.tsx
+msgid "Create User"
+msgstr ""
 
 #: src/routes/rankings/manage.tsx
 msgid "Create Year"
@@ -415,13 +483,22 @@ msgid "Creating account..."
 msgstr "Vytvářím účet..."
 
 #: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
 #: src/routes/rankings/manage.tsx
 msgid "Creating..."
 msgstr "Vytvářím..."
 
+#: src/routes/results.tsx
+msgid "current streak"
+msgstr ""
+
 #: src/routes/games/new.tsx
 #~ msgid "Custom Name (Optional)"
 #~ msgstr "Vlastní název (volitelné)"
+
+#: src/constants/board-game-types.ts
+msgid "Customizable Games"
+msgstr ""
 
 #: src/routes/results.tsx
 msgid "Damped (Recommended)"
@@ -520,6 +597,10 @@ msgid "Description"
 msgstr "Popis"
 
 #: src/routes/results.tsx
+msgid "different titles"
+msgstr ""
+
+#: src/routes/results.tsx
 msgid "Done"
 msgstr "Hotovo"
 
@@ -540,6 +621,7 @@ msgstr "např. Strategické hry, Rodinné oblíbené"
 msgid "Each player has equal voting weight (w_p = 1). Best for giving everyone an equal voice regardless of participation."
 msgstr "Každý hráč má stejnou váhu hlasu (w_p = 1). Nejlepší pro poskytnutí rovného hlasu všem bez ohledu na účast."
 
+#: src/routes/admin/users.tsx
 #: src/routes/games/library.tsx
 msgid "Edit"
 msgstr "Upravit"
@@ -573,6 +655,11 @@ msgid "Edit the game information"
 msgstr "Upravit informace o hře"
 
 #: src/routes/admin/users.tsx
+msgid "Edit User"
+msgstr ""
+
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
 #: src/routes/invite/$token.tsx
 #: src/routes/login.tsx
 #: src/routes/profile.tsx
@@ -583,6 +670,7 @@ msgstr "E-mail"
 msgid "Email cannot be changed"
 msgstr "E-mail nelze změnit"
 
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 msgid "Email required"
 msgstr "E-mail je povinný"
@@ -595,6 +683,11 @@ msgstr "Zadejte BGG ID hry (např. 174430)"
 #: src/routes/profile.tsx
 msgid "Enter new password"
 msgstr "Zadejte nové heslo"
+
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "Enter nickname"
+msgstr ""
 
 #: src/routes/admin/users.tsx
 msgid "Enter nickname to confirm"
@@ -653,6 +746,10 @@ msgstr "Chyba při změně hesla"
 msgid "Error creating invitation"
 msgstr "Chyba při vytváření pozvánky"
 
+#: src/routes/admin/users.tsx
+msgid "Error creating placeholder user"
+msgstr ""
+
 #: src/routes/rankings/index.tsx
 #: src/routes/rankings/manage.tsx
 msgid "Error creating year"
@@ -698,6 +795,10 @@ msgstr "Chyba při načítání hry"
 msgid "Error loading games"
 msgstr "Chyba při načítání her"
 
+#: src/routes/results.tsx
+msgid "Error loading player statistics"
+msgstr ""
+
 #: src/routes/rankings/$year.tsx
 msgid "Error loading rankings"
 msgstr "Chyba při načítání hodnocení"
@@ -736,6 +837,10 @@ msgstr "Chyba při ukládání předvolby"
 msgid "Error saving rankings"
 msgstr "Chyba při ukládání hodnocení"
 
+#: src/routes/admin/users.tsx
+msgid "Error sending activation"
+msgstr ""
+
 #: src/routes/rankings/manage.tsx
 msgid "Error updating deadline"
 msgstr "Chyba při aktualizaci uzávěrky"
@@ -755,6 +860,10 @@ msgstr "Chyba při aktualizaci role"
 #: src/routes/games/sessions/edit.$sessionId.tsx
 msgid "Error updating session"
 msgstr "Chyba při aktualizaci partie"
+
+#: src/routes/admin/users.tsx
+msgid "Error updating user"
+msgstr ""
 
 #: src/routes/admin/users.tsx
 msgid "Error updating user status"
@@ -785,6 +894,10 @@ msgstr "Nepodařilo se načíst pozvánku"
 #: src/routes/games/edit.$gameId.tsx
 msgid "Failed to update game"
 msgstr "Nepodařilo se aktualizovat hru"
+
+#: src/constants/board-game-types.ts
+msgid "Family Games"
+msgstr ""
 
 #: src/routes/games/new.tsx
 msgid "Fetch"
@@ -862,12 +975,26 @@ msgid "Game session deleted"
 msgstr "Herní partie smazána"
 
 #: src/routes/games/edit.$gameId.tsx
+#: src/routes/games/new.tsx
+#: src/routes/results.tsx
+msgid "Game Type"
+msgstr ""
+
+#: src/routes/games/library.tsx
+msgid "Game Type:"
+msgstr ""
+
+#: src/routes/games/edit.$gameId.tsx
 msgid "Game updated"
 msgstr "Hra aktualizována"
 
 #: src/components/layout/header.tsx
 msgid "Games"
 msgstr "Hry"
+
+#: src/routes/results.tsx
+msgid "Games Ranking"
+msgstr ""
 
 #: src/routes/rankings/$year.tsx
 msgid "Games you didn't play but can still rank"
@@ -885,6 +1012,15 @@ msgstr "Přejít na přihlášení"
 #: src/routes/rankings/manage.tsx
 msgid "Hide Results"
 msgstr "Skrýt výsledky"
+
+#: src/routes/results.tsx
+msgid "Highest Win Rate"
+msgstr ""
+
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "https://example.com/avatar.jpg"
+msgstr ""
 
 #: src/routes/games/new.tsx
 msgid "Import from BGG"
@@ -987,6 +1123,10 @@ msgstr "Načítám hry..."
 msgid "Loading invitation..."
 msgstr "Načítám pozvánku..."
 
+#: src/routes/results.tsx
+msgid "Loading player statistics..."
+msgstr ""
+
 #: src/routes/rankings/manage.tsx
 msgid "Loading submissions..."
 msgstr "Načítám odevzdaná hodnocení..."
@@ -1059,6 +1199,18 @@ msgstr "Ruční zadání"
 msgid "Moderator"
 msgstr "Moderátor"
 
+#: src/routes/results.tsx
+msgid "Most Games Played"
+msgstr ""
+
+#: src/routes/results.tsx
+msgid "Most Played Game"
+msgstr ""
+
+#: src/routes/results.tsx
+msgid "Most Wins"
+msgstr ""
+
 #: src/routes/dashboard.tsx
 msgid "My Games"
 msgstr "Moje hry"
@@ -1081,6 +1233,8 @@ msgstr "Nikdy"
 msgid "New Password"
 msgstr "Nové heslo"
 
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
 #: src/routes/invite/$token.tsx
 #: src/routes/profile.tsx
 msgid "Nickname"
@@ -1090,9 +1244,18 @@ msgstr "Přezdívka"
 msgid "Nickname is required"
 msgstr "Přezdívka je povinná"
 
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "Nickname required"
+msgstr ""
+
 #: src/routes/games/$gameId.tsx
 msgid "No comments yet. Be the first to comment!"
 msgstr "Zatím žádné komentáře. Buďte první, kdo přidá komentář!"
+
+#: src/routes/admin/users.tsx
+msgid "No email"
+msgstr ""
 
 #: src/routes/games/library.tsx
 msgid "No games found matching \"{searchQuery}\""
@@ -1107,8 +1270,12 @@ msgid "No games in the library yet"
 msgstr "V knihovně zatím nejsou žádné hry"
 
 #: src/routes/results.tsx
-msgid "No games match the selected categories"
-msgstr "Vybraným kategoriím neodpovídají žádné hry"
+#~ msgid "No games match the selected categories"
+#~ msgstr "Vybraným kategoriím neodpovídají žádné hry"
+
+#: src/routes/results.tsx
+msgid "No games match the selected filters"
+msgstr ""
 
 #: src/routes/rankings/$year.tsx
 msgid "No games ranked yet. Add games from below to start ranking."
@@ -1125,6 +1292,10 @@ msgstr "Žádné čekající pozvánky"
 #: src/routes/games/index.tsx
 msgid "No play sessions recorded yet"
 msgstr "Zatím nebyly zaznamenány žádné herní partie"
+
+#: src/routes/results.tsx
+msgid "No player data available for this year"
+msgstr ""
 
 #: src/routes/results.tsx
 msgid "No public results available yet"
@@ -1152,6 +1323,11 @@ msgstr "Nenalezeni žádní uživatelé"
 msgid "Not Published"
 msgstr "Nezveřejněno"
 
+#: src/routes/games/edit.$gameId.tsx
+#: src/routes/games/new.tsx
+msgid "Not specified"
+msgstr ""
+
 #: src/routes/games/index.tsx
 msgid "Note:"
 msgstr "Poznámka:"
@@ -1164,6 +1340,10 @@ msgstr "Poznámky (volitelné)"
 #: src/routes/games/$gameId.tsx
 msgid "Notes:"
 msgstr "Poznámky:"
+
+#: src/routes/results.tsx
+msgid "of all sessions"
+msgstr ""
 
 #: src/routes/rankings/manage.tsx
 msgid "Open"
@@ -1205,9 +1385,22 @@ msgstr "Ostatní kategorie"
 msgid "Other Games Played in {0}"
 msgstr "Ostatní hry hrané v roce {0}"
 
+#. placeholder {0}: stats.gamesPlayed
+#: src/routes/results.tsx
+msgid "out of {0} games"
+msgstr ""
+
 #: src/routes/games/new.tsx
 #~ msgid "Override the game name for this session"
 #~ msgstr "Přepsat název hry pro tuto partii"
+
+#: src/routes/results.tsx
+msgid "Participation"
+msgstr ""
+
+#: src/constants/board-game-types.ts
+msgid "Party Games"
+msgstr ""
 
 #: src/routes/invite/$token.tsx
 #: src/routes/login.tsx
@@ -1235,6 +1428,14 @@ msgstr "Hesla se neshodují"
 #: src/routes/admin/users.tsx
 msgid "Pending Invitations"
 msgstr "Čekající pozvánky"
+
+#: src/routes/admin/users.tsx
+msgid "Placeholder"
+msgstr ""
+
+#: src/routes/admin/users.tsx
+msgid "Placeholder user created"
+msgstr ""
 
 #: src/routes/games/index.tsx
 msgid "Played Games"
@@ -1272,6 +1473,10 @@ msgstr "Váha hráče je úměrná počtu odehraných her (w_p = np). Dává vě
 msgid "Players"
 msgstr "Hráči"
 
+#: src/routes/results.tsx
+msgid "Players Ranking"
+msgstr ""
+
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/games/sessions/new.tsx
 msgid "Players required"
@@ -1287,6 +1492,15 @@ msgstr "Hráči:"
 msgid "Please enter a BoardGameGeek game ID"
 msgstr "Zadejte prosím BoardGameGeek ID hry"
 
+#: src/routes/admin/users.tsx
+msgid "Please enter a nickname"
+msgstr ""
+
+#: src/routes/admin/users.tsx
+msgid "Please enter a nickname for the placeholder user"
+msgstr ""
+
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 msgid "Please enter an email address"
 msgstr "Zadejte prosím e-mailovou adresu"
@@ -1320,6 +1534,10 @@ msgstr "Vyberte prosím alespoň jednoho hráče"
 #: src/routes/login.tsx
 msgid "Please wait..."
 msgstr "Čekejte prosím..."
+
+#: src/routes/results.tsx
+msgid "points per game"
+msgstr ""
 
 #: src/routes/results.tsx
 msgid "Preset"
@@ -1542,6 +1760,7 @@ msgstr "Role: {0}"
 msgid "Save a group of categories as a preset for quick filtering"
 msgstr "Uložte skupinu kategorií jako předvolbu pro rychlé filtrování"
 
+#: src/routes/admin/users.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/profile.tsx
@@ -1556,6 +1775,7 @@ msgstr "Uložit předvolbu"
 msgid "Save Rankings"
 msgstr "Uložit hodnocení"
 
+#: src/routes/admin/users.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/profile.tsx
@@ -1603,6 +1823,11 @@ msgstr "Vyberte kategorie pro filtrování výsledků. Zobrazí se hry, které o
 msgid "Select Game"
 msgstr "Vybrat hru"
 
+#: src/routes/games/edit.$gameId.tsx
+#: src/routes/games/new.tsx
+msgid "Select the primary game type classification"
+msgstr ""
+
 #: src/routes/games/sessions/new.tsx
 msgid "Select who played and add their scores"
 msgstr "Vyberte, kdo hrál, a přidejte jejich skóre"
@@ -1618,8 +1843,16 @@ msgid "Selected: {0} categories"
 msgstr "Vybráno: {0} kategorií"
 
 #: src/routes/admin/users.tsx
+msgid "Send an invitation email to activate this placeholder user. They will be able to log in after completing registration."
+msgstr ""
+
+#: src/routes/admin/users.tsx
 msgid "Send an invitation link to a new user. The link will expire in 14 days."
 msgstr "Pošlete odkaz s pozvánkou novému uživateli. Odkaz vyprší za 14 dní."
+
+#: src/routes/admin/users.tsx
+msgid "Send Invitation"
+msgstr ""
 
 #: src/routes/login.tsx
 msgid "Send reset link"
@@ -1629,6 +1862,7 @@ msgstr "Odeslat odkaz pro obnovu"
 #~ msgid "Send this link to the user. It expires in 14 days."
 #~ msgstr "Pošlete tento odkaz uživateli. Vyprší za 14 dní."
 
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 msgid "Sending..."
 msgstr "Odesílám..."
@@ -1662,6 +1896,11 @@ msgstr "Nastavte si svůj účet"
 msgid "Share your thoughts about this game session"
 msgstr "Podělte se o své myšlenky o této herní partii"
 
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "Short description"
+msgstr ""
+
 #. placeholder {0}: filteredResults.length
 #. placeholder {1}: results.length
 #: src/routes/results.tsx
@@ -1675,6 +1914,10 @@ msgstr "Přihlásit se"
 #: src/components/layout/header.tsx
 msgid "Sign Out"
 msgstr "Odhlásit se"
+
+#: src/constants/board-game-types.ts
+msgid "Strategy Games"
+msgstr ""
 
 #: src/components/ui/theme-toggle.tsx
 msgid "System"
@@ -1708,6 +1951,10 @@ msgstr "Hra, která se hrála (nelze změnit)"
 msgid "The game you are trying to edit does not exist"
 msgstr "Hra, kterou se snažíte upravit, neexistuje"
 
+#: src/routes/admin/users.tsx
+msgid "The placeholder user has been created successfully"
+msgstr ""
+
 #. placeholder {0}: selectedGame.name
 #: src/routes/games/sessions/new.tsx
 msgid "The play session for {0} has been recorded"
@@ -1717,6 +1964,14 @@ msgstr "Herní partie pro {0} byla zaznamenána"
 msgid "The play session has been updated successfully"
 msgstr "Herní partie byla úspěšně aktualizována"
 
+#: src/routes/admin/users.tsx
+msgid "The user has been updated successfully"
+msgstr ""
+
+#: src/constants/board-game-types.ts
+msgid "Thematic Games"
+msgstr ""
+
 #: src/routes/invite/$token.tsx
 msgid "This invitation link is invalid or has expired"
 msgstr "Tento odkaz s pozvánkou je neplatný nebo vypršel"
@@ -1725,10 +1980,22 @@ msgstr "Tento odkaz s pozvánkou je neplatný nebo vypršel"
 msgid "This name will be visible to other users"
 msgstr "Tato přezdívka bude viditelná pro ostatní uživatele"
 
+#: src/routes/results.tsx
+msgid "times"
+msgstr ""
+
+#: src/routes/results.tsx
+msgid "Total Players"
+msgstr ""
+
 #. placeholder {0}: userToDelete?.nickname
 #: src/routes/admin/users.tsx
 msgid "Type <0>{0}</0> to confirm deletion"
 msgstr "Napište <0>{0}</0> pro potvrzení smazání"
+
+#: src/routes/results.tsx
+msgid "Unique Games"
+msgstr ""
 
 #: src/routes/rankings/manage.tsx
 msgid "Unlock"
@@ -1746,6 +2013,10 @@ msgstr "Aktualizovat podrobnosti pro {0}"
 #: src/routes/games/sessions/edit.$sessionId.tsx
 msgid "Update the details of this game session"
 msgstr "Aktualizovat podrobnosti této herní partie"
+
+#: src/routes/admin/users.tsx
+msgid "Update the user's profile information."
+msgstr ""
 
 #: src/routes/profile.tsx
 msgid "Update your password"
@@ -1782,6 +2053,10 @@ msgid "Use This Game"
 msgstr "Použít tuto hru"
 
 #: src/routes/admin/users.tsx
+msgid "User"
+msgstr ""
+
+#: src/routes/admin/users.tsx
 msgid "User activated"
 msgstr "Uživatel aktivován"
 
@@ -1814,6 +2089,11 @@ msgstr "Správa uživatelů"
 msgid "User role has been updated successfully"
 msgstr "Role uživatele byla úspěšně aktualizována"
 
+#: src/routes/admin/users.tsx
+msgid "User updated"
+msgstr ""
+
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 msgid "user@example.com"
 msgstr "uzivatel@example.com"
@@ -1860,6 +2140,10 @@ msgstr "Zobrazit výsledky"
 msgid "View your final rankings"
 msgstr "Zobrazte své konečné hodnocení"
 
+#: src/constants/board-game-types.ts
+msgid "Wargames"
+msgstr ""
+
 #: src/routes/login.tsx
 msgid "We've sent you a password reset link. Please check your email and follow the instructions."
 msgstr "Poslali jsme vám odkaz pro obnovu hesla. Zkontrolujte prosím svůj e-mail a postupujte podle pokynů."
@@ -1874,10 +2158,22 @@ msgstr "Vítejte zpět, {0}!"
 msgid "When was the game played?"
 msgstr "Kdy se hra hrála?"
 
+#: src/routes/results.tsx
+msgid "Win Rate"
+msgstr ""
+
+#: src/routes/results.tsx
+msgid "Win Streak"
+msgstr ""
+
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/games/sessions/new.tsx
 msgid "Winner"
 msgstr "Vítěz"
+
+#: src/routes/results.tsx
+msgid "Wins"
+msgstr ""
 
 #: src/routes/games/$gameId.tsx
 msgid "Write a comment..."

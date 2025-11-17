@@ -35,6 +35,11 @@ msgstr "{0} comment(s)"
 msgid "{0} first-place votes"
 msgstr "{0} first-place votes"
 
+#. placeholder {0}: stats.gamesPlayed
+#: src/routes/results.tsx
+msgid "{0} games played in {selectedYear}"
+msgstr "{0} games played in {selectedYear}"
+
 #. placeholder {0}: player.games_ranked
 #: src/routes/rankings/manage.tsx
 msgid "{0} games ranked"
@@ -56,14 +61,24 @@ msgstr "{0} has been updated"
 msgid "A game with BGG ID {0} already exists: {1}"
 msgstr "A game with BGG ID {0} already exists: {1}"
 
+#: src/constants/board-game-types.ts
+msgid "Abstract Strategy Games"
+msgstr "Abstract Strategy Games"
+
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 msgid "Activate"
 msgstr "Activate"
 
 #: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
 msgid "Activate User"
 msgstr "Activate User"
+
+#: src/routes/admin/users.tsx
+msgid "Activation email sent"
+msgstr "Activation email sent"
 
 #: src/routes/games/new.tsx
 msgid "Add a new board game to the database by entering details manually or importing from BoardGameGeek."
@@ -97,6 +112,10 @@ msgstr "Add Game"
 #: src/routes/games/new.tsx
 #~ msgid "Add Game Session"
 #~ msgstr "Add Game Session"
+
+#: src/routes/admin/users.tsx
+msgid "Add Placeholder User"
+msgstr "Add Placeholder User"
 
 #: src/routes/dashboard.tsx
 msgid "Add Played Game"
@@ -138,6 +157,11 @@ msgstr "All Categories"
 msgid "All registered users"
 msgstr "All registered users"
 
+#: src/routes/results.tsx
+#: src/routes/results.tsx
+msgid "All Types"
+msgstr "All Types"
+
 #: src/routes/games/library.tsx
 msgid "Also known as:"
 msgstr "Also known as:"
@@ -150,6 +174,11 @@ msgstr "Alternate Names"
 #: src/routes/login.tsx
 msgid "An error occurred"
 msgstr "An error occurred"
+
+#. placeholder {0}: activateEmail.trim()
+#: src/routes/admin/users.tsx
+msgid "An invitation email has been sent to {0}"
+msgstr "An invitation email has been sent to {0}"
 
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/games/sessions/new.tsx
@@ -188,6 +217,18 @@ msgstr "Are you sure you want to permanently delete this game session? This will
 msgid "Available Categories"
 msgstr "Available Categories"
 
+#: src/routes/admin/users.tsx
+msgid "Avatar URL"
+msgstr "Avatar URL"
+
+#: src/routes/admin/users.tsx
+msgid "Avatar URL (optional)"
+msgstr "Avatar URL (optional)"
+
+#: src/routes/results.tsx
+msgid "Average Score"
+msgstr "Average Score"
+
 #: src/routes/games/$gameId.tsx
 #: src/routes/games/$gameId.tsx
 #: src/routes/games/$gameId.tsx
@@ -225,6 +266,14 @@ msgstr "BGG ID required"
 msgid "BGG Rank: #{0}"
 msgstr "BGG Rank: #{0}"
 
+#: src/routes/admin/users.tsx
+msgid "Bio"
+msgstr "Bio"
+
+#: src/routes/admin/users.tsx
+msgid "Bio (optional)"
+msgstr "Bio (optional)"
+
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
@@ -240,6 +289,9 @@ msgstr "Browse all game sessions"
 msgid "Calculating rankings..."
 msgstr "Calculating rankings..."
 
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
@@ -303,6 +355,10 @@ msgstr "Changing..."
 #: src/routes/login.tsx
 msgid "Check your email"
 msgstr "Check your email"
+
+#: src/constants/board-game-types.ts
+msgid "Children's Games"
+msgstr "Children's Games"
 
 #: src/routes/invite/$token.tsx
 msgid "Choose a password"
@@ -372,6 +428,10 @@ msgstr "Copy Link"
 msgid "Create"
 msgstr "Create"
 
+#: src/routes/admin/users.tsx
+msgid "Create a user without an email account. They can be assigned to game sessions and activated later."
+msgstr "Create a user without an email account. They can be assigned to game sessions and activated later."
+
 #: src/routes/invite/$token.tsx
 msgid "Create Account"
 msgstr "Create Account"
@@ -388,6 +448,10 @@ msgstr "Create Current Year"
 msgid "Create Invitation"
 msgstr "Create Invitation"
 
+#: src/routes/admin/users.tsx
+msgid "Create Placeholder User"
+msgstr "Create Placeholder User"
+
 #: src/routes/results.tsx
 msgid "Create Preset"
 msgstr "Create Preset"
@@ -395,6 +459,10 @@ msgstr "Create Preset"
 #: src/routes/rankings/manage.tsx
 msgid "Create Ranking Year"
 msgstr "Create Ranking Year"
+
+#: src/routes/admin/users.tsx
+msgid "Create User"
+msgstr "Create User"
 
 #: src/routes/rankings/manage.tsx
 msgid "Create Year"
@@ -415,13 +483,22 @@ msgid "Creating account..."
 msgstr "Creating account..."
 
 #: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
 #: src/routes/rankings/manage.tsx
 msgid "Creating..."
 msgstr "Creating..."
 
+#: src/routes/results.tsx
+msgid "current streak"
+msgstr "current streak"
+
 #: src/routes/games/new.tsx
 #~ msgid "Custom Name (Optional)"
 #~ msgstr "Custom Name (Optional)"
+
+#: src/constants/board-game-types.ts
+msgid "Customizable Games"
+msgstr "Customizable Games"
 
 #: src/routes/results.tsx
 msgid "Damped (Recommended)"
@@ -520,6 +597,10 @@ msgid "Description"
 msgstr "Description"
 
 #: src/routes/results.tsx
+msgid "different titles"
+msgstr "different titles"
+
+#: src/routes/results.tsx
 msgid "Done"
 msgstr "Done"
 
@@ -540,6 +621,7 @@ msgstr "e.g., Strategy Games, Family Favorites"
 msgid "Each player has equal voting weight (w_p = 1). Best for giving everyone an equal voice regardless of participation."
 msgstr "Each player has equal voting weight (w_p = 1). Best for giving everyone an equal voice regardless of participation."
 
+#: src/routes/admin/users.tsx
 #: src/routes/games/library.tsx
 msgid "Edit"
 msgstr "Edit"
@@ -573,6 +655,11 @@ msgid "Edit the game information"
 msgstr "Edit the game information"
 
 #: src/routes/admin/users.tsx
+msgid "Edit User"
+msgstr "Edit User"
+
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
 #: src/routes/invite/$token.tsx
 #: src/routes/login.tsx
 #: src/routes/profile.tsx
@@ -583,6 +670,7 @@ msgstr "Email"
 msgid "Email cannot be changed"
 msgstr "Email cannot be changed"
 
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 msgid "Email required"
 msgstr "Email required"
@@ -595,6 +683,11 @@ msgstr "Enter BGG game ID (e.g., 174430)"
 #: src/routes/profile.tsx
 msgid "Enter new password"
 msgstr "Enter new password"
+
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "Enter nickname"
+msgstr "Enter nickname"
 
 #: src/routes/admin/users.tsx
 msgid "Enter nickname to confirm"
@@ -653,6 +746,10 @@ msgstr "Error changing password"
 msgid "Error creating invitation"
 msgstr "Error creating invitation"
 
+#: src/routes/admin/users.tsx
+msgid "Error creating placeholder user"
+msgstr "Error creating placeholder user"
+
 #: src/routes/rankings/index.tsx
 #: src/routes/rankings/manage.tsx
 msgid "Error creating year"
@@ -698,6 +795,10 @@ msgstr "Error loading game"
 msgid "Error loading games"
 msgstr "Error loading games"
 
+#: src/routes/results.tsx
+msgid "Error loading player statistics"
+msgstr "Error loading player statistics"
+
 #: src/routes/rankings/$year.tsx
 msgid "Error loading rankings"
 msgstr "Error loading rankings"
@@ -736,6 +837,10 @@ msgstr "Error saving preset"
 msgid "Error saving rankings"
 msgstr "Error saving rankings"
 
+#: src/routes/admin/users.tsx
+msgid "Error sending activation"
+msgstr "Error sending activation"
+
 #: src/routes/rankings/manage.tsx
 msgid "Error updating deadline"
 msgstr "Error updating deadline"
@@ -755,6 +860,10 @@ msgstr "Error updating role"
 #: src/routes/games/sessions/edit.$sessionId.tsx
 msgid "Error updating session"
 msgstr "Error updating session"
+
+#: src/routes/admin/users.tsx
+msgid "Error updating user"
+msgstr "Error updating user"
 
 #: src/routes/admin/users.tsx
 msgid "Error updating user status"
@@ -785,6 +894,10 @@ msgstr "Failed to load invitation"
 #: src/routes/games/edit.$gameId.tsx
 msgid "Failed to update game"
 msgstr "Failed to update game"
+
+#: src/constants/board-game-types.ts
+msgid "Family Games"
+msgstr "Family Games"
 
 #: src/routes/games/new.tsx
 msgid "Fetch"
@@ -862,12 +975,26 @@ msgid "Game session deleted"
 msgstr "Game session deleted"
 
 #: src/routes/games/edit.$gameId.tsx
+#: src/routes/games/new.tsx
+#: src/routes/results.tsx
+msgid "Game Type"
+msgstr "Game Type"
+
+#: src/routes/games/library.tsx
+msgid "Game Type:"
+msgstr "Game Type:"
+
+#: src/routes/games/edit.$gameId.tsx
 msgid "Game updated"
 msgstr "Game updated"
 
 #: src/components/layout/header.tsx
 msgid "Games"
 msgstr "Games"
+
+#: src/routes/results.tsx
+msgid "Games Ranking"
+msgstr "Games Ranking"
 
 #: src/routes/rankings/$year.tsx
 msgid "Games you didn't play but can still rank"
@@ -885,6 +1012,15 @@ msgstr "Go to Login"
 #: src/routes/rankings/manage.tsx
 msgid "Hide Results"
 msgstr "Hide Results"
+
+#: src/routes/results.tsx
+msgid "Highest Win Rate"
+msgstr "Highest Win Rate"
+
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "https://example.com/avatar.jpg"
+msgstr "https://example.com/avatar.jpg"
 
 #: src/routes/games/new.tsx
 msgid "Import from BGG"
@@ -987,6 +1123,10 @@ msgstr "Loading games..."
 msgid "Loading invitation..."
 msgstr "Loading invitation..."
 
+#: src/routes/results.tsx
+msgid "Loading player statistics..."
+msgstr "Loading player statistics..."
+
 #: src/routes/rankings/manage.tsx
 msgid "Loading submissions..."
 msgstr "Loading submissions..."
@@ -1059,6 +1199,18 @@ msgstr "Manual Entry"
 msgid "Moderator"
 msgstr "Moderator"
 
+#: src/routes/results.tsx
+msgid "Most Games Played"
+msgstr "Most Games Played"
+
+#: src/routes/results.tsx
+msgid "Most Played Game"
+msgstr "Most Played Game"
+
+#: src/routes/results.tsx
+msgid "Most Wins"
+msgstr "Most Wins"
+
 #: src/routes/dashboard.tsx
 msgid "My Games"
 msgstr "My Games"
@@ -1081,6 +1233,8 @@ msgstr "Never"
 msgid "New Password"
 msgstr "New Password"
 
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
 #: src/routes/invite/$token.tsx
 #: src/routes/profile.tsx
 msgid "Nickname"
@@ -1090,9 +1244,18 @@ msgstr "Nickname"
 msgid "Nickname is required"
 msgstr "Nickname is required"
 
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "Nickname required"
+msgstr "Nickname required"
+
 #: src/routes/games/$gameId.tsx
 msgid "No comments yet. Be the first to comment!"
 msgstr "No comments yet. Be the first to comment!"
+
+#: src/routes/admin/users.tsx
+msgid "No email"
+msgstr "No email"
 
 #: src/routes/games/library.tsx
 msgid "No games found matching \"{searchQuery}\""
@@ -1107,8 +1270,12 @@ msgid "No games in the library yet"
 msgstr "No games in the library yet"
 
 #: src/routes/results.tsx
-msgid "No games match the selected categories"
-msgstr "No games match the selected categories"
+#~ msgid "No games match the selected categories"
+#~ msgstr "No games match the selected categories"
+
+#: src/routes/results.tsx
+msgid "No games match the selected filters"
+msgstr "No games match the selected filters"
 
 #: src/routes/rankings/$year.tsx
 msgid "No games ranked yet. Add games from below to start ranking."
@@ -1125,6 +1292,10 @@ msgstr "No pending invitations"
 #: src/routes/games/index.tsx
 msgid "No play sessions recorded yet"
 msgstr "No play sessions recorded yet"
+
+#: src/routes/results.tsx
+msgid "No player data available for this year"
+msgstr "No player data available for this year"
 
 #: src/routes/results.tsx
 msgid "No public results available yet"
@@ -1152,6 +1323,11 @@ msgstr "No users found"
 msgid "Not Published"
 msgstr "Not Published"
 
+#: src/routes/games/edit.$gameId.tsx
+#: src/routes/games/new.tsx
+msgid "Not specified"
+msgstr "Not specified"
+
 #: src/routes/games/index.tsx
 msgid "Note:"
 msgstr "Note:"
@@ -1164,6 +1340,10 @@ msgstr "Notes (Optional)"
 #: src/routes/games/$gameId.tsx
 msgid "Notes:"
 msgstr "Notes:"
+
+#: src/routes/results.tsx
+msgid "of all sessions"
+msgstr "of all sessions"
 
 #: src/routes/rankings/manage.tsx
 msgid "Open"
@@ -1205,9 +1385,22 @@ msgstr "Other Categories"
 msgid "Other Games Played in {0}"
 msgstr "Other Games Played in {0}"
 
+#. placeholder {0}: stats.gamesPlayed
+#: src/routes/results.tsx
+msgid "out of {0} games"
+msgstr "out of {0} games"
+
 #: src/routes/games/new.tsx
 #~ msgid "Override the game name for this session"
 #~ msgstr "Override the game name for this session"
+
+#: src/routes/results.tsx
+msgid "Participation"
+msgstr "Participation"
+
+#: src/constants/board-game-types.ts
+msgid "Party Games"
+msgstr "Party Games"
 
 #: src/routes/invite/$token.tsx
 #: src/routes/login.tsx
@@ -1235,6 +1428,14 @@ msgstr "Passwords do not match"
 #: src/routes/admin/users.tsx
 msgid "Pending Invitations"
 msgstr "Pending Invitations"
+
+#: src/routes/admin/users.tsx
+msgid "Placeholder"
+msgstr "Placeholder"
+
+#: src/routes/admin/users.tsx
+msgid "Placeholder user created"
+msgstr "Placeholder user created"
 
 #: src/routes/games/index.tsx
 msgid "Played Games"
@@ -1272,6 +1473,10 @@ msgstr "Player weight proportional to games played (w_p = np). Gives more weight
 msgid "Players"
 msgstr "Players"
 
+#: src/routes/results.tsx
+msgid "Players Ranking"
+msgstr "Players Ranking"
+
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/games/sessions/new.tsx
 msgid "Players required"
@@ -1287,6 +1492,15 @@ msgstr "Players:"
 msgid "Please enter a BoardGameGeek game ID"
 msgstr "Please enter a BoardGameGeek game ID"
 
+#: src/routes/admin/users.tsx
+msgid "Please enter a nickname"
+msgstr "Please enter a nickname"
+
+#: src/routes/admin/users.tsx
+msgid "Please enter a nickname for the placeholder user"
+msgstr "Please enter a nickname for the placeholder user"
+
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 msgid "Please enter an email address"
 msgstr "Please enter an email address"
@@ -1320,6 +1534,10 @@ msgstr "Please select at least one player"
 #: src/routes/login.tsx
 msgid "Please wait..."
 msgstr "Please wait..."
+
+#: src/routes/results.tsx
+msgid "points per game"
+msgstr "points per game"
 
 #: src/routes/results.tsx
 msgid "Preset"
@@ -1542,6 +1760,7 @@ msgstr "Role: {0}"
 msgid "Save a group of categories as a preset for quick filtering"
 msgstr "Save a group of categories as a preset for quick filtering"
 
+#: src/routes/admin/users.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/profile.tsx
@@ -1556,6 +1775,7 @@ msgstr "Save Preset"
 msgid "Save Rankings"
 msgstr "Save Rankings"
 
+#: src/routes/admin/users.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/profile.tsx
@@ -1603,6 +1823,11 @@ msgstr "Select categories to filter results. Games matching at least one selecte
 msgid "Select Game"
 msgstr "Select Game"
 
+#: src/routes/games/edit.$gameId.tsx
+#: src/routes/games/new.tsx
+msgid "Select the primary game type classification"
+msgstr "Select the primary game type classification"
+
 #: src/routes/games/sessions/new.tsx
 msgid "Select who played and add their scores"
 msgstr "Select who played and add their scores"
@@ -1618,8 +1843,16 @@ msgid "Selected: {0} categories"
 msgstr "Selected: {0} categories"
 
 #: src/routes/admin/users.tsx
+msgid "Send an invitation email to activate this placeholder user. They will be able to log in after completing registration."
+msgstr "Send an invitation email to activate this placeholder user. They will be able to log in after completing registration."
+
+#: src/routes/admin/users.tsx
 msgid "Send an invitation link to a new user. The link will expire in 14 days."
 msgstr "Send an invitation link to a new user. The link will expire in 14 days."
+
+#: src/routes/admin/users.tsx
+msgid "Send Invitation"
+msgstr "Send Invitation"
 
 #: src/routes/login.tsx
 msgid "Send reset link"
@@ -1629,6 +1862,7 @@ msgstr "Send reset link"
 #~ msgid "Send this link to the user. It expires in 14 days."
 #~ msgstr "Send this link to the user. It expires in 14 days."
 
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 msgid "Sending..."
 msgstr "Sending..."
@@ -1662,6 +1896,11 @@ msgstr "Set Up Your Account"
 msgid "Share your thoughts about this game session"
 msgstr "Share your thoughts about this game session"
 
+#: src/routes/admin/users.tsx
+#: src/routes/admin/users.tsx
+msgid "Short description"
+msgstr "Short description"
+
 #. placeholder {0}: filteredResults.length
 #. placeholder {1}: results.length
 #: src/routes/results.tsx
@@ -1675,6 +1914,10 @@ msgstr "Sign in"
 #: src/components/layout/header.tsx
 msgid "Sign Out"
 msgstr "Sign Out"
+
+#: src/constants/board-game-types.ts
+msgid "Strategy Games"
+msgstr "Strategy Games"
 
 #: src/components/ui/theme-toggle.tsx
 msgid "System"
@@ -1708,6 +1951,10 @@ msgstr "The game that was played (cannot be changed)"
 msgid "The game you are trying to edit does not exist"
 msgstr "The game you are trying to edit does not exist"
 
+#: src/routes/admin/users.tsx
+msgid "The placeholder user has been created successfully"
+msgstr "The placeholder user has been created successfully"
+
 #. placeholder {0}: selectedGame.name
 #: src/routes/games/sessions/new.tsx
 msgid "The play session for {0} has been recorded"
@@ -1717,6 +1964,14 @@ msgstr "The play session for {0} has been recorded"
 msgid "The play session has been updated successfully"
 msgstr "The play session has been updated successfully"
 
+#: src/routes/admin/users.tsx
+msgid "The user has been updated successfully"
+msgstr "The user has been updated successfully"
+
+#: src/constants/board-game-types.ts
+msgid "Thematic Games"
+msgstr "Thematic Games"
+
 #: src/routes/invite/$token.tsx
 msgid "This invitation link is invalid or has expired"
 msgstr "This invitation link is invalid or has expired"
@@ -1725,10 +1980,22 @@ msgstr "This invitation link is invalid or has expired"
 msgid "This name will be visible to other users"
 msgstr "This name will be visible to other users"
 
+#: src/routes/results.tsx
+msgid "times"
+msgstr "times"
+
+#: src/routes/results.tsx
+msgid "Total Players"
+msgstr "Total Players"
+
 #. placeholder {0}: userToDelete?.nickname
 #: src/routes/admin/users.tsx
 msgid "Type <0>{0}</0> to confirm deletion"
 msgstr "Type <0>{0}</0> to confirm deletion"
+
+#: src/routes/results.tsx
+msgid "Unique Games"
+msgstr "Unique Games"
 
 #: src/routes/rankings/manage.tsx
 msgid "Unlock"
@@ -1746,6 +2013,10 @@ msgstr "Update the details for {0}"
 #: src/routes/games/sessions/edit.$sessionId.tsx
 msgid "Update the details of this game session"
 msgstr "Update the details of this game session"
+
+#: src/routes/admin/users.tsx
+msgid "Update the user's profile information."
+msgstr "Update the user's profile information."
 
 #: src/routes/profile.tsx
 msgid "Update your password"
@@ -1782,6 +2053,10 @@ msgid "Use This Game"
 msgstr "Use This Game"
 
 #: src/routes/admin/users.tsx
+msgid "User"
+msgstr "User"
+
+#: src/routes/admin/users.tsx
 msgid "User activated"
 msgstr "User activated"
 
@@ -1814,6 +2089,11 @@ msgstr "User Management"
 msgid "User role has been updated successfully"
 msgstr "User role has been updated successfully"
 
+#: src/routes/admin/users.tsx
+msgid "User updated"
+msgstr "User updated"
+
+#: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 msgid "user@example.com"
 msgstr "user@example.com"
@@ -1860,6 +2140,10 @@ msgstr "View Results"
 msgid "View your final rankings"
 msgstr "View your final rankings"
 
+#: src/constants/board-game-types.ts
+msgid "Wargames"
+msgstr "Wargames"
+
 #: src/routes/login.tsx
 msgid "We've sent you a password reset link. Please check your email and follow the instructions."
 msgstr "We've sent you a password reset link. Please check your email and follow the instructions."
@@ -1874,10 +2158,22 @@ msgstr "Welcome back, {0}!"
 msgid "When was the game played?"
 msgstr "When was the game played?"
 
+#: src/routes/results.tsx
+msgid "Win Rate"
+msgstr "Win Rate"
+
+#: src/routes/results.tsx
+msgid "Win Streak"
+msgstr "Win Streak"
+
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/games/sessions/new.tsx
 msgid "Winner"
 msgstr "Winner"
+
+#: src/routes/results.tsx
+msgid "Wins"
+msgstr "Wins"
 
 #: src/routes/games/$gameId.tsx
 msgid "Write a comment..."
