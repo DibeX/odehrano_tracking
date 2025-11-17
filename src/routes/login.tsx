@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Trans } from "@lingui/react/macro";
 import { t } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuthContext } from "@/contexts/auth-context";
 import { LanguageSelector } from "@/components/ui/language-selector";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
@@ -30,8 +30,15 @@ function LoginPage() {
   const [resetMode, setResetMode] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
 
-  const { signIn, resetPassword } = useAuth();
+  const { signIn, resetPassword, user } = useAuthContext();
   const navigate = useNavigate();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate({ to: "/dashboard" });
+    }
+  }, [user, navigate]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -50,12 +57,8 @@ function LoginPage() {
           throw error;
         }
 
-        // Wait for auth state to update before navigating
-        if (data?.session) {
-          // Small delay to ensure auth state is propagated
-          await new Promise((resolve) => setTimeout(resolve, 100));
-          navigate({ to: "/dashboard" });
-        } else {
+        // Navigation will happen automatically via useEffect when user state updates
+        if (!data?.session) {
           console.warn("🟡 No session in response");
         }
       }

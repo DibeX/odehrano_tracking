@@ -20,20 +20,24 @@ function getSystemTheme(): "light" | "dark" {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === "undefined") return "system";
-    return (localStorage.getItem(STORAGE_KEY) as Theme) || "system";
-  });
+  // Use consistent initial values for SSR - always start with defaults
+  // to avoid hydration mismatch
+  const [theme, setThemeState] = useState<Theme>("system");
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
+  const [mounted, setMounted] = useState(false);
 
-  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(() => {
-    if (typeof window === "undefined") return "light";
-    const stored = localStorage.getItem(STORAGE_KEY) as Theme;
-    if (stored === "dark") return "dark";
-    if (stored === "light") return "light";
-    return getSystemTheme();
-  });
+  // Load theme from localStorage after mount (client-side only)
+  useEffect(() => {
+    const storedTheme = localStorage.getItem(STORAGE_KEY) as Theme | null;
+    if (storedTheme) {
+      setThemeState(storedTheme);
+    }
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
+    if (!mounted) return;
+
     const root = window.document.documentElement;
 
     function applyTheme(newTheme: Theme) {
@@ -56,7 +60,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [theme]);
+  }, [theme, mounted]);
 
   function setTheme(newTheme: Theme) {
     localStorage.setItem(STORAGE_KEY, newTheme);
