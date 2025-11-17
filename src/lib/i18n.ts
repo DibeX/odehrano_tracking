@@ -1,5 +1,5 @@
 import { i18n } from "@lingui/core";
-import { en, cs } from "make-plural/plurals";
+import { messages as enMessages } from "../locales/en.po";
 
 export const locales = {
   en: "English",
@@ -8,10 +8,9 @@ export const locales = {
 
 export const defaultLocale = "en";
 
-const pluralData: Record<string, (n: number | string, ord?: boolean) => string> = {
-  en,
-  cs,
-};
+// Load default locale synchronously to avoid hydration mismatch
+i18n.load("en", enMessages);
+i18n.activate("en");
 
 /**
  * Load messages for given locale and activate it.
@@ -19,8 +18,13 @@ const pluralData: Record<string, (n: number | string, ord?: boolean) => string> 
  * many ways how to load messages — from REST API, from file, from cache, etc.
  */
 export async function loadCatalog(locale: string) {
+  if (locale === "en") {
+    // Already loaded synchronously
+    i18n.activate("en");
+    return;
+  }
+
   const catalogs: Record<string, () => Promise<{ messages: any }>> = {
-    en: () => import("../locales/en.po"),
     cs: () => import("../locales/cs.po"),
   };
 
@@ -31,9 +35,6 @@ export async function loadCatalog(locale: string) {
   }
 
   const { messages } = await catalog();
-  i18n.load(locale, { ...messages, plurals: pluralData[locale] });
+  i18n.load(locale, messages);
   i18n.activate(locale);
 }
-
-// Load the default locale
-loadCatalog(defaultLocale);

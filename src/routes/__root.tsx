@@ -16,6 +16,7 @@ import "@/lib/i18n";
 import "@/styles/globals.css";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { ClientOnly } from "@/components/client-only";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -36,8 +37,14 @@ function RootComponent() {
                 <ScrollArea className="h-dvh">
                   <Outlet />
                 </ScrollArea>
-                <Toaster />
-                {import.meta.env.DEV && <TanStackRouterDevtools />}
+                <ClientOnly>
+                  <Toaster />
+                </ClientOnly>
+                {import.meta.env.DEV && (
+                  <ClientOnly>
+                    <TanStackRouterDevtools />
+                  </ClientOnly>
+                )}
               </TooltipProvider>
             </AuthProvider>
           </ThemeProvider>

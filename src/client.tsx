@@ -1,4 +1,7 @@
 import { hydrateRoot } from "react-dom/client";
 import { StartClient } from "@tanstack/react-start/client";
+import { startTransition } from "react";
 
-hydrateRoot(document, <StartClient />);
+startTransition(() => {
+  hydrateRoot(document, <StartClient />);
+});
