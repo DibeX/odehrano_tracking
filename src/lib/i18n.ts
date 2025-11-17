@@ -1,16 +1,16 @@
 import { i18n } from "@lingui/core";
-import { messages as enMessages } from "../locales/en.po";
+import { messages as csMessages } from "../locales/cs.po";
 
 export const locales = {
   en: "English",
   cs: "Čeština",
 };
 
-export const defaultLocale = "en";
+export const defaultLocale = "cs";
 
 // Load default locale synchronously to avoid hydration mismatch
-i18n.load("en", enMessages);
-i18n.activate("en");
+i18n.load("cs", csMessages);
+i18n.activate("cs");
 
 /**
  * Load messages for given locale and activate it.
@@ -18,14 +18,14 @@ i18n.activate("en");
  * many ways how to load messages — from REST API, from file, from cache, etc.
  */
 export async function loadCatalog(locale: string) {
-  if (locale === "en") {
+  if (locale === "cs") {
     // Already loaded synchronously
-    i18n.activate("en");
+    i18n.activate("cs");
     return;
   }
 
   const catalogs: Record<string, () => Promise<{ messages: any }>> = {
-    cs: () => import("../locales/cs.po"),
+    en: () => import("../locales/en.po"),
   };
 
   const catalog = catalogs[locale];
