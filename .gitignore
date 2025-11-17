@@ -43,3 +43,7 @@ src/locales/**/*.js
 # Tanstack
 .tanstack
 nul
+src/locales/extract.bat
+src/locales/import_and_replace.bat
+src/locales/import.bat
+src/locales/BATCH_FILES_README.txt

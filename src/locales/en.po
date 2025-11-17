@@ -55,6 +55,12 @@ msgstr "{0} has been added to the database"
 msgid "{0} has been updated"
 msgstr "{0} has been updated"
 
+#. placeholder {0}: filteredPlayerGameRankings.length
+#. placeholder {1}: playerGameRankings.length
+#: src/routes/results.tsx
+msgid "{0} of {1} games shown"
+msgstr "{0} of {1} games shown"
+
 #. placeholder {0}: formData.bggId
 #. placeholder {1}: existingGame.name
 #: src/routes/games/new.tsx
@@ -62,8 +68,8 @@ msgid "A game with BGG ID {0} already exists: {1}"
 msgstr "A game with BGG ID {0} already exists: {1}"
 
 #: src/constants/board-game-types.ts
-msgid "Abstract Strategy Games"
-msgstr "Abstract Strategy Games"
+msgid "Abstract Strategy Game"
+msgstr "Abstract Strategy Game"
 
 #: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
@@ -157,6 +163,8 @@ msgstr "All Categories"
 msgid "All registered users"
 msgstr "All registered users"
 
+#: src/routes/results.tsx
+#: src/routes/results.tsx
 #: src/routes/results.tsx
 #: src/routes/results.tsx
 msgid "All Types"
@@ -357,12 +365,16 @@ msgid "Check your email"
 msgstr "Check your email"
 
 #: src/constants/board-game-types.ts
-msgid "Children's Games"
-msgstr "Children's Games"
+msgid "Children's Game"
+msgstr "Children's Game"
 
 #: src/routes/invite/$token.tsx
 msgid "Choose a password"
 msgstr "Choose a password"
+
+#: src/routes/results.tsx
+msgid "Choose a player..."
+msgstr "Choose a player..."
 
 #: src/routes/games/new.tsx
 msgid "Choose how you want to add the game"
@@ -383,6 +395,10 @@ msgstr "Clear All"
 #: src/routes/rankings/$year.tsx
 msgid "Click to add to your rankings"
 msgstr "Click to add to your rankings"
+
+#: src/routes/results.tsx
+msgid "Close"
+msgstr "Close"
 
 #: src/routes/games/$gameId.tsx
 msgid "Comment added"
@@ -497,8 +513,8 @@ msgstr "current streak"
 #~ msgstr "Custom Name (Optional)"
 
 #: src/constants/board-game-types.ts
-msgid "Customizable Games"
-msgstr "Customizable Games"
+msgid "Customizable Game"
+msgstr "Customizable Game"
 
 #: src/routes/results.tsx
 msgid "Damped (Recommended)"
@@ -796,6 +812,10 @@ msgid "Error loading games"
 msgstr "Error loading games"
 
 #: src/routes/results.tsx
+msgid "Error loading player rankings"
+msgstr "Error loading player rankings"
+
+#: src/routes/results.tsx
 msgid "Error loading player statistics"
 msgstr "Error loading player statistics"
 
@@ -811,9 +831,9 @@ msgstr "Error loading session"
 msgid "Error loading submissions"
 msgstr "Error loading submissions"
 
-#: src/routes/games/new.tsx
-#~ msgid "Error loading users"
-#~ msgstr "Error loading users"
+#: src/routes/results.tsx
+msgid "Error loading users"
+msgstr "Error loading users"
 
 #: src/routes/rankings/index.tsx
 #: src/routes/rankings/manage.tsx
@@ -896,8 +916,8 @@ msgid "Failed to update game"
 msgstr "Failed to update game"
 
 #: src/constants/board-game-types.ts
-msgid "Family Games"
-msgstr "Family Games"
+msgid "Family Game"
+msgstr "Family Game"
 
 #: src/routes/games/new.tsx
 msgid "Fetch"
@@ -977,6 +997,7 @@ msgstr "Game session deleted"
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
 #: src/routes/results.tsx
+#: src/routes/results.tsx
 msgid "Game Type"
 msgstr "Game Type"
 
@@ -995,6 +1016,10 @@ msgstr "Games"
 #: src/routes/results.tsx
 msgid "Games Ranking"
 msgstr "Games Ranking"
+
+#: src/routes/results.tsx
+msgid "Games Won"
+msgstr "Games Won"
 
 #: src/routes/rankings/$year.tsx
 msgid "Games you didn't play but can still rank"
@@ -1126,6 +1151,10 @@ msgstr "Loading invitation..."
 #: src/routes/results.tsx
 msgid "Loading player statistics..."
 msgstr "Loading player statistics..."
+
+#: src/routes/results.tsx
+msgid "Loading rankings..."
+msgstr "Loading rankings..."
 
 #: src/routes/rankings/manage.tsx
 msgid "Loading submissions..."
@@ -1277,6 +1306,10 @@ msgstr "No games in the library yet"
 msgid "No games match the selected filters"
 msgstr "No games match the selected filters"
 
+#: src/routes/results.tsx
+msgid "No games match the selected game type filter"
+msgstr "No games match the selected game type filter"
+
 #: src/routes/rankings/$year.tsx
 msgid "No games ranked yet. Add games from below to start ranking."
 msgstr "No games ranked yet. Add games from below to start ranking."
@@ -1398,9 +1431,13 @@ msgstr "out of {0} games"
 msgid "Participation"
 msgstr "Participation"
 
+#: src/routes/results.tsx
+msgid "Participation Rate"
+msgstr "Participation Rate"
+
 #: src/constants/board-game-types.ts
-msgid "Party Games"
-msgstr "Party Games"
+msgid "Party Game"
+msgstr "Party Game"
 
 #: src/routes/invite/$token.tsx
 #: src/routes/login.tsx
@@ -1451,6 +1488,10 @@ msgstr "Played on {0}"
 #: src/routes/admin/users.tsx
 msgid "Player"
 msgstr "Player"
+
+#: src/routes/results.tsx
+msgid "Player Game Rankings"
+msgstr "Player Game Rankings"
 
 #: src/routes/results.tsx
 msgid "Player Rankings:"
@@ -1810,6 +1851,10 @@ msgstr "Search games by name, publisher, or category..."
 msgid "Searching..."
 msgstr "Searching..."
 
+#: src/routes/results.tsx
+msgid "Select a player to view how they ranked their games for {selectedYear}"
+msgstr "Select a player to view how they ranked their games for {selectedYear}"
+
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
 msgid "Select all categories that apply to this game"
@@ -1822,6 +1867,10 @@ msgstr "Select categories to filter results. Games matching at least one selecte
 #: src/routes/games/sessions/new.tsx
 msgid "Select Game"
 msgstr "Select Game"
+
+#: src/routes/results.tsx
+msgid "Select Player"
+msgstr "Select Player"
 
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
@@ -1884,6 +1933,10 @@ msgstr "Session recorded"
 msgid "Session updated"
 msgstr "Session updated"
 
+#: src/routes/results.tsx
+msgid "Sessions Played"
+msgstr "Sessions Played"
+
 #: src/routes/rankings/manage.tsx
 msgid "Set up a new year for game rankings"
 msgstr "Set up a new year for game rankings"
@@ -1915,9 +1968,13 @@ msgstr "Sign in"
 msgid "Sign Out"
 msgstr "Sign Out"
 
+#: src/routes/results.tsx
+msgid "Sort By"
+msgstr "Sort By"
+
 #: src/constants/board-game-types.ts
-msgid "Strategy Games"
-msgstr "Strategy Games"
+msgid "Strategy Game"
+msgstr "Strategy Game"
 
 #: src/components/ui/theme-toggle.tsx
 msgid "System"
@@ -1969,8 +2026,8 @@ msgid "The user has been updated successfully"
 msgstr "The user has been updated successfully"
 
 #: src/constants/board-game-types.ts
-msgid "Thematic Games"
-msgstr "Thematic Games"
+msgid "Thematic Game"
+msgstr "Thematic Game"
 
 #: src/routes/invite/$token.tsx
 msgid "This invitation link is invalid or has expired"
@@ -1979,6 +2036,10 @@ msgstr "This invitation link is invalid or has expired"
 #: src/routes/invite/$token.tsx
 msgid "This name will be visible to other users"
 msgstr "This name will be visible to other users"
+
+#: src/routes/results.tsx
+msgid "This player has not submitted any rankings for {selectedYear}"
+msgstr "This player has not submitted any rankings for {selectedYear}"
 
 #: src/routes/results.tsx
 msgid "times"
@@ -1993,6 +2054,7 @@ msgstr "Total Players"
 msgid "Type <0>{0}</0> to confirm deletion"
 msgstr "Type <0>{0}</0> to confirm deletion"
 
+#: src/routes/results.tsx
 #: src/routes/results.tsx
 msgid "Unique Games"
 msgstr "Unique Games"
@@ -2127,6 +2189,10 @@ msgstr "View Details"
 msgid "View Games"
 msgstr "View Games"
 
+#: src/routes/results.tsx
+msgid "View Player Rankings"
+msgstr "View Player Rankings"
+
 #: src/routes/rankings/index.tsx
 msgid "View Rankings"
 msgstr "View Rankings"
@@ -2159,9 +2225,11 @@ msgid "When was the game played?"
 msgstr "When was the game played?"
 
 #: src/routes/results.tsx
+#: src/routes/results.tsx
 msgid "Win Rate"
 msgstr "Win Rate"
 
+#: src/routes/results.tsx
 #: src/routes/results.tsx
 msgid "Win Streak"
 msgstr "Win Streak"
