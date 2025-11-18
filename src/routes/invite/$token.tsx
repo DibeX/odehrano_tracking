@@ -112,17 +112,17 @@ function InvitePage() {
       const isPlaceholderActivation = !!invitation.placeholder_user_id;
 
       if (isPlaceholderActivation) {
-        // For placeholder user activation, we need to:
-        // 1. Create auth account without triggering the normal user creation
-        // 2. Link the auth account to the existing placeholder user
+        // For placeholder activation, the trigger will automatically:
+        // 1. Find the placeholder user by email
+        // 2. Update it with auth_user_id instead of creating new user
         const { data: authData, error: signUpError } = await supabase.auth.signUp(
           {
             email: invitation.email,
             password,
             options: {
               data: {
-                // Mark as placeholder activation to skip normal user creation
-                skip_user_creation: true,
+                nickname: nickname.trim(),
+                role: invitation.role || "player",
               },
             },
           }
@@ -131,18 +131,7 @@ function InvitePage() {
         if (signUpError) throw signUpError;
         if (!authData.user) throw new Error("Failed to create auth account");
 
-        // Link the placeholder user to the new auth account
-        const { error: linkError } = await supabase
-          .from("users")
-          .update({
-            auth_user_id: authData.user.id,
-            email: invitation.email,
-            nickname: nickname.trim(),
-            is_placeholder: false,
-          })
-          .eq("id", invitation.placeholder_user_id!);
-
-        if (linkError) throw linkError;
+        // Trigger has already updated the placeholder user - nothing more needed!
       } else {
         // Normal invitation flow - create new user
         const { data: authData, error: signUpError } = await supabase.auth.signUp(
@@ -170,13 +159,8 @@ function InvitePage() {
         if (updateError) throw updateError;
       }
 
-      // Mark invitation as used
-      const { error: invitationError } = await supabase
-        .from("user_invitations")
-        .update({ used_at: new Date().toISOString() })
-        .eq("id", invitation.id);
-
-      if (invitationError) throw invitationError;
+      // Invitation is automatically marked as used by the trigger
+      // (no need to update it here since user isn't fully authenticated until email confirmation)
 
       // Redirect to dashboard
       navigate({ to: "/dashboard" });

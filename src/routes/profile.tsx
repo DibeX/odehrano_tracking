@@ -79,7 +79,7 @@ function createImage(url: string): Promise<HTMLImageElement> {
 }
 
 function ProfilePage() {
-  const { user } = useAuthContext();
+  const { user, supabaseUser } = useAuthContext();
   const { _ } = useLingui();
   const { toast } = useToast();
   const [nickname, setNickname] = useState("");
@@ -189,7 +189,8 @@ function ProfilePage() {
       // Upload new avatar if there's a blob to upload
       if (avatarBlob) {
         const fileName = `${Date.now()}.jpg`;
-        const filePath = `${user.id}/${fileName}`;
+        // Use supabaseUser.id (auth_user_id) for storage path to match RLS policy
+        const filePath = `${supabaseUser?.id}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from("avatars")

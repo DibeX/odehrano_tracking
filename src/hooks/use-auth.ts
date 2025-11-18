@@ -40,7 +40,7 @@ export function useAuth() {
       const { data, error } = await supabase
         .from("users")
         .select("*")
-        .eq("id", userId)
+        .eq("auth_user_id", userId)
         .single();
 
       if (error) throw error;
@@ -50,7 +50,7 @@ export function useAuth() {
       supabase
         .from("users")
         .update({ last_login_at: new Date().toISOString() })
-        .eq("id", userId)
+        .eq("auth_user_id", userId)
         .then(() => {});
     } catch (error) {
       console.error("Error fetching user profile:", error);
