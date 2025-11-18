@@ -18,6 +18,8 @@ import { LanguageSelector } from "@/components/ui/language-selector";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
+import logoBlack from "@/assets/logos/played_logo_black.png";
+import logoWhite from "@/assets/logos/played_logo_white.png";
 
 const loginSearchSchema = z.object({
   redirect: z.string().optional(),
@@ -37,7 +39,12 @@ function LoginPage() {
   const [resetMode, setResetMode] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
 
-  const { signIn, resetPassword, user, loading: authLoading } = useAuthContext();
+  const {
+    signIn,
+    resetPassword,
+    user,
+    loading: authLoading,
+  } = useAuthContext();
   const navigate = useNavigate();
   const { redirect: redirectTo } = Route.useSearch();
 
@@ -122,96 +129,110 @@ function LoginPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen p-4 bg-background">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="flex justify-between">
-            <div className="flex flex-col gap-1">
-              {resetMode ? <Trans>Reset Password</Trans> : <Trans>Login</Trans>}
-              <CardDescription>
+      <div className="flex flex-col items-center w-full max-w-md gap-6">
+        <div className="flex items-center">
+          <img src={logoBlack} alt="Played" className="h-32 dark:hidden" />
+          <img
+            src={logoWhite}
+            alt="Played"
+            className="hidden h-32 dark:block"
+          />
+        </div>
+        <Card className="w-full">
+          <CardHeader>
+            <CardTitle className="flex justify-between">
+              <div className="flex flex-col gap-1">
                 {resetMode ? (
-                  <Trans>
-                    Enter your email to receive a password reset link
-                  </Trans>
+                  <Trans>Reset Password</Trans>
                 ) : (
-                  <Trans>Enter your credentials to access your account</Trans>
+                  <Trans>Login</Trans>
                 )}
-              </CardDescription>
-            </div>
-            <div className="flex gap-1">
-              <LanguageSelector />
-              <ThemeToggle />
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">
-                <Trans>Email</Trans>
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder={_(t`you@example.com`)}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-
-            {!resetMode && (
+                <CardDescription>
+                  {resetMode ? (
+                    <Trans>
+                      Enter your email to receive a password reset link
+                    </Trans>
+                  ) : (
+                    <Trans>Enter your credentials to access your account</Trans>
+                  )}
+                </CardDescription>
+              </div>
+              <div className="flex gap-1">
+                <LanguageSelector />
+                <ThemeToggle />
+              </div>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="password">
-                  <Trans>Password</Trans>
+                <Label htmlFor="email">
+                  <Trans>Email</Trans>
                 </Label>
                 <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="email"
+                  type="email"
+                  placeholder={_(t`you@example.com`)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={loading}
                 />
               </div>
-            )}
 
-            {error && (
-              <div className="p-3 text-sm rounded-md bg-destructive/15 text-destructive">
-                {error}
-              </div>
-            )}
-
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
-                <Trans>Please wait...</Trans>
-              ) : resetMode ? (
-                <Trans>Send reset link</Trans>
-              ) : (
-                <Trans>Sign in</Trans>
+              {!resetMode && (
+                <div className="space-y-2">
+                  <Label htmlFor="password">
+                    <Trans>Password</Trans>
+                  </Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                  />
+                </div>
               )}
-            </Button>
 
-            <Button
-              type="button"
-              variant="link"
-              className="w-full"
-              onClick={() => {
-                setResetMode(!resetMode);
-                setError("");
-              }}
-              disabled={loading}
-            >
-              {resetMode ? (
-                <Trans>Back to login</Trans>
-              ) : (
-                <Trans>Forgot password?</Trans>
+              {error && (
+                <div className="p-3 text-sm rounded-md bg-destructive/15 text-destructive">
+                  {error}
+                </div>
               )}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (
+                  <Trans>Please wait...</Trans>
+                ) : resetMode ? (
+                  <Trans>Send reset link</Trans>
+                ) : (
+                  <Trans>Sign in</Trans>
+                )}
+              </Button>
+
+              <Button
+                type="button"
+                variant="link"
+                className="w-full"
+                onClick={() => {
+                  setResetMode(!resetMode);
+                  setError("");
+                }}
+                disabled={loading}
+              >
+                {resetMode ? (
+                  <Trans>Back to login</Trans>
+                ) : (
+                  <Trans>Forgot password?</Trans>
+                )}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
