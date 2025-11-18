@@ -356,6 +356,10 @@ msgstr "Změnit"
 msgid "Change Password"
 msgstr "Změnit heslo"
 
+#: src/routes/rankings/$year.tsx
+msgid "Changes discarded"
+msgstr "Změny byly zrušeny"
+
 #: src/routes/profile.tsx
 msgid "Changing..."
 msgstr "Měním..."
@@ -615,6 +619,10 @@ msgstr "Popis"
 #: src/routes/results.tsx
 msgid "different titles"
 msgstr "různých titulů"
+
+#: src/routes/rankings/$year.tsx
+msgid "Discard Changes"
+msgstr "Zrušit změny"
 
 #: src/routes/results.tsx
 msgid "Done"
@@ -1115,6 +1123,11 @@ msgstr "Pozvat uživatele"
 #: src/routes/admin/users.tsx
 msgid "Last login:"
 msgstr "Poslední přihlášení:"
+
+#. placeholder {0}: lastSavedAt.toLocaleString()
+#: src/routes/rankings/$year.tsx
+msgid "Last saved: {0}"
+msgstr "Naposledy uloženo: {0}"
 
 #: src/routes/rankings/manage.tsx
 msgid "Last updated"
@@ -2316,6 +2329,10 @@ msgstr "Vaše hodnocení"
 #: src/routes/rankings/$year.tsx
 msgid "Your rankings have been saved successfully"
 msgstr "Vaše hodnocení bylo úspěšně uloženo"
+
+#: src/routes/rankings/$year.tsx
+msgid "Your unsaved changes have been discarded"
+msgstr "Tvoje neuložené změny byly zrušeny"
 
 #: src/routes/profile.tsx
 msgid "Zoom"

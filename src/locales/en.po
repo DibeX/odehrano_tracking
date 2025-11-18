@@ -356,6 +356,10 @@ msgstr "Change"
 msgid "Change Password"
 msgstr "Change Password"
 
+#: src/routes/rankings/$year.tsx
+msgid "Changes discarded"
+msgstr "Changes discarded"
+
 #: src/routes/profile.tsx
 msgid "Changing..."
 msgstr "Changing..."
@@ -615,6 +619,10 @@ msgstr "Description"
 #: src/routes/results.tsx
 msgid "different titles"
 msgstr "different titles"
+
+#: src/routes/rankings/$year.tsx
+msgid "Discard Changes"
+msgstr "Discard Changes"
 
 #: src/routes/results.tsx
 msgid "Done"
@@ -1115,6 +1123,11 @@ msgstr "Invite User"
 #: src/routes/admin/users.tsx
 msgid "Last login:"
 msgstr "Last login:"
+
+#. placeholder {0}: lastSavedAt.toLocaleString()
+#: src/routes/rankings/$year.tsx
+msgid "Last saved: {0}"
+msgstr "Last saved: {0}"
 
 #: src/routes/rankings/manage.tsx
 msgid "Last updated"
@@ -2316,6 +2329,10 @@ msgstr "Your Rankings"
 #: src/routes/rankings/$year.tsx
 msgid "Your rankings have been saved successfully"
 msgstr "Your rankings have been saved successfully"
+
+#: src/routes/rankings/$year.tsx
+msgid "Your unsaved changes have been discarded"
+msgstr "Your unsaved changes have been discarded"
 
 #: src/routes/profile.tsx
 msgid "Zoom"
