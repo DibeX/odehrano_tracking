@@ -598,7 +598,7 @@ function YearRankingsPage() {
                       <img
                         src={rg.boardGame.image_url}
                         alt={rg.boardGame.name}
-                        className="object-cover rounded size-16"
+                        className="object-contain w-16 h-16 rounded"
                       />
                     )}
 
@@ -649,7 +649,7 @@ function YearRankingsPage() {
                       <img
                         src={game.image_url}
                         alt={game.name}
-                        className="object-cover w-12 h-12 rounded"
+                        className="object-contain w-12 h-12 rounded"
                       />
                     )}
                     <div className="flex-1">
@@ -690,7 +690,7 @@ function YearRankingsPage() {
                       <img
                         src={game.image_url}
                         alt={game.name}
-                        className="object-cover w-12 h-12 rounded"
+                        className="object-contain w-12 h-12 rounded"
                       />
                     )}
                     <div className="flex-1">
