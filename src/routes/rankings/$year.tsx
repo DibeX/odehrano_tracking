@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, ArrowLeft, ChevronUp, ChevronDown } from "lucide-react";
+import { Plus, ArrowLeft, ChevronUp, ChevronDown, X } from "lucide-react";
 import type { BoardGame, UserGameRanking, RankingYear } from "@/types";
 
 export const Route = createFileRoute("/rankings/$year")({
@@ -50,7 +50,10 @@ function YearRankingsPage() {
   const [saving, setSaving] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [initialRankedGames, setInitialRankedGames] = useState<RankedGame[]>([]);
+  const [initialRankedGames, setInitialRankedGames] = useState<RankedGame[]>(
+    []
+  );
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
 
   function handleBack() {
     if (router.history.length <= 1) {
@@ -61,6 +64,7 @@ function YearRankingsPage() {
   }
 
   const localStorageKey = `rankings_${year}_${user?.id}`;
+  const lastSavedKey = `rankings_last_saved_${year}_${user?.id}`;
 
   function saveToLocalStorage(games: RankedGame[]) {
     localStorage.setItem(localStorageKey, JSON.stringify(games));
@@ -82,6 +86,40 @@ function YearRankingsPage() {
     localStorage.removeItem(localStorageKey);
   }
 
+  function saveLastSavedTimestamp() {
+    const timestamp = new Date().toISOString();
+    localStorage.setItem(lastSavedKey, timestamp);
+    setLastSavedAt(new Date(timestamp));
+  }
+
+  function loadLastSavedTimestamp() {
+    const stored = localStorage.getItem(lastSavedKey);
+    if (stored) {
+      setLastSavedAt(new Date(stored));
+    } else {
+      setLastSavedAt(null);
+    }
+  }
+
+  function handleDiscardChanges() {
+    clearLocalStorage();
+    setRankedGames(initialRankedGames);
+    setHasUnsavedChanges(false);
+
+    // Rebuild available games lists
+    const rankedGameIds = new Set(
+      initialRankedGames.map((rg) => rg.boardGame.id)
+    );
+
+    // We need to reload to get fresh available games
+    loadData();
+
+    toast({
+      title: _(t`Changes discarded`),
+      description: _(t`Your unsaved changes have been discarded`),
+    });
+  }
+
   function checkForChanges(current: RankedGame[], initial: RankedGame[]) {
     if (current.length !== initial.length) return true;
     for (let i = 0; i < current.length; i++) {
@@ -92,6 +130,7 @@ function YearRankingsPage() {
 
   useEffect(() => {
     loadData();
+    loadLastSavedTimestamp();
   }, [year, user]);
 
   // Save to localStorage and track changes whenever rankedGames changes
@@ -120,7 +159,9 @@ function YearRankingsPage() {
       // Load user's existing rankings
       const { data: rankingsData, error: rankingsError } = await supabase
         .from("user_game_rankings")
-        .select("*, board_game:board_games(*)")
+        .select(
+          "id, rank, is_manually_added, updated_at, board_game:board_games(*)"
+        )
         .eq("user_id", user.id)
         .eq("year", parseInt(year))
         .order("rank");
@@ -135,6 +176,17 @@ function YearRankingsPage() {
       }));
 
       setInitialRankedGames(ranked);
+
+      // Get the most recent updated_at timestamp from the rankings
+      if (rankingsData && rankingsData.length > 0) {
+        const timestamps = rankingsData.map((r: any) => new Date(r.updated_at));
+        const mostRecent = new Date(
+          Math.max(...timestamps.map((d) => d.getTime()))
+        );
+        setLastSavedAt(mostRecent);
+        // Also save it to localStorage for consistency
+        localStorage.setItem(lastSavedKey, mostRecent.toISOString());
+      }
 
       // Load games the user played in this year
       const { data: userPlayedGamesData, error: userPlayedError } =
@@ -201,7 +253,9 @@ function YearRankingsPage() {
       }
 
       // Filter out already ranked games
-      const rankedGameIds = new Set(currentRankedGames.map((rg) => rg.boardGame.id));
+      const rankedGameIds = new Set(
+        currentRankedGames.map((rg) => rg.boardGame.id)
+      );
       const userPlayedGameIds = new Set(
         (userPlayedGamesData || []).map((pg: any) => pg.board_game.id)
       );
@@ -285,6 +339,7 @@ function YearRankingsPage() {
       }
 
       clearLocalStorage();
+      saveLastSavedTimestamp();
       setHasUnsavedChanges(false);
 
       toast({
@@ -354,14 +409,20 @@ function YearRankingsPage() {
   function moveGameUp(index: number) {
     if (index === 0) return;
     const newRanked = [...rankedGames];
-    [newRanked[index - 1], newRanked[index]] = [newRanked[index], newRanked[index - 1]];
+    [newRanked[index - 1], newRanked[index]] = [
+      newRanked[index],
+      newRanked[index - 1],
+    ];
     setRankedGames(newRanked);
   }
 
   function moveGameDown(index: number) {
     if (index === rankedGames.length - 1) return;
     const newRanked = [...rankedGames];
-    [newRanked[index], newRanked[index + 1]] = [newRanked[index + 1], newRanked[index]];
+    [newRanked[index], newRanked[index + 1]] = [
+      newRanked[index + 1],
+      newRanked[index],
+    ];
     setRankedGames(newRanked);
   }
 
@@ -423,10 +484,28 @@ function YearRankingsPage() {
             </p>
           </div>
 
-          {!isLocked && hasUnsavedChanges && (
-            <Button onClick={handleSaveRankings} disabled={saving}>
-              {saving ? <Trans>Saving...</Trans> : <Trans>Save Rankings</Trans>}
-            </Button>
+          {!isLocked && (
+            <div className="flex gap-2">
+              {hasUnsavedChanges && (
+                <>
+                  <Button
+                    variant="outline"
+                    onClick={handleDiscardChanges}
+                    disabled={saving}
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    <Trans>Discard Changes</Trans>
+                  </Button>
+                  <Button onClick={handleSaveRankings} disabled={saving}>
+                    {saving ? (
+                      <Trans>Saving...</Trans>
+                    ) : (
+                      <Trans>Save Rankings</Trans>
+                    )}
+                  </Button>
+                </>
+              )}
+            </div>
           )}
         </div>
 
@@ -444,19 +523,28 @@ function YearRankingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>
-              <Trans>Your Rankings</Trans>
-            </CardTitle>
-            <CardDescription>
-              {isLocked ? (
-                <Trans>View your final rankings</Trans>
-              ) : (
-                <Trans>
-                  Rank 1 = Most Favorite, Rank {rankedGames.length} = Least
-                  Favorite
-                </Trans>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>
+                  <Trans>Your Rankings</Trans>
+                </CardTitle>
+                <CardDescription>
+                  {isLocked ? (
+                    <Trans>View your final rankings</Trans>
+                  ) : (
+                    <Trans>
+                      Rank 1 = Most Favorite, Rank {rankedGames.length} = Least
+                      Favorite
+                    </Trans>
+                  )}
+                </CardDescription>
+              </div>
+              {lastSavedAt && (
+                <p className="text-sm text-muted-foreground">
+                  <Trans>Last saved: {lastSavedAt.toLocaleString()}</Trans>
+                </p>
               )}
-            </CardDescription>
+            </div>
           </CardHeader>
           <CardContent>
             {rankedGames.length === 0 ? (
