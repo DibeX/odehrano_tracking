@@ -164,6 +164,10 @@ msgstr "Všechny deskové hry v databázi ({0} her)"
 msgid "All Categories"
 msgstr "Všechny kategorie"
 
+#: src/components/features/bgg-edition-selection.tsx
+msgid "All editions — all publishers"
+msgstr "Všechna vydání — všichni vydavatelé"
+
 #: src/routes/admin/users.tsx
 msgid "All registered users"
 msgstr "Všichni registrovaní uživatelé"
@@ -568,6 +572,10 @@ msgstr "Aktuálně:"
 #: src/constants/board-game-types.ts
 msgid "Customizable Game"
 msgstr "Upravitelné"
+
+#: src/components/features/bgg-edition-selection.tsx
+msgid "Czech-language editions are listed here. The selected edition determines the publishers."
+msgstr "Zde jsou uvedena vydání v češtině. Vybrané vydání určuje vydavatele."
 
 #: src/routes/results.tsx
 msgid "Damped (Recommended)"
@@ -1700,6 +1708,10 @@ msgstr "Předvolba uložena"
 msgid "Preset updated"
 msgstr "Předvolba aktualizována"
 
+#: src/components/features/bgg-edition-selection.tsx
+msgid "Primary game name"
+msgstr "Hlavní název hry"
+
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
 #: src/services/bgg-messages.ts
@@ -1738,6 +1750,10 @@ msgstr "Veřejné"
 #: src/routes/rankings/manage.tsx
 msgid "Publish Results"
 msgstr "Zveřejnit výsledky"
+
+#: src/components/features/bgg-edition-selection.tsx
+msgid "Publisher edition"
+msgstr "Vydání pro výběr vydavatelů"
 
 #: src/components/features/bgg-game-preview.tsx
 #: src/routes/games/edit.$gameId.tsx
@@ -1989,6 +2005,10 @@ msgstr "Vybrat hru"
 #: src/routes/results.tsx
 msgid "Select Player"
 msgstr "Vybrat hráče"
+
+#: src/components/features/bgg-edition-selection.tsx
+msgid "Select the Czech title if available. BGG does not label alternate names by language; other titles are kept as alternate names."
+msgstr "Vyberte český název, pokud je dostupný. BGG u alternativních názvů neuvádí jazyk; ostatní názvy se zachovají jako alternativní."
 
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx

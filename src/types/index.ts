@@ -47,6 +47,14 @@ export interface BGGGameInfo {
   publishers: string[];
   rank: number | null;
   rating: number | null;
+  editions?: BGGEdition[];
+}
+
+export interface BGGEdition {
+  id: number;
+  name: string;
+  languages: string[];
+  publishers: string[];
 }
 
 export interface PlayedGameWithDetails extends PlayedGame {

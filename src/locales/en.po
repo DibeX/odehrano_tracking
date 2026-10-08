@@ -164,6 +164,10 @@ msgstr "All board games in the database ({0} games)"
 msgid "All Categories"
 msgstr "All Categories"
 
+#: src/components/features/bgg-edition-selection.tsx
+msgid "All editions — all publishers"
+msgstr "All editions — all publishers"
+
 #: src/routes/admin/users.tsx
 msgid "All registered users"
 msgstr "All registered users"
@@ -568,6 +572,10 @@ msgstr "Current:"
 #: src/constants/board-game-types.ts
 msgid "Customizable Game"
 msgstr "Customizable Game"
+
+#: src/components/features/bgg-edition-selection.tsx
+msgid "Czech-language editions are listed here. The selected edition determines the publishers."
+msgstr "Czech-language editions are listed here. The selected edition determines the publishers."
 
 #: src/routes/results.tsx
 msgid "Damped (Recommended)"
@@ -1700,6 +1708,10 @@ msgstr "Preset saved"
 msgid "Preset updated"
 msgstr "Preset updated"
 
+#: src/components/features/bgg-edition-selection.tsx
+msgid "Primary game name"
+msgstr "Primary game name"
+
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
 #: src/services/bgg-messages.ts
@@ -1738,6 +1750,10 @@ msgstr "Public"
 #: src/routes/rankings/manage.tsx
 msgid "Publish Results"
 msgstr "Publish Results"
+
+#: src/components/features/bgg-edition-selection.tsx
+msgid "Publisher edition"
+msgstr "Publisher edition"
 
 #: src/components/features/bgg-game-preview.tsx
 #: src/routes/games/edit.$gameId.tsx
@@ -1989,6 +2005,10 @@ msgstr "Select Game"
 #: src/routes/results.tsx
 msgid "Select Player"
 msgstr "Select Player"
+
+#: src/components/features/bgg-edition-selection.tsx
+msgid "Select the Czech title if available. BGG does not label alternate names by language; other titles are kept as alternate names."
+msgstr "Select the Czech title if available. BGG does not label alternate names by language; other titles are kept as alternate names."
 
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx

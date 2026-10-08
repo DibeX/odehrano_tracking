@@ -42,6 +42,49 @@ afterEach(() => {
 });
 
 describe("BGG search and import", () => {
+  it("defaults to Czech edition publishers and imports a selected alternate title while preserving the original", async () => {
+    api.fetchBGGGame.mockResolvedValue({
+      ...game,
+      editions: [
+        {
+          id: 461082,
+          name: "Czech edition 2019",
+          languages: ["Czech"],
+          publishers: ["MINDOK"],
+        },
+        {
+          id: 604978,
+          name: "Czech third edition",
+          languages: ["Czech"],
+          publishers: ["MINDOK", "Stonemaier Games"],
+        },
+      ],
+    });
+    api.findExistingBGGGame.mockResolvedValue(null);
+    const selected = vi.fn();
+    const user = userEvent.setup();
+    view(<BGGGameSearch onGameSelected={selected} />);
+    await user.type(screen.getByRole("textbox"), "174430");
+    await user.click(screen.getByRole("button", { name: "Search" }));
+    const edition = await screen.findByRole("combobox", {
+      name: "Publisher edition",
+    });
+    expect((edition as HTMLSelectElement).value).toBe("461082");
+    await user.selectOptions(edition, "604978");
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Primary game name" }),
+      "Gloomhaven CZ",
+    );
+    await user.click(screen.getByRole("button", { name: "Use This Game" }));
+    expect(selected).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Gloomhaven CZ",
+        alternateNames: ["Gloomhaven"],
+        publishers: ["MINDOK", "Stonemaier Games"],
+        yearPublished: 2017,
+      }),
+    );
+  });
   it("renders Czech search and error messages with their diacritics", async () => {
     i18n.load("cs", csMessages);
     i18n.activate("cs");
@@ -141,6 +184,103 @@ describe("BGG search and import", () => {
 });
 
 describe("metadata refresh preview", () => {
+  it("preserves an unchecked field when edition and title selections change", async () => {
+    api.fetchBGGGame.mockResolvedValue({
+      ...game,
+      editions: [
+        {
+          id: 461082,
+          name: "Czech edition",
+          languages: ["Czech"],
+          publishers: ["MINDOK"],
+        },
+      ],
+    });
+    const onApply = vi.fn();
+    const user = userEvent.setup();
+    view(
+      <BGGMetadataRefresh
+        bggId="174430"
+        current={{ ...getBGGMetadata(game), categories: ["Local category"] }}
+        onApply={onApply}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Refresh from BGG" }));
+    await user.click(
+      await screen.findByRole("checkbox", { name: /Categories/ }),
+    );
+    await user.click(screen.getByRole("checkbox", { name: /Publishers/ }));
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Primary game name" }),
+      "Gloomhaven CZ",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Publisher edition" }),
+      "",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Publisher edition" }),
+      "461082",
+    );
+    expect(
+      (screen.getByRole("checkbox", { name: /Categories/ }) as HTMLInputElement)
+        .checked,
+    ).toBe(false);
+    expect(
+      (screen.getByRole("checkbox", { name: /Publishers/ }) as HTMLInputElement)
+        .checked,
+    ).toBe(false);
+    await user.click(
+      screen.getByRole("button", { name: "Apply Selected Changes" }),
+    );
+    expect(onApply.mock.calls[0][0].categories).toEqual(["Local category"]);
+  });
+  it("offers Czech edition publishers and retains a previously selected localized title", async () => {
+    api.fetchBGGGame.mockResolvedValue({
+      ...game,
+      editions: [
+        {
+          id: 461082,
+          name: "Czech edition",
+          languages: ["Czech"],
+          publishers: ["MINDOK"],
+        },
+      ],
+    });
+    const onApply = vi.fn();
+    const user = userEvent.setup();
+    view(
+      <BGGMetadataRefresh
+        bggId="174430"
+        current={{
+          ...getBGGMetadata(game),
+          name: "Gloomhaven CZ",
+          alternate_names: ["Gloomhaven"],
+          publishers: ["Old publisher"],
+        }}
+        onApply={onApply}
+      />,
+    );
+    await user.click(screen.getByRole("button", { name: "Refresh from BGG" }));
+    expect(
+      (
+        (await screen.findByRole("combobox", {
+          name: "Primary game name",
+        })) as HTMLSelectElement
+      ).value,
+    ).toBe("Gloomhaven CZ");
+    expect(screen.queryByRole("checkbox", { name: /Primary Name/ })).toBeNull();
+    await user.click(
+      screen.getByRole("button", { name: "Apply Selected Changes" }),
+    );
+    expect(onApply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Gloomhaven CZ",
+        publishers: ["MINDOK"],
+      }),
+      ["publishers"],
+    );
+  });
   it("keeps a custom name and image unchecked and applies only chosen changes", async () => {
     api.fetchBGGGame.mockResolvedValue(game);
     const onApply = vi.fn();

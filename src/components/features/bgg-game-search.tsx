@@ -12,6 +12,12 @@ import { getBGGErrorMessage } from "@/services/bgg-messages";
 import type { BGGSearchResult } from "@/services/bgg-contract";
 import type { BGGGameInfo } from "@/types";
 import { BGGGamePreview } from "./bgg-game-preview";
+import { BGGEditionSelection } from "./bgg-edition-selection";
+import {
+  defaultBGGEditionSelection,
+  selectBGGEdition,
+  type BGGEditionSelection as Selection,
+} from "@/services/bgg-editions";
 
 export function BGGGameSearch({
   onGameSelected,
@@ -29,6 +35,11 @@ export function BGGGameSearch({
   const [results, setResults] = useState<BGGSearchResult[] | null>(null);
   const [visibleCount, setVisibleCount] = useState(50);
   const [game, setGame] = useState<BGGGameInfo | null>(null);
+  const [selection, setSelection] = useState<Selection>({
+    name: "",
+    editionId: null,
+  });
+  const selectedGame = game ? selectBGGEdition(game, selection) : null;
   const [existing, setExisting] = useState<{ id: string; name: string } | null>(
     null,
   );
@@ -46,6 +57,7 @@ export function BGGGameSearch({
     ]);
     if (generation !== requestId.current) return;
     setGame(metadata);
+    setSelection(defaultBGGEditionSelection(metadata));
     setExisting(duplicate);
   }
   async function search() {
@@ -179,7 +191,13 @@ export function BGGGameSearch({
       )}
       {game && (
         <div className="space-y-4 rounded-md border p-4">
-          <BGGGamePreview game={game} />
+          <BGGEditionSelection
+            game={game}
+            selection={selection}
+            onChange={setSelection}
+            disabled={disabled || busy}
+          />
+          <BGGGamePreview game={selectedGame!} />
           {existing && (
             <p role="status" className="text-sm">
               <Trans>This game is already in your library:</Trans>{" "}
@@ -195,7 +213,7 @@ export function BGGGameSearch({
             type="button"
             className="w-full"
             disabled={!!existing || disabled || busy}
-            onClick={() => onGameSelected(game)}
+            onClick={() => onGameSelected(selectedGame!)}
           >
             <Trans>Use This Game</Trans>
           </Button>

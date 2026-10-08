@@ -13,6 +13,13 @@ import {
 } from "@/services/bgg-metadata";
 import { BGGError } from "@/services/bgg-contract";
 import { BGG_FIELD_LABELS, getBGGErrorMessage } from "@/services/bgg-messages";
+import type { BGGGameInfo } from "@/types";
+import { BGGEditionSelection } from "./bgg-edition-selection";
+import {
+  defaultBGGEditionSelection,
+  selectBGGEdition,
+  type BGGEditionSelection as Selection,
+} from "@/services/bgg-editions";
 
 function display(value: BGGMetadataChange["before"]): string {
   return Array.isArray(value) ? value.join(", ") : (value?.toString() ?? "—");
@@ -30,14 +37,22 @@ export function BGGMetadataRefresh({
 }) {
   const { _ } = useLingui();
   const generation = useRef(0);
+  const selectionOverrides = useRef(new Map<BGGMetadataField, boolean>());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [changes, setChanges] = useState<BGGMetadataChange[] | null>(null);
+  const [source, setSource] = useState<BGGGameInfo | null>(null);
+  const [selection, setSelection] = useState<Selection>({
+    name: "",
+    editionId: null,
+  });
   // A preview belongs to the form values it was requested for, including unsaved edits.
   const fingerprint = JSON.stringify(current);
   useEffect(() => {
     generation.current++;
+    selectionOverrides.current.clear();
     setChanges(null);
+    setSource(null);
     setBusy(false);
     setError(null);
     return () => {
@@ -47,15 +62,23 @@ export function BGGMetadataRefresh({
 
   async function refresh() {
     const request = ++generation.current;
+    selectionOverrides.current.clear();
     setBusy(true);
     setError(null);
     setChanges(null);
+    setSource(null);
     try {
       const lookup = parseBGGLookup(bggId);
       if (lookup.kind !== "game") throw new BGGError("INVALID_INPUT");
       const game = await fetchBGGGame(lookup.id, { refresh: true });
-      if (request === generation.current)
-        setChanges(buildBGGChanges(current, game));
+      if (request === generation.current) {
+        const nextSelection = defaultBGGEditionSelection(game, current);
+        setSource(game);
+        setSelection(nextSelection);
+        setChanges(
+          buildBGGChanges(current, selectBGGEdition(game, nextSelection)),
+        );
+      }
     } catch (error) {
       if (request === generation.current) setError(error);
     } finally {
@@ -88,6 +111,26 @@ export function BGGMetadataRefresh({
           {getBGGErrorMessage(error, _)}
         </p>
       )}
+      {source && changes !== null && (
+        <BGGEditionSelection
+          game={source}
+          selection={selection}
+          disabled={disabled}
+          onChange={(next) => {
+            setSelection(next);
+            setChanges(
+              buildBGGChanges(current, selectBGGEdition(source, next)).map(
+                (change) => ({
+                  ...change,
+                  selected:
+                    selectionOverrides.current.get(change.field) ??
+                    change.selected,
+                }),
+              ),
+            );
+          }}
+        />
+      )}
       {changes !== null &&
         (changes.length === 0 ? (
           <p role="status" className="text-sm">
@@ -112,15 +155,19 @@ export function BGGMetadataRefresh({
                     checked={change.selected}
                     disabled={disabled}
                     className="mt-1"
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      selectionOverrides.current.set(
+                        change.field,
+                        event.target.checked,
+                      );
                       setChanges((all) =>
                         all!.map((item) =>
                           item.field === change.field
                             ? { ...item, selected: event.target.checked }
                             : item,
                         ),
-                      )
-                    }
+                      );
+                    }}
                   />
                   <span className="min-w-0 text-sm">
                     <span className="font-medium">

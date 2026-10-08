@@ -280,10 +280,27 @@ the private BGG application token is never sent to the browser.
    categories, ratings and ranks are saved when you submit. Manual entry remains
    available; the local game-type classification can be selected separately.
 
+   The preview defaults to a Czech-language edition's publishers when one is
+   available. Choose another Czech edition or all publishers in **Publisher
+   edition**, then choose the Czech title in **Primary game name**. BGG alternate
+   names have no language tags, and edition labels such as "Czech edition 2019"
+   are not game titles. Changing the primary name preserves the original as an
+   alternate. Edition selection changes publishers; the game's original
+   publication year, image, rating, and rank remain game-level metadata.
+
 4. To refresh, open a game's edit form and choose **Refresh from BGG**. Select
    the fields to replace, apply them to the form, and save. Existing names and
    images are unchecked by default. Missing BGG values do not clear local values.
    Changing form values discards an outdated refresh preview.
+   The refresh preview also allows edition and primary-name selection; a current
+   title found among BGG's alternate names is retained automatically.
+
+Game type follows the community classification poll's highest vote count. The
+XML API currently provides classification ranks but does not include those poll
+counts, so game type remains manual. A category's rank or its order in the XML
+is not a proxy for classification votes. Automated typing needs an additional
+supported poll source; the [website JSON API](https://boardgamegeek.com/wiki/page/BGG_JSON_API)
+requires separate permission for application use outside browsing the website.
 
 The server caches game details for 24 hours and search results for 10 minutes,
 with a maximum of 200 entries per server process. Refresh bypasses the game

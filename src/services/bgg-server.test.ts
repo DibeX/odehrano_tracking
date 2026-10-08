@@ -12,6 +12,28 @@ const response = (body = xml, status = 200, headers?: HeadersInit) =>
   new Response(body, { status, headers });
 
 describe("BGG XML parsing", () => {
+  it("reads edition languages and publishers without treating edition labels as game titles", () => {
+    const editions = `<versions><item type="boardgameversion" id="461082"><name type="primary" value="Czech edition 2019"/><link type="language" id="2180" value="Czech"/><link type="boardgamepublisher" value="MINDOK"/></item><item type="boardgameversion" id="123"><name type="primary" value="English edition"/><link type="language" value="English"/><link type="boardgamepublisher" value="Stonemaier Games"/></item><item type="boardgameversion" id="0"><name type="primary" value="Invalid edition"/></item></versions>`;
+    const parsed = parseBGGGame(
+      xml.replace("</item></items>", editions + "</item></items>"),
+      174430,
+    );
+    expect(parsed.editions).toEqual([
+      {
+        id: 461082,
+        name: "Czech edition 2019",
+        languages: ["Czech"],
+        publishers: ["MINDOK"],
+      },
+      {
+        id: 123,
+        name: "English edition",
+        languages: ["English"],
+        publishers: ["Stonemaier Games"],
+      },
+    ]);
+    expect(parsed.name).toBe("Gloomhaven & Friends");
+  });
   it("preserves negative publication years for ancient games in details and search", () => {
     const ancient =
       '<items><item type="boardgame" id="2399"><name type="primary" value="The Royal Game of Ur"/><yearpublished value="-2200"/></item></items>';
@@ -31,6 +53,7 @@ describe("BGG XML parsing", () => {
       publishers: ["Cephalofair Games"],
       rank: 4,
       rating: 8.6,
+      editions: [],
     });
   });
   it("treats missing, unrated and unranked metadata as null", () => {
@@ -88,7 +111,7 @@ describe("authenticated BGG transport, caching and retries", () => {
     await client.game(174430);
     expect(requests).toHaveLength(1);
     expect(requests[0].url).toBe(
-      "https://boardgamegeek.com/xmlapi2/thing?id=174430&stats=1",
+      "https://boardgamegeek.com/xmlapi2/thing?id=174430&stats=1&versions=1",
     );
     expect(requests[0].headers.get("Authorization")).toBe(
       "Bearer private-token",

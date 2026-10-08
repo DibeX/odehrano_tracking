@@ -94,6 +94,27 @@ export function parseBGGGame(xml: string, id: number): BGGGameInfo {
       true,
     ),
     rating: rating !== null && rating <= 10 ? rating : null,
+    editions: (item.versions?.item ?? []).flatMap((edition: XMLNode) => {
+      const editionId = numberOrNull(edition["@_id"], true);
+      const editionName = edition.name?.find(
+        (name: XMLNode) => name["@_type"] === "primary",
+      )?.["@_value"];
+      if (
+        !editionId ||
+        edition["@_type"] !== "boardgameversion" ||
+        typeof editionName !== "string" ||
+        !editionName.trim()
+      )
+        return [];
+      return [
+        {
+          id: editionId,
+          name: editionName,
+          languages: strings(edition.link ?? [], "language"),
+          publishers: strings(edition.link ?? [], "boardgamepublisher"),
+        },
+      ];
+    }),
   };
 }
 export function parseBGGSearch(xml: string): BGGSearchResult[] {
@@ -238,7 +259,7 @@ export function createBGGClient(options: BGGClientOptions) {
   return {
     game: (id: number, refresh = false) =>
       lookup(
-        `https://boardgamegeek.com/xmlapi2/thing?id=${id}&stats=1`,
+        `https://boardgamegeek.com/xmlapi2/thing?id=${id}&stats=1&versions=1`,
         (xml) => parseBGGGame(xml, id),
         24 * 60 * 60 * 1000,
         refresh,
