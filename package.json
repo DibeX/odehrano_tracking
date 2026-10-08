@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "start": "vite start",
+    "start": "node .output/server/index.mjs",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
+    "test": "vitest run",
     "extract": "lingui extract",
     "compile": "lingui compile"
   },
@@ -33,6 +34,7 @@
     "@tanstack/router-plugin": "^1.135.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "fast-xml-parser": "^5.11.2",
     "lucide-react": "^0.553.0",
     "make-plural": "^7.4.0",
     "nitro": "^3.0.1-alpha.1",
@@ -47,16 +49,21 @@
     "@lingui/babel-plugin-lingui-macro": "^5.5.2",
     "@lingui/cli": "^5.5.2",
     "@lingui/vite-plugin": "^5.5.2",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/node": "^24.10.0",
     "@types/react": "^19.2.3",
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^5.1.0",
+    "jsdom": "^26.1.0",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
     "vite": "^7.2.2",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^5.0.3"
   },
   "overrides": {
-    "vite": "$vite"
+    "vite": "$vite",
+    "seroval": "^1.6.8"
   }
 }

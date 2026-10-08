@@ -1,153 +1,205 @@
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Trans } from "@lingui/react/macro";
-import { t } from "@lingui/core/macro";
+import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { fetchBGGGame } from "@/services/bgg-api";
-import { useToast } from "@/hooks/use-toast";
+import { fetchBGGGame, searchBGGGames } from "@/services/bgg-api";
+import { findExistingBGGGame } from "@/services/bgg-library";
+import { parseBGGLookup } from "@/services/bgg-metadata";
+import { getBGGErrorMessage } from "@/services/bgg-messages";
+import type { BGGSearchResult } from "@/services/bgg-contract";
 import type { BGGGameInfo } from "@/types";
+import { BGGGamePreview } from "./bgg-game-preview";
 
-interface BGGGameSearchProps {
+export function BGGGameSearch({
+  onGameSelected,
+  disabled = false,
+}: {
   onGameSelected: (game: BGGGameInfo) => void;
-}
-
-export function BGGGameSearch({ onGameSelected }: BGGGameSearchProps) {
+  disabled?: boolean;
+}) {
   const { _ } = useLingui();
-  const { toast } = useToast();
-  const [bggId, setBggId] = useState("");
-  const [searching, setSearching] = useState(false);
-  const [gameInfo, setGameInfo] = useState<BGGGameInfo | null>(null);
+  const inputId = useId();
+  const requestId = useRef(0);
+  const [query, setQuery] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+  const [results, setResults] = useState<BGGSearchResult[] | null>(null);
+  const [visibleCount, setVisibleCount] = useState(50);
+  const [game, setGame] = useState<BGGGameInfo | null>(null);
+  const [existing, setExisting] = useState<{ id: string; name: string } | null>(
+    null,
+  );
+  useEffect(
+    () => () => {
+      requestId.current++;
+    },
+    [],
+  );
 
-  async function handleSearch() {
-    if (!bggId.trim()) {
-      toast({
-        title: _(t`BGG ID required`),
-        description: _(t`Please enter a BoardGameGeek game ID`),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setSearching(true);
+  async function loadGame(id: number, generation: number) {
+    const [metadata, duplicate] = await Promise.all([
+      fetchBGGGame(id),
+      findExistingBGGGame(id),
+    ]);
+    if (generation !== requestId.current) return;
+    setGame(metadata);
+    setExisting(duplicate);
+  }
+  async function search() {
+    const generation = ++requestId.current;
+    setBusy(true);
+    setError(null);
+    setGame(null);
+    setExisting(null);
+    setResults(null);
+    setVisibleCount(50);
     try {
-      const info = await fetchBGGGame(parseInt(bggId));
-      setGameInfo(info);
-    } catch (error: any) {
-      toast({
-        title: _(t`Error fetching game`),
-        description: error.message,
-        variant: "destructive",
-      });
-      setGameInfo(null);
+      const lookup = parseBGGLookup(query);
+      if (lookup.kind === "game") await loadGame(lookup.id, generation);
+      else {
+        const matches = await searchBGGGames(lookup.query);
+        if (generation === requestId.current) setResults(matches);
+      }
+    } catch (error) {
+      if (generation === requestId.current) setError(error);
     } finally {
-      setSearching(false);
+      if (generation === requestId.current) setBusy(false);
     }
   }
-
-  function handleSelectGame() {
-    if (gameInfo) {
-      onGameSelected(gameInfo);
+  async function preview(id: number) {
+    const generation = ++requestId.current;
+    setBusy(true);
+    setError(null);
+    setGame(null);
+    setExisting(null);
+    try {
+      await loadGame(id, generation);
+    } catch (error) {
+      if (generation === requestId.current) setError(error);
+    } finally {
+      if (generation === requestId.current) setBusy(false);
     }
   }
-
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="bggId">
-          <Trans>BoardGameGeek ID</Trans>
+        <Label htmlFor={inputId}>
+          <Trans>Game name, BGG ID, or URL</Trans>
         </Label>
         <div className="flex gap-2">
           <Input
-            id="bggId"
-            type="number"
-            placeholder={_(t`Enter BGG game ID (e.g., 174430)`)}
-            value={bggId}
-            onChange={(e) => setBggId(e.target.value)}
-            disabled={searching}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSearch();
+            id={inputId}
+            value={query}
+            disabled={disabled}
+            maxLength={200}
+            placeholder={_(msg`e.g., Wingspan, 266192, or a BGG game URL`)}
+            onChange={(event) => {
+              requestId.current++;
+              setQuery(event.target.value);
+              setBusy(false);
+              setResults(null);
+              setGame(null);
+              setExisting(null);
+              setError(null);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                if (!busy && !disabled && query.trim()) void search();
               }
             }}
           />
-          <Button onClick={handleSearch} disabled={searching || !bggId.trim()}>
-            {searching ? <Trans>Searching...</Trans> : <Trans>Search</Trans>}
+          <Button
+            type="button"
+            onClick={() => void search()}
+            disabled={busy || disabled || !query.trim()}
+          >
+            <Trans>Search</Trans>
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground">
-          <Trans>
-            Find the game ID on BoardGameGeek.com in the URL (e.g.,
-            /boardgame/174430/gloomhaven)
-          </Trans>
-        </p>
       </div>
-
-      {gameInfo && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{gameInfo.name}</CardTitle>
-            <CardDescription>
-              {gameInfo.yearPublished && (
-                <Trans>Year: {gameInfo.yearPublished}</Trans>
-              )}
-              {gameInfo.rank && (
-                <>
-                  {" • "}
-                  <Trans>BGG Rank: #{gameInfo.rank}</Trans>
-                </>
-              )}
-              {gameInfo.rating && (
-                <>
-                  {" • "}
-                  <Trans>Rating: {gameInfo.rating}/10</Trans>
-                </>
-              )}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {gameInfo.imageUrl && (
-              <div className="aspect-video overflow-hidden rounded-lg bg-muted">
-                <img
-                  src={gameInfo.imageUrl}
-                  alt={gameInfo.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-
-            {gameInfo.categories.length > 0 && (
-              <div>
-                <p className="text-sm font-medium mb-2">
-                  <Trans>Categories:</Trans>
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {gameInfo.categories.map((category) => (
-                    <span
-                      key={category}
-                      className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded-full"
+      {busy && (
+        <p role="status" className="text-sm text-muted-foreground">
+          <Trans>Loading BGG metadata. This may take a few seconds.</Trans>
+        </p>
+      )}
+      {error !== null && (
+        <p role="alert" className="text-sm text-destructive">
+          {getBGGErrorMessage(error, _)}
+        </p>
+      )}
+      {results !== null && (
+        <div className="space-y-2" aria-live="polite">
+          {results.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              <Trans>No BGG games found. Try another name or a BGG ID.</Trans>
+            </p>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">
+                <Trans>Select a game to preview its metadata.</Trans>
+              </p>
+              <ul className="max-h-80 space-y-1 overflow-auto rounded-md border p-2">
+                {results.slice(0, visibleCount).map((result) => (
+                  <li key={result.id}>
+                    <button
+                      type="button"
+                      disabled={busy || disabled}
+                      onClick={() => void preview(result.id)}
+                      className="flex w-full items-start justify-between gap-3 rounded p-2 text-left hover:bg-muted disabled:opacity-50"
                     >
-                      {category}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <Button onClick={handleSelectGame} className="w-full">
-              <Trans>Use This Game</Trans>
-            </Button>
-          </CardContent>
-        </Card>
+                      <span className="break-words">
+                        {result.name}
+                        {result.yearPublished !== null &&
+                          ` (${result.yearPublished})`}
+                      </span>
+                      <span className="shrink-0 text-xs text-muted-foreground">
+                        #{result.id}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {visibleCount < results.length && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={busy || disabled}
+                  onClick={() => setVisibleCount((count) => count + 50)}
+                >
+                  <Trans>Show More Results</Trans>
+                </Button>
+              )}
+            </>
+          )}
+        </div>
+      )}
+      {game && (
+        <div className="space-y-4 rounded-md border p-4">
+          <BGGGamePreview game={game} />
+          {existing && (
+            <p role="status" className="text-sm">
+              <Trans>This game is already in your library:</Trans>{" "}
+              <a
+                href={`/games/edit/${existing.id}`}
+                className="text-primary underline"
+              >
+                {existing.name}
+              </a>
+            </p>
+          )}
+          <Button
+            type="button"
+            className="w-full"
+            disabled={!!existing || disabled || busy}
+            onClick={() => onGameSelected(game)}
+          >
+            <Trans>Use This Game</Trans>
+          </Button>
+        </div>
       )}
     </div>
   );

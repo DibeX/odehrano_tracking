@@ -15,20 +15,29 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
+import {
+  applyGameMetadata,
+  toGameMetadata,
+  toBoardGameWrite,
+  type GameFormData,
+} from "@/services/game-metadata";
+import { BGGMetadataRefresh } from "@/components/features/bgg-metadata-refresh";
+import { BGGStats } from "@/components/features/bgg-game-preview";
+import { BGGError } from "@/services/bgg-contract";
+import { getBGGErrorMessage } from "@/services/bgg-messages";
+
 import { useToast } from "@/hooks/use-toast";
 import { requireRole } from "@/lib/auth-helpers";
-import { fetchBGGGame } from "@/services/bgg-api";
-import {
-  GAME_CATEGORIES,
-  type GameCategory,
-} from "@/constants/game-categories";
+import { BGGGameSearch } from "@/components/features/bgg-game-search";
+import { getBGGMetadata } from "@/services/bgg-metadata";
+import { GAME_CATEGORIES } from "@/constants/game-categories";
 import {
   BOARD_GAME_TYPES,
   type BoardGameType,
   getBoardGameTypeLabel,
 } from "@/constants/board-game-types";
 import type { BGGGameInfo } from "@/types";
-import { Plus, X, Search, Download, Upload } from "lucide-react";
+import { Plus, X, Download, Upload } from "lucide-react";
 
 export const Route = createFileRoute("/games/new")({
   beforeLoad: async () => {
@@ -39,26 +48,13 @@ export const Route = createFileRoute("/games/new")({
 
 type InputMode = "bgg" | "manual";
 
-interface GameFormData {
-  primaryName: string;
-  alternateNames: string[];
-  yearPublished: string;
-  publishers: string[];
-  categories: GameCategory[];
-  gameType: BoardGameType | null;
-  bggId: string;
-  imageUrl: string;
-}
-
 function NewGamePage() {
   const { _ } = useLingui();
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const [inputMode, setInputMode] = useState<InputMode>("manual");
+  const [inputMode, setInputMode] = useState<InputMode>("bgg");
   const [loading, setLoading] = useState(false);
-  const [bggSearchId, setBggSearchId] = useState("");
-  const [bggSearching, setBggSearching] = useState(false);
 
   const [formData, setFormData] = useState<GameFormData>({
     primaryName: "",
@@ -69,6 +65,8 @@ function NewGamePage() {
     gameType: null,
     bggId: "",
     imageUrl: "",
+    bggRank: null,
+    bggRating: null,
   });
 
   const [newAlternateName, setNewAlternateName] = useState("");
@@ -76,51 +74,19 @@ function NewGamePage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
 
-  async function handleBGGSearch() {
-    if (!bggSearchId.trim()) {
-      toast({
-        title: _(t`BGG ID required`),
-        description: _(t`Please enter a BoardGameGeek game ID`),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setBggSearching(true);
-    try {
-      const gameInfo = await fetchBGGGame(parseInt(bggSearchId));
-
-      // Map BGG categories to our categories
-      const mappedCategories = gameInfo.categories.filter((cat) =>
-        GAME_CATEGORIES.includes(cat as GameCategory)
-      ) as GameCategory[];
-
-      setFormData({
-        primaryName: gameInfo.name,
-        alternateNames: gameInfo.alternateNames,
-        yearPublished: gameInfo.yearPublished?.toString() || "",
-        publishers: gameInfo.publishers,
-        categories: mappedCategories,
-        gameType: null, // BGG doesn't provide this info, user needs to select
-        bggId: gameInfo.id.toString(),
-        imageUrl: gameInfo.imageUrl || "",
-      });
-
-      toast({
-        title: _(t`Game loaded`),
-        description: _(
-          t`Game data imported from BoardGameGeek. You can edit any fields before saving.`
-        ),
-      });
-    } catch (error: any) {
-      toast({
-        title: _(t`Error fetching game`),
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setBggSearching(false);
-    }
+  function handleBGGImport(gameInfo: BGGGameInfo) {
+    setFormData((prev) => ({
+      ...applyGameMetadata(prev, getBGGMetadata(gameInfo)),
+      bggId: gameInfo.id.toString(),
+    }));
+    setImageFile(null);
+    setImagePreview("");
+    toast({
+      title: _(t`Game loaded`),
+      description: _(
+        t`Game data imported from BoardGameGeek. You can edit any fields before saving.`,
+      ),
+    });
   }
 
   function handleAddAlternateName() {
@@ -163,7 +129,7 @@ function NewGamePage() {
     }));
   }
 
-  function handleToggleCategory(category: GameCategory) {
+  function handleToggleCategory(category: string) {
     setFormData((prev) => {
       if (prev.categories.includes(category)) {
         return {
@@ -212,19 +178,25 @@ function NewGamePage() {
     setLoading(true);
 
     try {
+      const payload = toBoardGameWrite(formData);
       // Check if game with same BGG ID already exists (if BGG ID is provided)
       if (formData.bggId) {
-        const { data: existingGame } = (await supabase
+        const { data: existingGame, error: duplicateError } = (await supabase
           .from("board_games")
           .select("id, name")
-          .eq("bgg_id", parseInt(formData.bggId))
-          .maybeSingle()) as { data: { id: string; name: string } | null };
+          .eq("bgg_id", payload.bgg_id!)
+          .maybeSingle()) as {
+          data: { id: string; name: string } | null;
+          error: unknown;
+        };
+
+        if (duplicateError) throw duplicateError;
 
         if (existingGame) {
           toast({
             title: _(t`Game already exists`),
             description: _(
-              t`A game with BGG ID ${formData.bggId} already exists: ${existingGame.name}`
+              t`A game with BGG ID ${formData.bggId} already exists: ${existingGame.name}`,
             ),
             variant: "destructive",
           });
@@ -262,18 +234,7 @@ function NewGamePage() {
       // Insert the new game
       const { data: newGame, error } = await supabase
         .from("board_games")
-        .insert({
-          bgg_id: formData.bggId ? parseInt(formData.bggId) : null,
-          name: formData.primaryName.trim(),
-          alternate_names: formData.alternateNames,
-          year_published: formData.yearPublished
-            ? parseInt(formData.yearPublished)
-            : null,
-          publishers: formData.publishers,
-          categories: formData.categories,
-          game_type: formData.gameType,
-          image_url: finalImageUrl,
-        })
+        .insert({ ...payload, image_url: finalImageUrl })
         .select()
         .single();
 
@@ -282,16 +243,23 @@ function NewGamePage() {
       toast({
         title: _(t`Game added`),
         description: _(
-          t`${formData.primaryName} has been added to the database`
+          t`${formData.primaryName} has been added to the database`,
         ),
       });
 
-      navigate({ to: "/games" });
+      navigate({ to: "/games/library" });
     } catch (error: any) {
       console.error("Error adding game:", error);
       toast({
         title: _(t`Error adding game`),
-        description: error.message || _(t`Failed to add game to database`),
+        description:
+          error instanceof BGGError
+            ? getBGGErrorMessage(error, _)
+            : error.code === "23505"
+              ? _(
+                  t`A game with this BGG ID is already in your library. Search the library before adding it again.`,
+                )
+              : error.message || _(t`Failed to add game to database`),
         variant: "destructive",
       });
     } finally {
@@ -309,8 +277,9 @@ function NewGamePage() {
       gameType: null,
       bggId: "",
       imageUrl: "",
+      bggRank: null,
+      bggRating: null,
     });
-    setBggSearchId("");
     setNewAlternateName("");
     setNewPublisher("");
     setImageFile(null);
@@ -375,54 +344,20 @@ function NewGamePage() {
               </CardTitle>
               <CardDescription>
                 <Trans>
-                  Enter the BGG ID to fetch game information automatically
+                  Find a game and preview its metadata before importing.
                 </Trans>
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="bggSearchId">
-                  <Trans>BoardGameGeek ID</Trans>
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="bggSearchId"
-                    type="number"
-                    placeholder={_(t`Enter BGG game ID (e.g., 174430)`)}
-                    value={bggSearchId}
-                    onChange={(e) => setBggSearchId(e.target.value)}
-                    disabled={bggSearching}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        handleBGGSearch();
-                      }
-                    }}
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleBGGSearch}
-                    disabled={bggSearching || !bggSearchId.trim()}
-                  >
-                    <Search className="w-4 h-4 mr-2" />
-                    {bggSearching ? (
-                      <Trans>Loading...</Trans>
-                    ) : (
-                      <Trans>Fetch</Trans>
-                    )}
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  <Trans>
-                    Find the game ID on BoardGameGeek.com in the URL (e.g.,
-                    /boardgame/174430/gloomhaven)
-                  </Trans>
-                </p>
-              </div>
+            <CardContent>
+              <BGGGameSearch
+                onGameSelected={handleBGGImport}
+                disabled={loading}
+              />
             </CardContent>
           </Card>
         )}
 
+        <BGGStats rank={formData.bggRank} rating={formData.bggRating} />
         {/* Game Details Form */}
         <form onSubmit={handleSubmit}>
           <Card>
@@ -521,7 +456,7 @@ function NewGamePage() {
                     }))
                   }
                   placeholder={_(t`e.g., 2017`)}
-                  min="1900"
+                  min="-5000"
                   max={new Date().getFullYear() + 1}
                 />
               </div>
@@ -626,7 +561,9 @@ function NewGamePage() {
                   <Trans>Select all categories that apply to this game</Trans>
                 </p>
                 <div className="p-3 space-y-1 overflow-y-auto border rounded-md max-h-64">
-                  {GAME_CATEGORIES.map((category) => (
+                  {[
+                    ...new Set([...GAME_CATEGORIES, ...formData.categories]),
+                  ].map((category) => (
                     <label
                       key={category}
                       className="flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-muted"
@@ -660,7 +597,14 @@ function NewGamePage() {
                   type="number"
                   value={formData.bggId}
                   onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, bggId: e.target.value }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      bggId: e.target.value,
+                      bggRank:
+                        e.target.value === prev.bggId ? prev.bggRank : null,
+                      bggRating:
+                        e.target.value === prev.bggId ? prev.bggRating : null,
+                    }))
                   }
                   placeholder={_(t`Optional - BGG game ID`)}
                 />
@@ -670,6 +614,26 @@ function NewGamePage() {
                   </Trans>
                 </p>
               </div>
+
+              {formData.bggId && (
+                <BGGMetadataRefresh
+                  bggId={formData.bggId}
+                  current={{
+                    ...toGameMetadata(formData),
+                    image_url: imagePreview || formData.imageUrl || null,
+                  }}
+                  disabled={loading}
+                  onApply={(metadata, fields) => {
+                    setFormData((prev) =>
+                      applyGameMetadata(prev, metadata, fields),
+                    );
+                    if (fields.includes("image_url")) {
+                      setImageFile(null);
+                      setImagePreview("");
+                    }
+                  }}
+                />
+              )}
 
               {/* Game Image Upload */}
               <div className="space-y-2">

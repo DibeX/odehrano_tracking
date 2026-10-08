@@ -67,6 +67,11 @@ msgstr "Zobrazeno {0} z {1} her"
 msgid "A game with BGG ID {0} already exists: {1}"
 msgstr "Hra s BGG ID {0} již existuje: {1}"
 
+#: src/routes/games/edit.$gameId.tsx
+#: src/routes/games/new.tsx
+msgid "A game with this BGG ID is already in your library. Search the library before adding it again."
+msgstr "Hra s tímto BGG ID už je v knihovně. Před dalším přidáním ji vyhledejte v knihovně."
+
 #: src/constants/board-game-types.ts
 msgid "Abstract Strategy Game"
 msgstr "Abstraktní strategické"
@@ -174,8 +179,10 @@ msgstr "Všechny typy"
 msgid "Also known as:"
 msgstr "Také známá jako:"
 
+#: src/components/features/bgg-game-preview.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Alternate Names"
 msgstr "Alternativní názvy"
 
@@ -192,6 +199,10 @@ msgstr "E-mail s pozvánkou byl odeslán na {0}"
 #: src/routes/games/sessions/new.tsx
 msgid "Any notes about this game session..."
 msgstr "Jakékoli poznámky k této herní partii..."
+
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Apply Selected Changes"
+msgstr "Použít vybrané změny"
 
 #. placeholder {0}: userToToggle?.nickname
 #: src/routes/admin/users.tsx
@@ -254,6 +265,10 @@ msgstr "Zpět"
 msgid "Back to login"
 msgstr "Zpět na přihlášení"
 
+#: src/services/bgg-messages.ts
+msgid "BGG access is not configured. Ask an administrator to set the server's BGG_API_TOKEN."
+msgstr "Přístup k BGG není nastaven. Požádejte správce o nastavení BGG_API_TOKEN na serveru."
+
 #. placeholder {0}: formData.bggId
 #. placeholder {1}: existingGame.name
 #: src/routes/games/edit.$gameId.tsx
@@ -266,13 +281,44 @@ msgstr "BGG ID je již použito"
 
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/new.tsx
-msgid "BGG ID required"
-msgstr "Je vyžadováno BGG ID"
+#~ msgid "BGG ID required"
+#~ msgstr "Je vyžadováno BGG ID"
 
-#. placeholder {0}: gameInfo.rank
+#: src/services/bgg-messages.ts
+msgid "BGG is temporarily unavailable or busy. Please try again shortly."
+msgstr "BGG je dočasně nedostupné nebo přetížené. Zkuste to za chvíli znovu."
+
+#: src/services/bgg-messages.ts
+msgid "BGG Rank"
+msgstr "Pořadí na BGG"
+
 #: src/components/features/bgg-game-search.tsx
-msgid "BGG Rank: #{0}"
-msgstr "BGG hodnocení: #{0}"
+#~ msgid "BGG Rank: #{0}"
+#~ msgstr "BGG hodnocení: #{0}"
+
+#: src/components/features/bgg-game-preview.tsx
+msgid "BGG Rank: #{rank}"
+msgstr "Pořadí na BGG: #{rank}"
+
+#: src/services/bgg-messages.ts
+msgid "BGG Rating"
+msgstr "Hodnocení na BGG"
+
+#: src/services/bgg-messages.ts
+msgid "BGG rejected the application token. Ask an administrator to check BGG_API_TOKEN."
+msgstr "BGG odmítlo token aplikace. Požádejte správce o kontrolu BGG_API_TOKEN."
+
+#: src/services/bgg-messages.ts
+msgid "BGG returned an unreadable response. Please try again later."
+msgstr "BGG vrátilo nečitelnou odpověď. Zkuste to později znovu."
+
+#: src/services/bgg-messages.ts
+msgid "BGG took too long to respond. Please try again."
+msgstr "BGG neodpovědělo včas. Zkuste to znovu."
+
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "BGG:"
+msgstr "BGG:"
 
 #: src/routes/admin/users.tsx
 msgid "Bio"
@@ -282,9 +328,7 @@ msgstr "O mně"
 msgid "Bio (optional)"
 msgstr "O mně (volitelné)"
 
-#: src/components/features/bgg-game-search.tsx
 #: src/routes/games/edit.$gameId.tsx
-#: src/routes/games/new.tsx
 #: src/routes/games/new.tsx
 msgid "BoardGameGeek ID"
 msgstr "BoardGameGeek ID"
@@ -316,8 +360,10 @@ msgstr "Počítám hodnocení..."
 msgid "Cancel"
 msgstr "Zrušit"
 
+#: src/components/features/bgg-game-preview.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Categories"
 msgstr "Kategorie"
 
@@ -325,7 +371,6 @@ msgstr "Kategorie"
 msgid "Categories in Current Year"
 msgstr "Kategorie v aktuálním roce"
 
-#: src/components/features/bgg-game-search.tsx
 #: src/routes/games/$gameId.tsx
 #: src/routes/games/library.tsx
 msgid "Categories:"
@@ -512,6 +557,10 @@ msgstr "Vytvářím..."
 msgid "current streak"
 msgstr "aktuální série"
 
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Current:"
+msgstr "Aktuálně:"
+
 #: src/routes/games/new.tsx
 #~ msgid "Custom Name (Optional)"
 #~ msgstr "Vlastní název (volitelné)"
@@ -620,6 +669,10 @@ msgstr "Popis"
 msgid "different titles"
 msgstr "různých titulů"
 
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Discard BGG Changes"
+msgstr "Zahodit změny z BGG"
+
 #: src/routes/rankings/$year.tsx
 msgid "Discard Changes"
 msgstr "Zrušit změny"
@@ -640,6 +693,10 @@ msgstr "např. 2017"
 #: src/routes/results.tsx
 msgid "e.g., Strategy Games, Family Favorites"
 msgstr "např. Strategické hry, Rodinné oblíbené"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "e.g., Wingspan, 266192, or a BGG game URL"
+msgstr "např. Na křídlech, 266192 nebo URL hry na BGG"
 
 #: src/routes/results.tsx
 msgid "Each player has equal voting weight (w_p = 1). Best for giving everyone an equal voice regardless of participation."
@@ -699,10 +756,14 @@ msgstr "E-mail nelze změnit"
 msgid "Email required"
 msgstr "E-mail je povinný"
 
+#: src/services/bgg-messages.ts
+msgid "Enter a valid game name, positive BGG ID, or BoardGameGeek game URL."
+msgstr "Zadejte platný název hry, kladné BGG ID nebo URL hry na BoardGameGeek."
+
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/new.tsx
-msgid "Enter BGG game ID (e.g., 174430)"
-msgstr "Zadejte BGG ID hry (např. 174430)"
+#~ msgid "Enter BGG game ID (e.g., 174430)"
+#~ msgstr "Zadejte BGG ID hry (např. 174430)"
 
 #: src/routes/profile.tsx
 msgid "Enter new password"
@@ -718,8 +779,8 @@ msgid "Enter nickname to confirm"
 msgstr "Pro potvrzení zadejte přezdívku"
 
 #: src/routes/games/new.tsx
-msgid "Enter the BGG ID to fetch game information automatically"
-msgstr "Zadejte BGG ID pro automatické načtení informací o hře"
+#~ msgid "Enter the BGG ID to fetch game information automatically"
+#~ msgstr "Zadejte BGG ID pro automatické načtení informací o hře"
 
 #: src/routes/games/new.tsx
 msgid "Enter the game details manually"
@@ -801,8 +862,8 @@ msgstr "Chyba při mazání uživatele"
 
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/new.tsx
-msgid "Error fetching game"
-msgstr "Chyba při načítání hry"
+#~ msgid "Error fetching game"
+#~ msgstr "Chyba při načítání hry"
 
 #: src/routes/admin/users.tsx
 #: src/routes/games/sessions/new.tsx
@@ -928,8 +989,8 @@ msgid "Family Game"
 msgstr "Rodinné"
 
 #: src/routes/games/new.tsx
-msgid "Fetch"
-msgstr "Načíst"
+#~ msgid "Fetch"
+#~ msgstr "Načíst"
 
 #: src/routes/results.tsx
 msgid "Filter by Categories"
@@ -940,10 +1001,14 @@ msgstr "Filtrovat podle kategorií"
 msgid "Filtering by {0} categories"
 msgstr "Filtrováno podle {0} kategorií"
 
+#: src/routes/games/new.tsx
+msgid "Find a game and preview its metadata before importing."
+msgstr "Vyhledejte hru a před importem si prohlédněte její údaje."
+
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/new.tsx
-msgid "Find the game ID on BoardGameGeek.com in the URL (e.g., /boardgame/174430/gloomhaven)"
-msgstr "ID hry najdete na BoardGameGeek.com v URL adrese (např. /boardgame/174430/gloomhaven)"
+#~ msgid "Find the game ID on BoardGameGeek.com in the URL (e.g., /boardgame/174430/gloomhaven)"
+#~ msgstr "ID hry najdete na BoardGameGeek.com v URL adrese (např. /boardgame/174430/gloomhaven)"
 
 #: src/routes/login.tsx
 msgid "Forgot password?"
@@ -976,6 +1041,7 @@ msgstr "Podrobnosti o hře"
 
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Game Image"
 msgstr "Obrázek hry"
 
@@ -987,6 +1053,10 @@ msgstr "Knihovna her"
 #: src/routes/games/new.tsx
 msgid "Game loaded"
 msgstr "Hra načtena"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Game name, BGG ID, or URL"
+msgstr "Název hry, BGG ID nebo URL"
 
 #: src/routes/games/$gameId.tsx
 #: src/routes/games/edit.$gameId.tsx
@@ -1149,6 +1219,11 @@ msgstr "Lineární dle zkušeností:"
 msgid "Link copied"
 msgstr "Odkaz zkopírován"
 
+#: src/components/features/bgg-game-search.tsx
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Loading BGG metadata. This may take a few seconds."
+msgstr "Načítání údajů z BGG. Může to trvat několik sekund."
+
 #: src/routes/games/edit.$gameId.tsx
 msgid "Loading game..."
 msgstr "Načítám hru..."
@@ -1177,7 +1252,6 @@ msgstr "Načítám odevzdaná hodnocení..."
 #: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 #: src/routes/games/$gameId.tsx
-#: src/routes/games/new.tsx
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/games/sessions/new.tsx
 #: src/routes/rankings/$year.tsx
@@ -1292,6 +1366,10 @@ msgstr "Přezdívka je povinná"
 msgid "Nickname required"
 msgstr "Přezdívka je povinná"
 
+#: src/components/features/bgg-game-search.tsx
+msgid "No BGG games found. Try another name or a BGG ID."
+msgstr "Na BGG nebyly nalezeny žádné hry. Zkuste jiný název nebo BGG ID."
+
 #: src/routes/games/$gameId.tsx
 msgid "No comments yet. Be the first to comment!"
 msgstr "Zatím žádné komentáře. Buďte první, kdo přidá komentář!"
@@ -1331,6 +1409,10 @@ msgstr "Zatím žádné ohodnocené hry. Přidejte hry ze seznamu níže a začn
 #: src/routes/games/index.tsx
 #~ msgid "No games recorded yet"
 #~ msgstr "Zatím nebyly zaznamenány žádné hry"
+
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "No new BGG metadata is available."
+msgstr "Na BGG nejsou k dispozici žádné nové údaje."
 
 #: src/routes/admin/users.tsx
 msgid "No pending invitations"
@@ -1391,6 +1473,10 @@ msgstr "Poznámky:"
 #: src/routes/results.tsx
 msgid "of all sessions"
 msgstr "ze všech partií"
+
+#: src/services/bgg-messages.ts
+msgid "Only moderators and administrators can import BGG metadata."
+msgstr "Údaje z BGG mohou importovat pouze moderátoři a správci."
 
 #: src/routes/rankings/manage.tsx
 msgid "Open"
@@ -1544,8 +1630,8 @@ msgstr "Hráči:"
 
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/new.tsx
-msgid "Please enter a BoardGameGeek game ID"
-msgstr "Zadejte prosím BoardGameGeek ID hry"
+#~ msgid "Please enter a BoardGameGeek game ID"
+#~ msgstr "Zadejte prosím BoardGameGeek ID hry"
 
 #: src/routes/admin/users.tsx
 msgid "Please enter a nickname"
@@ -1616,6 +1702,7 @@ msgstr "Předvolba aktualizována"
 
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Primary Name"
 msgstr "Hlavní název"
 
@@ -1652,8 +1739,10 @@ msgstr "Veřejné"
 msgid "Publish Results"
 msgstr "Zveřejnit výsledky"
 
+#: src/components/features/bgg-game-preview.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Publishers"
 msgstr "Vydavatelé"
 
@@ -1712,10 +1801,13 @@ msgstr "Hodnocení za rok {0}"
 msgid "Rankings saved"
 msgstr "Hodnocení uloženo"
 
-#. placeholder {0}: gameInfo.rating
 #: src/components/features/bgg-game-search.tsx
-msgid "Rating: {0}/10"
-msgstr "Hodnocení: {0}/10"
+#~ msgid "Rating: {0}/10"
+#~ msgstr "Hodnocení: {0}/10"
+
+#: src/components/features/bgg-game-preview.tsx
+msgid "Rating: {rating}/10"
+msgstr "Hodnocení: {rating}/10"
 
 #: src/routes/dashboard.tsx
 msgid "Record a new game session"
@@ -1746,6 +1838,10 @@ msgstr "Zaznamenejte, kdy jste hráli deskovou hru se svou skupinou"
 #: src/routes/games/sessions/new.tsx
 msgid "Recording..."
 msgstr "Zaznamenávám..."
+
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Refresh from BGG"
+msgstr "Aktualizovat z BGG"
 
 #: src/routes/rankings/$year.tsx
 msgid "Remove"
@@ -1796,6 +1892,10 @@ msgstr "Výsledky se zde objeví, jakmile je administrátor zveřejní"
 #: src/routes/games/new.tsx
 msgid "Review and edit the imported game information"
 msgstr "Zkontrolujte a upravte importované informace o hře"
+
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Review BGG changes before applying them. Save the form to update your library."
+msgstr "Před použitím zkontrolujte změny z BGG. Knihovnu aktualizujete uložením formuláře."
 
 #: src/routes/admin/users.tsx
 #: src/routes/profile.tsx
@@ -1862,8 +1962,12 @@ msgid "Search games by name, publisher, or category..."
 msgstr "Hledat hry podle názvu, vydavatele nebo kategorie..."
 
 #: src/components/features/bgg-game-search.tsx
-msgid "Searching..."
-msgstr "Hledám..."
+#~ msgid "Searching..."
+#~ msgstr "Hledám..."
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Select a game to preview its metadata."
+msgstr "Vyberte hru a prohlédněte si její údaje."
 
 #: src/routes/results.tsx
 msgid "Select a player to view how they ranked their games for {selectedYear}"
@@ -1968,6 +2072,10 @@ msgstr "Podělte se o své myšlenky o této herní partii"
 msgid "Short description"
 msgstr "Krátký popis"
 
+#: src/components/features/bgg-game-search.tsx
+msgid "Show More Results"
+msgstr "Zobrazit další výsledky"
+
 #. placeholder {0}: filteredResults.length
 #. placeholder {1}: results.length
 #: src/routes/results.tsx
@@ -2042,6 +2150,14 @@ msgstr "Uživatel byl úspěšně aktualizován"
 #: src/constants/board-game-types.ts
 msgid "Thematic Game"
 msgstr "Tematické"
+
+#: src/services/bgg-messages.ts
+msgid "This board game was not found on BGG. Check the ID or try searching by name."
+msgstr "Tato desková hra nebyla na BGG nalezena. Zkontrolujte ID nebo zkuste hledat podle názvu."
+
+#: src/components/features/bgg-game-search.tsx
+msgid "This game is already in your library:"
+msgstr "Tato hra už je v knihovně:"
 
 #: src/routes/invite/$token.tsx
 msgid "This invitation link is invalid or has expired"
@@ -2203,6 +2319,10 @@ msgstr "Zobrazit podrobnosti"
 msgid "View Games"
 msgstr "Zobrazit hry"
 
+#: src/components/features/bgg-game-preview.tsx
+msgid "View on BoardGameGeek"
+msgstr "Zobrazit na BoardGameGeek"
+
 #: src/routes/results.tsx
 msgid "View Player Rankings"
 msgstr "Zobrazit hodnocení hráče"
@@ -2285,6 +2405,7 @@ msgstr "Rok vydání:"
 
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Year Released"
 msgstr "Rok vydání"
 
@@ -2292,10 +2413,10 @@ msgstr "Rok vydání"
 msgid "Year unlocked"
 msgstr "Rok odemčen"
 
+#. placeholder {0}: game.yearPublished
 #. placeholder {0}: game.year_published
-#. placeholder {0}: gameInfo.yearPublished
 #. placeholder {0}: result.game.year_published
-#: src/components/features/bgg-game-search.tsx
+#: src/components/features/bgg-game-preview.tsx
 #: src/routes/games/library.tsx
 #: src/routes/results.tsx
 msgid "Year: {0}"
@@ -2314,6 +2435,10 @@ msgstr "vy@example.com"
 msgid "Your comment has been added successfully"
 msgstr "Váš komentář byl úspěšně přidán"
 
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Your current name and image are kept unless you select their replacements."
+msgstr "Aktuální název a obrázek zůstanou zachovány, pokud nevyberete jejich nahrazení."
+
 #: src/routes/profile.tsx
 msgid "Your password has been changed successfully"
 msgstr "Vaše heslo bylo úspěšně změněno"
@@ -2329,6 +2454,10 @@ msgstr "Vaše hodnocení"
 #: src/routes/rankings/$year.tsx
 msgid "Your rankings have been saved successfully"
 msgstr "Vaše hodnocení bylo úspěšně uloženo"
+
+#: src/services/bgg-messages.ts
+msgid "Your session has expired. Sign in again to use BGG."
+msgstr "Vaše přihlášení vypršelo. Pro použití BGG se přihlaste znovu."
 
 #: src/routes/rankings/$year.tsx
 msgid "Your unsaved changes have been discarded"

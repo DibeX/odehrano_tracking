@@ -101,7 +101,7 @@ tabletop-tracking/
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22.12+ (22.x), or Node.js 24+ (required by the test tooling)
 - npm or pnpm
 - Supabase account (free tier)
 
@@ -252,6 +252,50 @@ The app uses BGG XML API v2:
 - Search games: `https://boardgamegeek.com/xmlapi2/search?query={query}&type=boardgame`
 
 API service located in `src/services/bgg-api.ts`
+
+BGG requests run through authenticated TanStack Start server functions. The server
+verifies the current Supabase user and requires the `moderator` or `admin` role;
+the private BGG application token is never sent to the browser.
+
+1. Add your registered BGG application's token to the root `.env` or `.env.local`:
+
+   ```dotenv
+   BGG_API_TOKEN=your_bgg_application_token
+   ```
+
+   Keep this variable unprefixed. Restart the development server after changing it.
+   In production, set `BGG_API_TOKEN` in your hosting service's **server runtime**
+   environment. Deploy the TanStack Start/Nitro server, not only the static client
+   output. Do not commit credentials or use `VITE_BGG_API_TOKEN`.
+   Build with `npm run build`, then launch the generated server with `npm start`.
+
+2. Run `migrations/010_bgg_rating_precision.sql` in the Supabase SQL editor so
+   the rating column can store `10.00`. Existing names, metadata and play sessions
+   are preserved. The existing `board_games.bgg_id` unique constraint prevents
+   duplicate imports, including simultaneous saves.
+
+3. Open **Add Board Game → Import from BGG**. Search by name, positive BGG ID, or
+   a BoardGameGeek game URL; select a result, preview it, then use it to populate
+   the form. Imported names, alternate names, images, years, publishers,
+   categories, ratings and ranks are saved when you submit. Manual entry remains
+   available; the local game-type classification can be selected separately.
+
+4. To refresh, open a game's edit form and choose **Refresh from BGG**. Select
+   the fields to replace, apply them to the form, and save. Existing names and
+   images are unchecked by default. Missing BGG values do not clear local values.
+   Changing form values discards an outdated refresh preview.
+
+The server caches game details for 24 hours and search results for 10 minutes,
+with a maximum of 200 entries per server process. Refresh bypasses the game
+cache. Concurrent identical requests share one lookup. Upstream requests are
+spaced at least five seconds apart within each server process, time out after
+eight seconds, and make at most three attempts for queued, throttled, or
+transiently unavailable responses. Token errors are not retried. Multiple server
+instances have independent caches and request queues; large deployments should
+coordinate upstream limits across instances.
+
+Run `npm test` for the BGG service, permissions, persistence, search and refresh
+regressions, and `npm run build` to verify the production server/client build.
 
 ## Ranking Calculation
 

@@ -67,6 +67,11 @@ msgstr "{0} of {1} games shown"
 msgid "A game with BGG ID {0} already exists: {1}"
 msgstr "A game with BGG ID {0} already exists: {1}"
 
+#: src/routes/games/edit.$gameId.tsx
+#: src/routes/games/new.tsx
+msgid "A game with this BGG ID is already in your library. Search the library before adding it again."
+msgstr "A game with this BGG ID is already in your library. Search the library before adding it again."
+
 #: src/constants/board-game-types.ts
 msgid "Abstract Strategy Game"
 msgstr "Abstract Strategy Game"
@@ -174,8 +179,10 @@ msgstr "All Types"
 msgid "Also known as:"
 msgstr "Also known as:"
 
+#: src/components/features/bgg-game-preview.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Alternate Names"
 msgstr "Alternate Names"
 
@@ -192,6 +199,10 @@ msgstr "An invitation email has been sent to {0}"
 #: src/routes/games/sessions/new.tsx
 msgid "Any notes about this game session..."
 msgstr "Any notes about this game session..."
+
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Apply Selected Changes"
+msgstr "Apply Selected Changes"
 
 #. placeholder {0}: userToToggle?.nickname
 #: src/routes/admin/users.tsx
@@ -254,6 +265,10 @@ msgstr "Back"
 msgid "Back to login"
 msgstr "Back to login"
 
+#: src/services/bgg-messages.ts
+msgid "BGG access is not configured. Ask an administrator to set the server's BGG_API_TOKEN."
+msgstr "BGG access is not configured. Ask an administrator to set the server's BGG_API_TOKEN."
+
 #. placeholder {0}: formData.bggId
 #. placeholder {1}: existingGame.name
 #: src/routes/games/edit.$gameId.tsx
@@ -266,13 +281,44 @@ msgstr "BGG ID already used"
 
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/new.tsx
-msgid "BGG ID required"
-msgstr "BGG ID required"
+#~ msgid "BGG ID required"
+#~ msgstr "BGG ID required"
 
-#. placeholder {0}: gameInfo.rank
+#: src/services/bgg-messages.ts
+msgid "BGG is temporarily unavailable or busy. Please try again shortly."
+msgstr "BGG is temporarily unavailable or busy. Please try again shortly."
+
+#: src/services/bgg-messages.ts
+msgid "BGG Rank"
+msgstr "BGG Rank"
+
 #: src/components/features/bgg-game-search.tsx
-msgid "BGG Rank: #{0}"
-msgstr "BGG Rank: #{0}"
+#~ msgid "BGG Rank: #{0}"
+#~ msgstr "BGG Rank: #{0}"
+
+#: src/components/features/bgg-game-preview.tsx
+msgid "BGG Rank: #{rank}"
+msgstr "BGG Rank: #{rank}"
+
+#: src/services/bgg-messages.ts
+msgid "BGG Rating"
+msgstr "BGG Rating"
+
+#: src/services/bgg-messages.ts
+msgid "BGG rejected the application token. Ask an administrator to check BGG_API_TOKEN."
+msgstr "BGG rejected the application token. Ask an administrator to check BGG_API_TOKEN."
+
+#: src/services/bgg-messages.ts
+msgid "BGG returned an unreadable response. Please try again later."
+msgstr "BGG returned an unreadable response. Please try again later."
+
+#: src/services/bgg-messages.ts
+msgid "BGG took too long to respond. Please try again."
+msgstr "BGG took too long to respond. Please try again."
+
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "BGG:"
+msgstr "BGG:"
 
 #: src/routes/admin/users.tsx
 msgid "Bio"
@@ -282,9 +328,7 @@ msgstr "Bio"
 msgid "Bio (optional)"
 msgstr "Bio (optional)"
 
-#: src/components/features/bgg-game-search.tsx
 #: src/routes/games/edit.$gameId.tsx
-#: src/routes/games/new.tsx
 #: src/routes/games/new.tsx
 msgid "BoardGameGeek ID"
 msgstr "BoardGameGeek ID"
@@ -316,8 +360,10 @@ msgstr "Calculating rankings..."
 msgid "Cancel"
 msgstr "Cancel"
 
+#: src/components/features/bgg-game-preview.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Categories"
 msgstr "Categories"
 
@@ -325,7 +371,6 @@ msgstr "Categories"
 msgid "Categories in Current Year"
 msgstr "Categories in Current Year"
 
-#: src/components/features/bgg-game-search.tsx
 #: src/routes/games/$gameId.tsx
 #: src/routes/games/library.tsx
 msgid "Categories:"
@@ -512,6 +557,10 @@ msgstr "Creating..."
 msgid "current streak"
 msgstr "current streak"
 
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Current:"
+msgstr "Current:"
+
 #: src/routes/games/new.tsx
 #~ msgid "Custom Name (Optional)"
 #~ msgstr "Custom Name (Optional)"
@@ -620,6 +669,10 @@ msgstr "Description"
 msgid "different titles"
 msgstr "different titles"
 
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Discard BGG Changes"
+msgstr "Discard BGG Changes"
+
 #: src/routes/rankings/$year.tsx
 msgid "Discard Changes"
 msgstr "Discard Changes"
@@ -640,6 +693,10 @@ msgstr "e.g., 2017"
 #: src/routes/results.tsx
 msgid "e.g., Strategy Games, Family Favorites"
 msgstr "e.g., Strategy Games, Family Favorites"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "e.g., Wingspan, 266192, or a BGG game URL"
+msgstr "e.g., Wingspan, 266192, or a BGG game URL"
 
 #: src/routes/results.tsx
 msgid "Each player has equal voting weight (w_p = 1). Best for giving everyone an equal voice regardless of participation."
@@ -699,10 +756,14 @@ msgstr "Email cannot be changed"
 msgid "Email required"
 msgstr "Email required"
 
+#: src/services/bgg-messages.ts
+msgid "Enter a valid game name, positive BGG ID, or BoardGameGeek game URL."
+msgstr "Enter a valid game name, positive BGG ID, or BoardGameGeek game URL."
+
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/new.tsx
-msgid "Enter BGG game ID (e.g., 174430)"
-msgstr "Enter BGG game ID (e.g., 174430)"
+#~ msgid "Enter BGG game ID (e.g., 174430)"
+#~ msgstr "Enter BGG game ID (e.g., 174430)"
 
 #: src/routes/profile.tsx
 msgid "Enter new password"
@@ -718,8 +779,8 @@ msgid "Enter nickname to confirm"
 msgstr "Enter nickname to confirm"
 
 #: src/routes/games/new.tsx
-msgid "Enter the BGG ID to fetch game information automatically"
-msgstr "Enter the BGG ID to fetch game information automatically"
+#~ msgid "Enter the BGG ID to fetch game information automatically"
+#~ msgstr "Enter the BGG ID to fetch game information automatically"
 
 #: src/routes/games/new.tsx
 msgid "Enter the game details manually"
@@ -801,8 +862,8 @@ msgstr "Error deleting user"
 
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/new.tsx
-msgid "Error fetching game"
-msgstr "Error fetching game"
+#~ msgid "Error fetching game"
+#~ msgstr "Error fetching game"
 
 #: src/routes/admin/users.tsx
 #: src/routes/games/sessions/new.tsx
@@ -928,8 +989,8 @@ msgid "Family Game"
 msgstr "Family Game"
 
 #: src/routes/games/new.tsx
-msgid "Fetch"
-msgstr "Fetch"
+#~ msgid "Fetch"
+#~ msgstr "Fetch"
 
 #: src/routes/results.tsx
 msgid "Filter by Categories"
@@ -940,10 +1001,14 @@ msgstr "Filter by Categories"
 msgid "Filtering by {0} categories"
 msgstr "Filtering by {0} categories"
 
+#: src/routes/games/new.tsx
+msgid "Find a game and preview its metadata before importing."
+msgstr "Find a game and preview its metadata before importing."
+
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/new.tsx
-msgid "Find the game ID on BoardGameGeek.com in the URL (e.g., /boardgame/174430/gloomhaven)"
-msgstr "Find the game ID on BoardGameGeek.com in the URL (e.g., /boardgame/174430/gloomhaven)"
+#~ msgid "Find the game ID on BoardGameGeek.com in the URL (e.g., /boardgame/174430/gloomhaven)"
+#~ msgstr "Find the game ID on BoardGameGeek.com in the URL (e.g., /boardgame/174430/gloomhaven)"
 
 #: src/routes/login.tsx
 msgid "Forgot password?"
@@ -976,6 +1041,7 @@ msgstr "Game Details"
 
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Game Image"
 msgstr "Game Image"
 
@@ -987,6 +1053,10 @@ msgstr "Game Library"
 #: src/routes/games/new.tsx
 msgid "Game loaded"
 msgstr "Game loaded"
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Game name, BGG ID, or URL"
+msgstr "Game name, BGG ID, or URL"
 
 #: src/routes/games/$gameId.tsx
 #: src/routes/games/edit.$gameId.tsx
@@ -1149,6 +1219,11 @@ msgstr "Linear by Experience:"
 msgid "Link copied"
 msgstr "Link copied"
 
+#: src/components/features/bgg-game-search.tsx
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Loading BGG metadata. This may take a few seconds."
+msgstr "Loading BGG metadata. This may take a few seconds."
+
 #: src/routes/games/edit.$gameId.tsx
 msgid "Loading game..."
 msgstr "Loading game..."
@@ -1177,7 +1252,6 @@ msgstr "Loading submissions..."
 #: src/routes/admin/users.tsx
 #: src/routes/admin/users.tsx
 #: src/routes/games/$gameId.tsx
-#: src/routes/games/new.tsx
 #: src/routes/games/sessions/edit.$sessionId.tsx
 #: src/routes/games/sessions/new.tsx
 #: src/routes/rankings/$year.tsx
@@ -1292,6 +1366,10 @@ msgstr "Nickname is required"
 msgid "Nickname required"
 msgstr "Nickname required"
 
+#: src/components/features/bgg-game-search.tsx
+msgid "No BGG games found. Try another name or a BGG ID."
+msgstr "No BGG games found. Try another name or a BGG ID."
+
 #: src/routes/games/$gameId.tsx
 msgid "No comments yet. Be the first to comment!"
 msgstr "No comments yet. Be the first to comment!"
@@ -1331,6 +1409,10 @@ msgstr "No games ranked yet. Add games from below to start ranking."
 #: src/routes/games/index.tsx
 #~ msgid "No games recorded yet"
 #~ msgstr "No games recorded yet"
+
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "No new BGG metadata is available."
+msgstr "No new BGG metadata is available."
 
 #: src/routes/admin/users.tsx
 msgid "No pending invitations"
@@ -1391,6 +1473,10 @@ msgstr "Notes:"
 #: src/routes/results.tsx
 msgid "of all sessions"
 msgstr "of all sessions"
+
+#: src/services/bgg-messages.ts
+msgid "Only moderators and administrators can import BGG metadata."
+msgstr "Only moderators and administrators can import BGG metadata."
 
 #: src/routes/rankings/manage.tsx
 msgid "Open"
@@ -1544,8 +1630,8 @@ msgstr "Players:"
 
 #: src/components/features/bgg-game-search.tsx
 #: src/routes/games/new.tsx
-msgid "Please enter a BoardGameGeek game ID"
-msgstr "Please enter a BoardGameGeek game ID"
+#~ msgid "Please enter a BoardGameGeek game ID"
+#~ msgstr "Please enter a BoardGameGeek game ID"
 
 #: src/routes/admin/users.tsx
 msgid "Please enter a nickname"
@@ -1616,6 +1702,7 @@ msgstr "Preset updated"
 
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Primary Name"
 msgstr "Primary Name"
 
@@ -1652,8 +1739,10 @@ msgstr "Public"
 msgid "Publish Results"
 msgstr "Publish Results"
 
+#: src/components/features/bgg-game-preview.tsx
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Publishers"
 msgstr "Publishers"
 
@@ -1712,10 +1801,13 @@ msgstr "Rankings for {0}"
 msgid "Rankings saved"
 msgstr "Rankings saved"
 
-#. placeholder {0}: gameInfo.rating
 #: src/components/features/bgg-game-search.tsx
-msgid "Rating: {0}/10"
-msgstr "Rating: {0}/10"
+#~ msgid "Rating: {0}/10"
+#~ msgstr "Rating: {0}/10"
+
+#: src/components/features/bgg-game-preview.tsx
+msgid "Rating: {rating}/10"
+msgstr "Rating: {rating}/10"
 
 #: src/routes/dashboard.tsx
 msgid "Record a new game session"
@@ -1746,6 +1838,10 @@ msgstr "Record when you played a board game with your group"
 #: src/routes/games/sessions/new.tsx
 msgid "Recording..."
 msgstr "Recording..."
+
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Refresh from BGG"
+msgstr "Refresh from BGG"
 
 #: src/routes/rankings/$year.tsx
 msgid "Remove"
@@ -1796,6 +1892,10 @@ msgstr "Results will appear here once an admin publishes them"
 #: src/routes/games/new.tsx
 msgid "Review and edit the imported game information"
 msgstr "Review and edit the imported game information"
+
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Review BGG changes before applying them. Save the form to update your library."
+msgstr "Review BGG changes before applying them. Save the form to update your library."
 
 #: src/routes/admin/users.tsx
 #: src/routes/profile.tsx
@@ -1862,8 +1962,12 @@ msgid "Search games by name, publisher, or category..."
 msgstr "Search games by name, publisher, or category..."
 
 #: src/components/features/bgg-game-search.tsx
-msgid "Searching..."
-msgstr "Searching..."
+#~ msgid "Searching..."
+#~ msgstr "Searching..."
+
+#: src/components/features/bgg-game-search.tsx
+msgid "Select a game to preview its metadata."
+msgstr "Select a game to preview its metadata."
 
 #: src/routes/results.tsx
 msgid "Select a player to view how they ranked their games for {selectedYear}"
@@ -1968,6 +2072,10 @@ msgstr "Share your thoughts about this game session"
 msgid "Short description"
 msgstr "Short description"
 
+#: src/components/features/bgg-game-search.tsx
+msgid "Show More Results"
+msgstr "Show More Results"
+
 #. placeholder {0}: filteredResults.length
 #. placeholder {1}: results.length
 #: src/routes/results.tsx
@@ -2042,6 +2150,14 @@ msgstr "The user has been updated successfully"
 #: src/constants/board-game-types.ts
 msgid "Thematic Game"
 msgstr "Thematic Game"
+
+#: src/services/bgg-messages.ts
+msgid "This board game was not found on BGG. Check the ID or try searching by name."
+msgstr "This board game was not found on BGG. Check the ID or try searching by name."
+
+#: src/components/features/bgg-game-search.tsx
+msgid "This game is already in your library:"
+msgstr "This game is already in your library:"
 
 #: src/routes/invite/$token.tsx
 msgid "This invitation link is invalid or has expired"
@@ -2203,6 +2319,10 @@ msgstr "View Details"
 msgid "View Games"
 msgstr "View Games"
 
+#: src/components/features/bgg-game-preview.tsx
+msgid "View on BoardGameGeek"
+msgstr "View on BoardGameGeek"
+
 #: src/routes/results.tsx
 msgid "View Player Rankings"
 msgstr "View Player Rankings"
@@ -2285,6 +2405,7 @@ msgstr "Year Published:"
 
 #: src/routes/games/edit.$gameId.tsx
 #: src/routes/games/new.tsx
+#: src/services/bgg-messages.ts
 msgid "Year Released"
 msgstr "Year Released"
 
@@ -2292,10 +2413,10 @@ msgstr "Year Released"
 msgid "Year unlocked"
 msgstr "Year unlocked"
 
+#. placeholder {0}: game.yearPublished
 #. placeholder {0}: game.year_published
-#. placeholder {0}: gameInfo.yearPublished
 #. placeholder {0}: result.game.year_published
-#: src/components/features/bgg-game-search.tsx
+#: src/components/features/bgg-game-preview.tsx
 #: src/routes/games/library.tsx
 #: src/routes/results.tsx
 msgid "Year: {0}"
@@ -2314,6 +2435,10 @@ msgstr "you@example.com"
 msgid "Your comment has been added successfully"
 msgstr "Your comment has been added successfully"
 
+#: src/components/features/bgg-metadata-refresh.tsx
+msgid "Your current name and image are kept unless you select their replacements."
+msgstr "Your current name and image are kept unless you select their replacements."
+
 #: src/routes/profile.tsx
 msgid "Your password has been changed successfully"
 msgstr "Your password has been changed successfully"
@@ -2329,6 +2454,10 @@ msgstr "Your Rankings"
 #: src/routes/rankings/$year.tsx
 msgid "Your rankings have been saved successfully"
 msgstr "Your rankings have been saved successfully"
+
+#: src/services/bgg-messages.ts
+msgid "Your session has expired. Sign in again to use BGG."
+msgstr "Your session has expired. Sign in again to use BGG."
 
 #: src/routes/rankings/$year.tsx
 msgid "Your unsaved changes have been discarded"

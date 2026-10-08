@@ -7,6 +7,7 @@ import { requireAuth } from "@/lib/auth-helpers";
 import { useAuthContext } from "@/contexts/auth-context";
 import { AppLayout } from "@/components/layout/app-layout";
 import { Button } from "@/components/ui/button";
+import { BGGStats } from "@/components/features/bgg-game-preview";
 import { Input } from "@/components/ui/input";
 import {
   Card,
@@ -90,7 +91,7 @@ function GamesLibraryPage() {
     return (
       game.name.toLowerCase().includes(query) ||
       game.alternate_names?.some((name) =>
-        name.toLowerCase().includes(query)
+        name.toLowerCase().includes(query),
       ) ||
       game.publishers?.some((pub) => pub.toLowerCase().includes(query)) ||
       game.categories?.some((cat) => cat.toLowerCase().includes(query))
@@ -243,6 +244,7 @@ function GamesLibraryPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 flex-1 flex flex-col">
+                  <BGGStats rank={game.bgg_rank} rating={game.bgg_rating} />
                   {game.alternate_names && game.alternate_names.length > 0 && (
                     <div>
                       <p className="mb-1 text-sm font-medium">
@@ -273,7 +275,7 @@ function GamesLibraryPage() {
                       <span className="inline-block px-2 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary">
                         {getBoardGameTypeLabel(
                           game.game_type as BoardGameType,
-                          _
+                          _,
                         )}
                       </span>
                     </div>
@@ -354,7 +356,9 @@ function GamesLibraryPage() {
               </DialogTitle>
               <DialogDescription>
                 <Trans>
-                  Are you sure you want to permanently delete "{gameToDelete?.name}"? This will also delete all play sessions associated with this game. This action cannot be undone.
+                  Are you sure you want to permanently delete "
+                  {gameToDelete?.name}"? This will also delete all play sessions
+                  associated with this game. This action cannot be undone.
                 </Trans>
               </DialogDescription>
             </DialogHeader>
